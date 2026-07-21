@@ -1,9 +1,9 @@
-'use client';
+import Hero from '@/components/home/hero';
 
 export default function Home() {
   return (
-    <main className='flex flex-row grow'>
-      <h1>Hey</h1>
-    </main>
+    <section id='home'>
+      <Hero />
+    </section>
   );
 }
