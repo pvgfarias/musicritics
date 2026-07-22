@@ -20,14 +20,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isLoggedIn = true;
+
   return (
     <html lang='en' className={`${geist.variable} antialiased`}>
       <body>
-        <Navbar />
+        {!isLoggedIn && <Navbar />}
         <div className='min-h-screen bg-white dark:bg-slate-950'>
           <main className='relative'>{children}</main>
         </div>
-        <Footer />
+        {!isLoggedIn && <Footer />}
       </body>
     </html>
   );
