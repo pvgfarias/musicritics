@@ -3,7 +3,7 @@ import {
   IconHome,
   IconUser,
   IconDisc,
-  IconMusic,
+  IconStar,
   IconPlaylist,
   IconMicrophone2,
 } from '@tabler/icons-react';
@@ -19,8 +19,8 @@ const links = [
   },
   { name: 'Artists', href: '/dashboard/artists', icon: IconMicrophone2 },
   { name: 'Albums', href: '/dashboard/albums', icon: IconDisc },
-  { name: 'Songs', href: '/dashboard/songs', icon: IconMusic },
-  { name: 'Ratings', href: '/dashboard/ratings', icon: IconPlaylist },
+  { name: 'Songs', href: '/dashboard/songs', icon: IconPlaylist },
+  { name: 'Ratings', href: '/dashboard/ratings', icon: IconStar },
 ];
 
 export default function SidebarLinks() {
@@ -30,15 +30,24 @@ export default function SidebarLinks() {
     <>
       {links.map(link => {
         const LinkIcon = link.icon;
+        const isCurrentPath = pathname === link.href;
         return (
-          <Link
+          <div
             key={link.name}
-            href={link.href}
-            className={`flex h-12 grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium md:flex-none md:justify-start md:p-2 md:px-3 hover:text-amber-600 cursor-pointer transition-colors duration-200 ${pathname === link.href ? 'text-amber-600 bg-gray-100 dark:bg-slate-700' : 'text-gray-900 bg-white dark:bg-slate-800 dark:text-white'}`}
+            className={
+              isCurrentPath
+                ? 'bg-amber-950 text-white border-l-4 border-amber-600 rounded-sm'
+                : ''
+            }
           >
-            <LinkIcon className='w-6' />
-            <p className='hidden md:block'>{link.name}</p>
-          </Link>
+            <Link
+              href={link.href}
+              className='flex flex-row justify-center items-center gap-3 p-3 text-xs font-mono uppercase tracking-wide md:flex-none md:justify-start md:p-2 md:px-3 hover:text-amber-600 cursor-pointer hover:translate-x-2 transition-all duration-200'
+            >
+              <LinkIcon size={24} />
+              <p className='hidden md:block'>{link.name}</p>
+            </Link>
+          </div>
         );
       })}
     </>

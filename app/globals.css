@@ -17,7 +17,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-elms-sans);
+  --font-sans: var(--font-raleway-sans);
+  --font-title: var(--font-libre);
+  --font-mono: var(--font-space);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,5 +32,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-raleway-sans), 'Helvetica Neue', Arial, sans-serif;
 }

@@ -9,19 +9,10 @@
 //   CardsSkeleton,
 // } from "@/app/ui/skeletons";
 
-export default async function Artists() {
+export default function Artists() {
   return (
     <main>
-      <h1 className={` mb-4 text-xl md:text-2xl`}>Dashboard</h1>
-      <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-4'>
-        {/* CARD */}
-        <h1>hey</h1>
-      </div>
-      <div className='mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8'>
-        {/* Chart */}
-        {/* Invoice */}
-        <h1> hey </h1>
-      </div>
+      <h1>THIS IS THE ARTISTS PAGE</h1>
     </main>
   );
 }
