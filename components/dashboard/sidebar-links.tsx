@@ -36,8 +36,8 @@ export default function SidebarLinks() {
             key={link.name}
             className={
               isCurrentPath
-                ? 'bg-amber-950 text-white border-l-4 border-amber-600 rounded-sm'
-                : ''
+                ? 'bg-amber-950 text-white border-l-4 border-amber-600 rounded-sm mx-2'
+                : 'px-2'
             }
           >
             <Link

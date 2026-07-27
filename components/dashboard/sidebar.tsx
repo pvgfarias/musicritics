@@ -13,10 +13,10 @@ export default function Sidebar() {
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className='flex flex-col h-full py-2 bg-mist-900 text-gray-400 dark:bg-slate-900 dark:text-white border-r-amber-600 border-r-4'
+      className='flex flex-col h-full py-2 bg-mist-900 text-gray-400  border-r-amber-600 border-r-4'
     >
       <Link className='pt-4' href='/'>
-        <div className='flex flex-row justify-center items-center gap-2 text-white dark:text-amber-600'>
+        <div className='flex flex-row justify-center items-center gap-2 text-white'>
           <IconDisc
             size={32}
             className='shrink-0 translate-y-0.5 text-amber-600'

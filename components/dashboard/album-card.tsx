@@ -1,5 +1,4 @@
 import { IconCheck } from '@tabler/icons-react';
-import { motion } from 'motion/react';
 import Image from 'next/image';
 
 import currentRatings from '@/data/currentRatings';
@@ -7,21 +6,9 @@ import RatingGrade from './rating-grade';
 
 type Rating = (typeof currentRatings)[number];
 
-export default function AlbumCard({
-  rating,
-  index,
-}: {
-  rating: Rating;
-  index: number;
-}) {
+export default function AlbumCard({ rating }: { rating: Rating }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.05 }}
-      className='rounded-xl bg-white shadow-sm dark:bg-slate-900 z-0'
-    >
+    <div className='rounded-xl w-50 h-80 bg-white dark:bg-mist-800 shadow-sm  z-0 group cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-xl'>
       <div className='flex flex-col'>
         <div className='relative w-full'>
           {rating.status && !rating.finalized && (
@@ -36,22 +23,24 @@ export default function AlbumCard({
           <Image
             src={`/${rating.image}`}
             alt={`${rating.albumName} by ${rating.artistName}`}
-            width={150}
-            height={150}
-            className='rounded-t-xl z-10 w-full h-auto'
+            width={200}
+            height={200}
+            className='rounded-t-xl z-10'
             loading='eager'
           />
         </div>
 
-        <div className='flex flex-col gap-1 p-4'>
-          <h1 className='text-xs md:text-base font-bold text-amber-600 leading-tight w-full  overflow-hidden'>
+        <div className='flex flex-col h-34 p-4 justify-start'>
+          <h1
+            title={rating.albumName}
+            className='text-base font-bold text-amber-600 leading-tight w-full overflow-hidden'
+          >
             <span className='line-clamp-1'>{rating.albumName}</span>
           </h1>
-
-          <h2 className='text-xs md:text-sm font-semibold overflow-hidden'>
+          <h2 className='text-[14px] font-semibold overflow-hidden'>
             <span className='line-clamp-1'>{rating.artistName}</span>
           </h2>
-          <h3 className='text-[10px] md:text-xs font-mono text-gray-500'>
+          <h3 className='text-xs font-mono text-gray-400'>
             {rating.releaseYear} • {rating.genre}
           </h3>
           {rating.finalized && (
@@ -66,6 +55,6 @@ export default function AlbumCard({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
