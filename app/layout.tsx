@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Raleway, Libre_Caslon_Text, Space_Mono } from 'next/font/google';
+import { Raleway, Playwrite_NZ_Basic, Space_Mono } from 'next/font/google';
 import Navbar from '@/components/layout/navbar';
 import Footer from '@/components/layout/footer';
 
@@ -16,11 +16,10 @@ const raleway = Raleway({
   weight: ['700'],
 });
 
-const libre = Libre_Caslon_Text({
+const libre = Playwrite_NZ_Basic({
   variable: '--font-libre',
-  subsets: ['latin'],
   style: ['normal'],
-  weight: ['700'],
+  weight: ['400'],
 });
 
 const space = Space_Mono({

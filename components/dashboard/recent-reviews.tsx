@@ -11,7 +11,7 @@ export default function RecentRatings() {
   return (
     <div className='flex flex-col gap-2'>
       <div className='flex flex-row w-full justify-between items-center px-4 md:px-0 pt-4 gap-4'>
-        <h1 className='text-xl font-title tracking-wide text-gray-950 dark:text-white whitespace-nowrap'>
+        <h1 className='text-2xl font-title font-extrabold text-gray-950 dark:text-white md:text-left text-center pb-6'>
           Recent Reviews
         </h1>
         <div className='grow border-b border-dashed border-gray-500 mx-2' />
@@ -22,7 +22,11 @@ export default function RecentRatings() {
         </div>
       </div>
 
-      <CardCarousel cardsList={recentReviews} MAX_CARDS={MAX_ALBUMS} />
+      <CardCarousel
+        cardsList={recentReviews}
+        MAX_CARDS={MAX_ALBUMS}
+        type='reviews'
+      />
     </div>
   );
 }

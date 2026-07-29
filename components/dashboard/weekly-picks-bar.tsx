@@ -6,7 +6,7 @@ export default function WeeklyPicksBar({
   const pct = (completed / total) * 100;
 
   return (
-    <div className='flex flex-col w-full'>
+    <div className='flex flex-col w-1/3'>
       <div className='flex items-center gap-4 rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 px-4 py-3 md:mx-0 mx-4 shadow-sm mb-4 font-mono'>
         <span className='whitespace-nowrap text-xs uppercase tracking-wider text-gray-500 dark:text-white'>
           Weekly picks

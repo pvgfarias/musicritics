@@ -3,6 +3,7 @@ import Image from 'next/image';
 
 import currentRatings from '@/data/currentRatings';
 import RatingGrade from './rating-grade';
+import Link from 'next/link';
 
 type Rating = (typeof currentRatings)[number];
 
@@ -33,14 +34,14 @@ export default function AlbumCard({ rating }: { rating: Rating }) {
         <div className='flex flex-col h-34 p-4 justify-start'>
           <h1
             title={rating.albumName}
-            className='text-base font-bold text-amber-600 leading-tight w-full overflow-hidden'
+            className='text-[14px] font-title font-bold text-amber-600 leading-tight w-full h-6 overflow-hidden truncate'
           >
-            <span className='line-clamp-1'>{rating.albumName}</span>
+            {rating.albumName}
           </h1>
           <h2 className='text-[14px] font-semibold overflow-hidden'>
             <span className='line-clamp-1'>{rating.artistName}</span>
           </h2>
-          <h3 className='text-xs font-mono text-gray-400'>
+          <h3 className='text-xs font-mono text-gray-400 uppercase'>
             {rating.releaseYear} • {rating.genre}
           </h3>
           {rating.finalized && (
@@ -49,9 +50,12 @@ export default function AlbumCard({ rating }: { rating: Rating }) {
             </button>
           )}
           {!rating.finalized && (
-            <button className='mt-2 inline-block rounded-lg  font-semibold py-1 text-[10px] md:text-xs text-white bg-amber-600 transition-all duration-200 hover:bg-amber-600/60 cursor-pointer w-full'>
+            <Link
+              href={`/dashboard/albums/${rating.id}`}
+              className='mt-2 inline-block rounded-lg  font-semibold py-1 text-[10px] md:text-xs text-white bg-amber-600 transition-all duration-200 hover:bg-amber-600/60 cursor-pointer w-full'
+            >
               <span>RATE</span>
-            </button>
+            </Link>
           )}
         </div>
       </div>

@@ -1,27 +1,50 @@
 interface Rating {
   id: number;
   artistName: string[];
+  artistImg?: string;
   albumName: string;
   releaseYear: string;
-  songs: string[];
+  tracklist: string[];
   image: string;
   status: boolean;
   genre: string;
   finalized: boolean;
   finalGrade?: number;
+  myGrade?: number;
+  comments?: string[];
 }
 
 const currentRatings: Rating[] = [
   {
     id: 1,
     artistName: ['Jane Remover'],
+    artistImg: 'jr.jpg',
     albumName: 'Revengeseekerz',
     releaseYear: '2025',
     genre: 'Hyperpop',
-    songs: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
+    tracklist: [
+      'TWICE REMOVED',
+      'Psychoboost ft. Danny Brown',
+      'Star People',
+      'Experimental Skin',
+      'angels in camo',
+      'Dreamflasher',
+      'TURN UP OR DIE',
+      'Dancing with your eyes closed',
+      'Fadeoutz',
+      'Professional Vengeance',
+      'Dark night castle',
+      'JRJRJR',
+    ],
     image: 'revengeseekerz.jpg',
     status: true,
     finalized: false,
+    comments: [
+      'Kkkk muito bom Kkkk muito bomKkkk muito bomKkkk muito bomKkkk muito bom',
+      'adorei ',
+    ],
+    finalGrade: 83,
+    myGrade: 53,
   },
   {
     id: 2,
@@ -29,7 +52,7 @@ const currentRatings: Rating[] = [
     albumName: '♡',
     releaseYear: '2025',
     genre: 'Shoegaze',
-    songs: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
+    tracklist: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
     image: 'heart.jpg',
     status: false,
     finalized: false,
@@ -41,7 +64,7 @@ const currentRatings: Rating[] = [
     albumName: 'Indie Rock',
     releaseYear: '2025',
     genre: 'Rap',
-    songs: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
+    tracklist: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
     image: 'indierock.jpg',
     status: false,
     finalized: false,
@@ -53,7 +76,7 @@ const currentRatings: Rating[] = [
     albumName: 'Ghostholding',
     releaseYear: '2025',
     genre: 'Shoegaze',
-    songs: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
+    tracklist: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
     image: 'ghostholding.jpg',
     status: false,
     finalized: false,
@@ -65,7 +88,7 @@ const currentRatings: Rating[] = [
     albumName: 'Status Update Music',
     releaseYear: '2026',
     genre: 'Remix',
-    songs: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
+    tracklist: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
     image: 'status.jpg',
     status: false,
     finalized: false,
@@ -77,7 +100,7 @@ const currentRatings: Rating[] = [
     albumName: 'Status Update Music Status Update Music Status Update Music',
     releaseYear: '2026',
     genre: 'Remix',
-    songs: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
+    tracklist: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
     image: 'status.jpg',
     status: false,
     finalized: false,
@@ -89,7 +112,7 @@ const currentRatings: Rating[] = [
     albumName: 'Status Update Music',
     releaseYear: '2026',
     genre: 'Remix',
-    songs: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
+    tracklist: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
     image: 'status.jpg',
     status: false,
     finalized: false,
@@ -101,10 +124,10 @@ const currentRatings: Rating[] = [
     albumName: 'Status Update Music ',
     releaseYear: '2026',
     genre: 'Remix',
-    songs: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
+    tracklist: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
     image: 'status.jpg',
     status: false,
-    finalized: false,
+    finalized: true,
     finalGrade: 83,
   },
 ];

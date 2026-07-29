@@ -6,6 +6,7 @@ import { useState } from 'react';
 import AlbumCard from '../dashboard/album-card';
 import currentRatings from '@/data/currentRatings';
 import { useResponsiveCardCount } from '@/hooks/useResponsiveCardCount';
+import ReviewCard from '../dashboard/review-card';
 
 const containerVariants = {
   hidden: { opacity: 0, x: 60 },
@@ -29,9 +30,11 @@ const cardVariants = {
 export default function CardCarousel({
   cardsList,
   MAX_CARDS: fallbackMaxCards,
+  type,
 }: {
   cardsList: typeof currentRatings;
   MAX_CARDS: number;
+  type: string;
 }) {
   const MAX_CARDS = useResponsiveCardCount(fallbackMaxCards);
   const totalPages = Math.ceil(cardsList.length / MAX_CARDS);
@@ -49,9 +52,13 @@ export default function CardCarousel({
     <div className='md:flex flex-col gap-4'>
       {/* Mobile */}
       <div className='grid grid-cols-1 sm:grid-cols-2 place-items-center p-4 gap-4 md:hidden w-full'>
-        {cardsList.map(rating => (
-          <AlbumCard key={rating.id} rating={rating} />
-        ))}
+        {cardsList.map(rating =>
+          type === 'album' ? (
+            <AlbumCard key={rating.id} rating={rating} />
+          ) : (
+            <ReviewCard key={rating.id} rating={rating} />
+          )
+        )}
       </div>
 
       {/* Web */}
@@ -68,7 +75,11 @@ export default function CardCarousel({
           >
             {visibleCards.map(card => (
               <motion.div variants={cardVariants} key={card.id}>
-                <AlbumCard rating={card} />
+                {type === 'album' ? (
+                  <AlbumCard rating={card} />
+                ) : (
+                  <ReviewCard rating={card} />
+                )}
               </motion.div>
             ))}
           </motion.div>
