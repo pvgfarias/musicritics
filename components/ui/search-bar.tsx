@@ -15,15 +15,15 @@ export default function SearchBar() {
   }, 300);
 
   return (
-    <div className='h-12 w-100 flex flex-row justify-center items-center rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 px-4 py-3 md:mx-0 mx-4 shadow-sm mb-4 placeholder:text-gray-500 text-gray-900 text-base'>
+    <div className='w-120 h-10 flex flex-row justify-center items-center gap-2 p-2 rounded-md border border-gray-300 dark:border-mist-600 bg-foreground text-sm dark:bg-mist-900 placeholder:text-gray-500 text-gray-900'>
+      <IconSearch size={20} className='text-gray-500' />
       <input
         type='search'
-        placeholder='Search'
+        placeholder='Search albums, artists, songs...'
         className='w-full bg-transparent focus:outline-none'
         onChange={e => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()}
       />
-      <IconSearch size={20} className='text-gray-500' />
     </div>
   );
 }

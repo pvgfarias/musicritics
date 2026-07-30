@@ -5,7 +5,7 @@ type Album = (typeof currentRatings)[number];
 export default function AlbumStats({ album }: { album: Album }) {
   return (
     <div className='flex flex-col gap-4'>
-      <h1 className='text-xl font-title tracking-wide text-gray-950 dark:text-white whitespace-nowrap underline underline-offset-16 decoration-amber-600 decoration-4 pb-8'>
+      <h1 className='text-xl font-title tracking-wide text-gray-950 dark:text-white whitespace-nowrap underline underline-offset-16 decoration-summer-blue decoration-4 pb-8'>
         Stats
       </h1>
       <div className='flex flex-row gap-8'>

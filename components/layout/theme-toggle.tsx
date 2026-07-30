@@ -18,7 +18,12 @@ function getSnapshot() {
 function subscribe(callback: () => void) {
   if (typeof window === 'undefined') return () => {};
 
-  const handleMediaChange = () => callback();
+  const handleMediaChange = (e: MediaQueryListEvent) => {
+    if (!window.localStorage.getItem('theme')) {
+      document.documentElement.classList.toggle('dark', e.matches);
+    }
+    callback();
+  };
 
   const handleStorageChange = (event: StorageEvent) => {
     if (event.key === 'theme') callback();
@@ -66,33 +71,26 @@ export default function ThemeToggle() {
       return;
     }
 
-    const nextTheme = !document.documentElement.classList.contains('dark');
+    const nextTheme = !isDarkMode;
     document.documentElement.classList.toggle('dark', nextTheme);
     window.localStorage.setItem('theme', nextTheme ? 'dark' : 'light');
     window.dispatchEvent(new Event('themechange'));
   };
 
+  const Icon = isDarkMode ? IconSun : IconMoon;
+  const label = isDarkMode ? 'Light Mode' : 'Dark Mode';
+
   return (
-    <>
-      {isDarkMode ? (
-        <button
-          type='button'
-          onClick={toggleTheme}
-          className='text-gray-700 dark:text-gray-300 cursor-pointer'
-          aria-label='Light Mode'
-        >
-          <IconSun size={24} />
-        </button>
-      ) : (
-        <button
-          type='button'
-          onClick={toggleTheme}
-          className='text-gray-700 dark:text-gray-300 cursor-pointer'
-          aria-label='Dark Mode'
-        >
-          <IconMoon size={24} />
-        </button>
-      )}
-    </>
+    <button
+      type='button'
+      onClick={toggleTheme}
+      className='flex flex-row uppercase gap-3 cursor-pointer'
+      aria-label={label}
+    >
+      <Icon size={20} className='shrink-0' />
+      <p className='opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-150 whitespace-nowrap'>
+        {label}
+      </p>
+    </button>
   );
 }

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Raleway, Playwrite_NZ_Basic, Space_Mono } from 'next/font/google';
+import { Raleway, Quicksand, Space_Mono } from 'next/font/google';
 import Navbar from '@/components/layout/navbar';
-import Footer from '@/components/layout/footer';
+import Sidebar from '@/components/layout/sidebar';
 
 export const metadata: Metadata = {
   title: 'MusiCritics | Rate and discover new music.',
@@ -13,20 +13,20 @@ const raleway = Raleway({
   variable: '--font-raleway-sans',
   subsets: ['latin'],
   style: ['normal'],
-  weight: ['700'],
+  weight: ['500'],
 });
 
-const libre = Playwrite_NZ_Basic({
-  variable: '--font-libre',
+const carter = Quicksand({
+  variable: '--font-carter',
   style: ['normal'],
-  weight: ['400'],
+  weight: ['700'],
 });
 
 const space = Space_Mono({
   variable: '--font-space',
   subsets: ['latin'],
   style: ['normal'],
-  weight: ['700'],
+  weight: ['400'],
 });
 
 export default function RootLayout({
@@ -34,19 +34,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isLoggedIn = true;
-
   return (
     <html
       lang='en'
-      className={`${raleway.variable} ${libre.variable} ${space.variable} antialiased`}
+      className={`${raleway.variable} ${carter.variable} ${space.variable} antialiased`}
     >
-      <body>
-        {!isLoggedIn && <Navbar />}
-
-        <main className='relative'>{children}</main>
-
-        {!isLoggedIn && <Footer />}
+      <body className='flex h-dvh overflow-hidden'>
+        <Sidebar />
+        <div className='flex flex-col flex-1 min-w-0 h-dvh'>
+          <Navbar />
+          <main className='relative flex-1 overflow-y-auto'>{children}</main>
+        </div>
       </body>
     </html>
   );

@@ -9,7 +9,7 @@ export default function Page() {
   const MAX_ALBUMS = 6;
   return (
     <main>
-      <h1 className='text-4xl font-title font-extrabold text-gray-950 dark:text-white md:text-left text-center pb-8 underline underline-offset-16 decoration-amber-600 decoration-4'>
+      <h1 className='text-4xl font-title font-extrabold text-gray-950 dark:text-white md:text-left text-center pb-8 underline underline-offset-16 decoration-summer-blue decoration-4'>
         Albums
       </h1>
 

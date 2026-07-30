@@ -26,7 +26,7 @@ export default function ReviewCard({ rating }: { rating: Rating }) {
         <div className='flex-1'>
           <h1
             title={rating.albumName}
-            className='text-[14px] font-title font-bold text-amber-600 leading-tight w-full overflow-hidden truncate'
+            className='text-[14px] font-title font-bold text-summer-blue leading-tight w-full overflow-hidden truncate'
           >
             {rating.albumName}
           </h1>
@@ -37,7 +37,7 @@ export default function ReviewCard({ rating }: { rating: Rating }) {
             {rating.releaseYear} • {rating.genre}
           </h3>
         </div>
-        <button className='bg-transparent font-semibold text-amber-600 border-amber-600 border-2 transition-all duration-200 hover:bg-gray-100 cursor-pointer p-2 text-xs rounded-md h-1/2'>
+        <button className='bg-transparent font-semibold text-summer-blue border-summer-blue border-2 transition-all duration-200 hover:bg-gray-100 cursor-pointer p-2 text-xs rounded-md h-1/2'>
           VIEW
         </button>
       </div>

@@ -15,8 +15,8 @@ export default function Hero() {
         </p>
 
         <Link
-          href='/join?next=/home'
-          className='mt-8 inline-block rounded-full bg-amber-600 px-8 py-3 text-base font-semibold text-white transition hover:bg-amber-500'
+          href='/register'
+          className='mt-8 inline-block rounded-full bg-summer-blue px-8 py-3 text-base font-semibold text-white transition hover:bg-amber-500'
         >
           Start Now
         </Link>
