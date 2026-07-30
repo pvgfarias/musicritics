@@ -1,9 +1,8 @@
 import currentRatings from '@/data/currentRatings';
-import CardCarousel from '../ui/card-carousel';
-import WeeklyPicksBar from './weekly-picks-bar';
+import CardGrid from '../ui/card-grid';
 
-export default function CurrentRatings() {
-  const MAX_ALBUMS = 6;
+export default function WeeklyRotation() {
+  const MAX_ALBUMS = 8;
 
   const ratings = currentRatings.filter(rating => rating.finalized === false);
 
@@ -20,7 +19,7 @@ export default function CurrentRatings() {
           </span>
         </div>
       </div>
-      <CardCarousel cardsList={ratings} MAX_CARDS={MAX_ALBUMS} type={'album'} />
+      <CardGrid cardsList={ratings} MAX_CARDS={MAX_ALBUMS} />
     </div>
   );
 }

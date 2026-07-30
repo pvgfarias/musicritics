@@ -10,12 +10,16 @@ export default function SearchBar() {
 
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set('query', term);
-    router.push(`?${params.toString()}`); // Updates the URL and shares state
+    if (term) {
+      params.set('query', term);
+    } else {
+      params.delete('query');
+    }
+    router.push(`?${params.toString()}`);
   }, 300);
 
   return (
-    <div className='w-120 h-10 flex flex-row justify-center items-center gap-2 p-2 rounded-md border border-gray-300 dark:border-mist-600 bg-foreground text-sm dark:bg-mist-900 placeholder:text-gray-500 text-gray-900'>
+    <div className='flex-1 min-w-0 max-w-120 h-10 flex flex-row justify-start items-center gap-2 p-2 rounded-md border border-gray-300 dark:border-mist-600 bg-foreground text-sm dark:bg-mist-900 placeholder:text-gray-500 text-gray-900 dark:text-white'>
       <IconSearch size={20} className='text-gray-500' />
       <input
         type='search'

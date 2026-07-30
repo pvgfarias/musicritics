@@ -1,5 +1,5 @@
-import CurrentRatings from '@/components/dashboard/current-ratings';
 import RecentReviews from '@/components/dashboard/recent-reviews';
+import WeeklyRotation from '@/components/dashboard/weekly-rotation';
 
 export default function Page() {
   const days = [
@@ -32,13 +32,14 @@ export default function Page() {
   return (
     <main>
       <div className='flex flex-col gap-2 pb-8'>
-        <h1 className='text-4xl font-title'>Dashboard</h1>
-        <p className='text-xs text-gray-500 font-mono uppercase'>
+        <h1 className='text-4xl font-title text-gray-900 dark:text-white'>
+          Dashboard
+        </h1>
+        <p className='text-xs font-mono uppercase text-gray-500 dark:text-gray-300 '>
           {day}, {month} {d.getDay()} — WEEKLY ROTATION REFRESHES IN 2 DAYS
         </p>
       </div>
-
-      <CurrentRatings />
+      <WeeklyRotation />
       <RecentReviews />
     </main>
   );

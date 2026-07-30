@@ -52,9 +52,13 @@ export default function CardCarousel({
     <div className='md:flex flex-col gap-4'>
       {/* Mobile */}
       <div className='grid grid-cols-1 sm:grid-cols-2 place-items-center p-4 gap-4 md:hidden w-full'>
-        {cardsList.map(rating =>
+        {cardsList.map((rating, index) =>
           type === 'album' ? (
-            <AlbumCard key={rating.id} rating={rating} />
+            <AlbumCard
+              key={rating.id}
+              rating={rating}
+              priority={index <= 4 ? true : false}
+            />
           ) : (
             <ReviewCard key={rating.id} rating={rating} />
           )
@@ -73,10 +77,13 @@ export default function CardCarousel({
             transition={{ duration: 0.35 }}
             className='flex flex-row justify-center items-center gap-4 flex-nowrap'
           >
-            {visibleCards.map(card => (
+            {visibleCards.map((card, index) => (
               <motion.div variants={cardVariants} key={card.id}>
                 {type === 'album' ? (
-                  <AlbumCard rating={card} />
+                  <AlbumCard
+                    rating={card}
+                    priority={index <= 4 ? true : false}
+                  />
                 ) : (
                   <ReviewCard rating={card} />
                 )}

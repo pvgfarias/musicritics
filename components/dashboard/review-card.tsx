@@ -8,7 +8,7 @@ type Rating = (typeof currentRatings)[number];
 
 export default function ReviewCard({ rating }: { rating: Rating }) {
   return (
-    <div className='rounded-xl w-110 p-4 bg-white dark:bg-mist-800 shadow-sm  z-0 group cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-xl'>
+    <div className='rounded-xl w-110 p-4 bg-white dark:bg-mist-800 shadow-sm  z-0 group cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-lg'>
       <div className='flex flex-row gap-4 items-center'>
         <div className='relative'>
           {rating.finalGrade !== undefined && (

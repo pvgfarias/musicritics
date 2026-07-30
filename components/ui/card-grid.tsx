@@ -92,8 +92,12 @@ export default function CardGrid({
     <div className='md:flex flex-col gap-4'>
       {/* Mobile */}
       <div className='grid grid-cols-1 sm:grid-cols-2 place-items-center p-4 gap-4 md:hidden w-full'>
-        {filteredCards.map(rating => (
-          <AlbumCard key={rating.id} rating={rating} />
+        {filteredCards.map((rating, index) => (
+          <AlbumCard
+            key={rating.id}
+            rating={rating}
+            priority={index < 3 ? true : false}
+          />
         ))}
       </div>
 
@@ -107,11 +111,11 @@ export default function CardGrid({
             animate='show'
             exit='exit'
             transition={{ duration: 0.35 }}
-            className='grid grid-cols-6 justify-center place-items-center gap-4'
+            className='grid grid-cols-4 justify-center place-items-center gap-4'
           >
-            {visibleCards.map(card => (
+            {visibleCards.map((card, index) => (
               <motion.div variants={cardVariants} key={card.id}>
-                <AlbumCard rating={card} />
+                <AlbumCard rating={card} priority={index <= 4 ? true : false} />
               </motion.div>
             ))}
           </motion.div>

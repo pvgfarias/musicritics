@@ -1,12 +1,12 @@
 export default function WeeklyPicksBar({
   completed = 1,
-  total = 2,
+  total = 10,
   daysLeft = 1,
 }) {
-  const pct = (completed / total) * 100;
+  const pct = total > 0 ? (completed / total) * 100 : 0;
 
   return (
-    <div className='flex items-center gap-4 w-120 py-1 px-4 bg-foreground rounded-full border  border-gray-300 dark:border-mist-600 font-mono '>
+    <div className='flex items-center gap-4 shrink-0 w-full max-w-100 py-1 px-4 bg-foreground rounded-full border border-gray-300 dark:border-mist-600 font-mono'>
       <span className='whitespace-nowrap text-xs uppercase tracking-wider text-gray-500 dark:text-white'>
         Weekly Rotation
       </span>
