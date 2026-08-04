@@ -98,9 +98,9 @@ export default function CardGrid({
             initial='hidden'
             animate='show'
             exit='exit'
-            className='grid justify-center place-content-between gap-3'
+            className='grid justify-between gap-y-4 w-full'
             style={{
-              gridTemplateColumns: `repeat(${MAX_CARDS}, minmax(0, 1fr))`,
+              gridTemplateColumns: `repeat(${MAX_CARDS}, max-content)`,
             }}
           >
             <AnimatePresence initial={false}>

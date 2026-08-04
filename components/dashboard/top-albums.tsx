@@ -14,7 +14,10 @@ export default function TopAlbums() {
       </h3>
       <div className='flex flex-col max-h-80 overflow-y-auto'>
         {recentReviews.map((review, index) => (
-          <div className='flex flex-row justify-center items-center gap-2 h-10'>
+          <div
+            className='flex flex-row justify-center items-center gap-2 h-10'
+            key={review.id}
+          >
             <span className='text-dark-blue dark:text-gray-200 text-xs'>
               {index + 1}
             </span>
