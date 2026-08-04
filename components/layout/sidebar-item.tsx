@@ -1,6 +1,7 @@
 import type { Icon as TablerIcon } from '@tabler/icons-react';
 import { sidebarItemClasses } from '@/lib/styles';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 export default function SidebarItem({
   icon: Icon,
@@ -16,15 +17,15 @@ export default function SidebarItem({
 }) {
   return (
     <Link
-      className={sidebarItemClasses(isActive)}
-      {...props}
+      className={cn(sidebarItemClasses(isActive), 'relative')}
       href={href}
-      aria-current={isActive ? 'page' : undefined}
+      {...props}
     >
+      {isActive && (
+        <span className='absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-amber-600' />
+      )}
       <Icon size={20} className='shrink-0' />
-      <span className='opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-150 whitespace-nowrap'>
-        {label}
-      </span>
+      <span className='whitespace-nowrap'>{label}</span>
     </Link>
   );
 }

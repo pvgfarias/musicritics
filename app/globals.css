@@ -3,17 +3,16 @@
 :root {
   --background: #e1ebee;
   --foreground: #eff6f7;
-  --ink-black: #171a21;
+  --dark-blue: #080b19;
   --steel-blue: #7a93ac;
-  --summer-blue: #3577da;
-  --dark-blue: #1b3c6e;
   --light-blue: #eff6f7;
   color-scheme: light;
 }
 
 .dark {
-  --background: #0b0b11;
-  --foreground: #191f27;
+  --background: #080b19;
+  --foreground: #202330;
+  --foreground-border: #20243b;
   color-scheme: dark;
 }
 
@@ -22,12 +21,12 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-foreground-border: var(--foreground-border);
   --color-ink-black: var(--ink-black);
   --color-steel-blue: var(--steel-blue);
-  --color-summer-blue: var(--summer-blue);
   --color-dark-blue: var(--dark-blue);
   --font-sans: var(--font-raleway-sans);
-  --font-title: var(--font-carter);
+  --font-title: var(--font-quicksand);
   --font-mono: var(--font-space);
 }
 

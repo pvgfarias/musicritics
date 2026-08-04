@@ -1,11 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import AlbumCard from '../dashboard/album-card';
 import currentRatings from '@/data/currentRatings';
-import { useResponsiveCardCount } from '@/hooks/useResponsiveCardCount';
 import { useSearchParams } from 'next/navigation';
 
 const containerVariants = {
@@ -16,26 +14,24 @@ const containerVariants = {
     transition: {
       duration: 0.35,
       when: 'beforeChildren',
-      staggerChildren: 0.08,
+      staggerChildren: 0.05,
     },
   },
   exit: { opacity: 0, x: -60, transition: { duration: 0.25 } },
 };
 
 const cardVariants = {
-  hidden: { x: 40, opacity: 0 },
-  show: { x: 0, opacity: 1, transition: { duration: 0.35 } },
+  hidden: { y: 20, opacity: 0 },
+  show: { y: 0, opacity: 1, transition: { duration: 0.3 } },
 };
 
 export default function CardGrid({
   cardsList,
-  MAX_CARDS: fallbackMaxCards,
+  MAX_CARDS,
 }: {
   cardsList: typeof currentRatings;
   MAX_CARDS: number;
 }) {
-  const MAX_CARDS = useResponsiveCardCount(fallbackMaxCards);
-
   const searchParams = useSearchParams();
   const query = searchParams.get('query');
   const genre = searchParams.get('genre');
@@ -60,36 +56,28 @@ export default function CardGrid({
     });
   }, [cardsList, query, genre, status]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredCards.length / MAX_CARDS));
+  // Two rows worth of cards by default
+  const DEFAULT_VISIBLE = MAX_CARDS * 2;
 
-  const [page, setPage] = useState(0);
+  const [expanded, setExpanded] = useState(false);
 
-  // --- Reset page to 0 when filters change, without an effect ---
-  // Track the filter "signature" from the previous render and compare during render.
-  // If it changed, adjust state now, before this render commits — React re-renders
-  // immediately with the corrected value, no extra commit/paint/flash.
+  // Reset expansion when filters change, derived-state style (no useEffect)
   const filterKey = `${query}|${genre}|${status}`;
   const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
-  let currentPage = page;
+  let currentExpanded = expanded;
   if (filterKey !== prevFilterKey) {
     setPrevFilterKey(filterKey);
-    currentPage = 0;
-    setPage(0);
+    currentExpanded = false;
+    setExpanded(false);
   }
 
-  // --- Clamp to totalPages, purely derived, no state/effect involved ---
-  const effectivePage = Math.min(currentPage, totalPages - 1);
-
-  const hasNext = effectivePage < totalPages - 1;
-  const hasPrev = effectivePage > 0;
-  const start = effectivePage * MAX_CARDS;
-  const visibleCards = filteredCards.slice(start, start + MAX_CARDS);
-
-  const goNext = () => hasNext && setPage(effectivePage + 1);
-  const goPrev = () => hasPrev && setPage(effectivePage - 1);
+  const hasMore = filteredCards.length > DEFAULT_VISIBLE;
+  const visibleCards = currentExpanded
+    ? filteredCards
+    : filteredCards.slice(0, DEFAULT_VISIBLE);
 
   return (
-    <div className='md:flex flex-col gap-4'>
+    <div className='md:flex flex-col gap-4 w-full'>
       {/* Mobile */}
       <div className='grid grid-cols-1 sm:grid-cols-2 place-items-center p-4 gap-4 md:hidden w-full'>
         {filteredCards.map((rating, index) => (
@@ -102,44 +90,55 @@ export default function CardGrid({
       </div>
 
       {/* Web */}
-      <div className='hidden md:flex md:pt-4'>
+      <div className='hidden md:flex md:flex-col md:pt-4 md:gap-4'>
         <AnimatePresence mode='wait'>
           <motion.div
-            key={`${effectivePage}-${MAX_CARDS}-${filterKey}`}
+            key={filterKey}
             variants={containerVariants}
             initial='hidden'
             animate='show'
             exit='exit'
-            transition={{ duration: 0.35 }}
-            className='grid grid-cols-4 justify-center place-items-center gap-4'
+            className='grid justify-center place-content-between gap-3'
+            style={{
+              gridTemplateColumns: `repeat(${MAX_CARDS}, minmax(0, 1fr))`,
+            }}
           >
-            {visibleCards.map((card, index) => (
-              <motion.div variants={cardVariants} key={card.id}>
-                <AlbumCard rating={card} priority={index <= 4 ? true : false} />
-              </motion.div>
-            ))}
+            <AnimatePresence initial={false}>
+              {visibleCards.map((card, index) => (
+                <motion.div
+                  layout
+                  variants={cardVariants}
+                  initial='hidden'
+                  animate='show'
+                  exit={{
+                    opacity: 0,
+                    scale: 0.9,
+                    transition: { duration: 0.2 },
+                  }}
+                  key={card.id}
+                >
+                  <AlbumCard
+                    rating={card}
+                    priority={index < MAX_CARDS ? true : false}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </motion.div>
         </AnimatePresence>
-      </div>
 
-      <div className='hidden md:flex flex-row justify-center items-center'>
-        <button
-          onClick={goPrev}
-          disabled={!hasPrev}
-          className={`px-2 py-2 shrink-0 ${hasPrev ? 'text-gray-900 dark:text-white cursor-pointer' : 'text-gray-400'}`}
-        >
-          <IconChevronLeft size={32} />
-        </button>
-        <span className='text-xs font-mono text-gray-800 dark:text-white'>
-          {effectivePage + 1}/{totalPages}
-        </span>
-        <button
-          onClick={goNext}
-          disabled={!hasNext}
-          className={`px-2 py-2 shrink-0 ${hasNext ? 'text-gray-900 dark:text-white cursor-pointer' : 'text-gray-400'}`}
-        >
-          <IconChevronRight size={32} />
-        </button>
+        {hasMore && (
+          <div className='flex justify-center'>
+            <button
+              onClick={() => setExpanded(prev => !prev)}
+              className='px-4 py-1.5 text-xs font-mono uppercase tracking-wider text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-mist-600 rounded-full hover:bg-gray-100 dark:hover:bg-mist-800 transition-colors cursor-pointer'
+            >
+              {currentExpanded
+                ? 'Show less'
+                : `View all (${filteredCards.length})`}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

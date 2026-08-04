@@ -1,8 +1,5 @@
-import { IconCheck } from '@tabler/icons-react';
 import Image from 'next/image';
-
 import currentRatings from '@/data/currentRatings';
-import RatingGrade from './rating-grade';
 import Link from 'next/link';
 
 type Rating = (typeof currentRatings)[number];
@@ -15,49 +12,41 @@ export default function AlbumCard({
   priority: boolean;
 }) {
   return (
-    <div className='flex flex-row w-96 h-40 shrink-0 bg-foreground dark:bg-mist-800 shadow-sm cursor-pointer rounded-xl border border-gray-100 dark:border-mist-700 transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-lg'>
-      {/* {rating.status && !rating.finalized && (
-            <IconCheck
-              size={32}
-              className='absolute text-white z-20 bg-lime-500 rounded-full border-2 border-mist-100 -right-2.5 -top-2.5'
-            />
-          )} */}
-      {/* {rating.finalized && rating.finalGrade !== undefined && (
-            <RatingGrade ratingGrade={rating.finalGrade} />
-          )} */}
-      <div className='relative w-40 h-40 shrink-0'>
+    <div className='flex flex-col h-64 w-36 shrink-0 bg-foreground shadow-sm cursor-pointer rounded-xl border border-gray-100 dark:border-foreground-border transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-lg'>
+      <div className='relative w-36 h-36 shrink-0'>
         <Image
           src={`/${rating.image}`}
           alt={`${rating.albumName} by ${rating.artistName}`}
           fill
-          className='rounded-l-xl object-cover'
+          className='rounded-t-xl object-cover'
           priority={priority}
         />
       </div>
 
-      <div className='flex flex-col p-4 justify-start gap-0.5'>
-        <p className='text-lg font-title font-bold text-summer-blue truncate'>
+      <div className='flex flex-col p-2.5 justify-start gap-0.5 flex-1'>
+        <p className='text-sm font-title font-bold text-dark-blue dark:text-white line-clamp-1'>
           {rating.albumName}
         </p>
-        <p className='text-sm text-gray-500 dark:text-gray-400 line-clamp-1'>
+        <p className='text-xs text-gray-600 dark:text-gray-300 line-clamp-1'>
           {rating.artistName}
         </p>
-        <span className='inline-flex w-fit items-center text-[10px] font-mono uppercase tracking-wide text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-mist-700 rounded-full px-2 py-0.5 mt-1'>
-          {rating.releaseYear} • {rating.genre}
-        </span>
+        <div className='flex flex-row gap-1'>
+          <span className='inline-flex w-fit items-center text-[9px] font-mono uppercase tracking-wide text-gray-600 dark:text-gray-300 bg-gray-300 dark:bg-mist-700 rounded-full px-1.5 py-0.5 mt-1'>
+            {rating.releaseYear}
+          </span>
+          <span className='inline-flex w-fit items-center text-[9px] font-mono uppercase tracking-wide text-gray-600 dark:text-gray-300 bg-gray-300 dark:bg-mist-700 rounded-full px-1.5 py-0.5 mt-1 truncate max-w-16'>
+            {rating.genre}
+          </span>
+        </div>
 
-        {rating.finalized && (
-          <Link
-            href={`/dashboard/albums/${rating.id}`}
-            className='mt-2 rounded-lg py-1.5 text-xs text-white bg-summer-blue shadow-sm transition-all duration-200 hover:bg-summer-blue/90 hover:shadow-md active:scale-[0.98] w-full text-center'
-          >
+        {rating.finalized ? (
+          <button className='mt-auto bg-transparent font-semibold text-amber-600 border-amber-600 border-2 transition-all duration-200 hover:bg-gray-100 cursor-pointer py-1.5 text-[10px] rounded-md w-full'>
             VIEW
-          </Link>
-        )}
-        {!rating.finalized && (
+          </button>
+        ) : (
           <Link
             href={`/dashboard/albums/${rating.id}`}
-            className='mt-2 rounded-lg  py-1.5 text-xs text-white bg-summer-blue shadow-sm transition-all duration-200 hover:bg-summer-blue/90 hover:shadow-md active:scale-[0.98] w-full text-center'
+            className='mt-auto rounded-lg py-1.5 text-[10px] text-white bg-amber-600 shadow-sm transition-all duration-200 hover:bg-amber-600/90 hover:shadow-md active:scale-[0.98] w-full text-center'
           >
             RATE
           </Link>

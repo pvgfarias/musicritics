@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Raleway, Quicksand, Space_Mono } from 'next/font/google';
-import Navbar from '@/components/layout/navbar';
 import Sidebar from '@/components/layout/sidebar';
 
 export const metadata: Metadata = {
@@ -16,8 +15,8 @@ const raleway = Raleway({
   weight: ['500'],
 });
 
-const carter = Quicksand({
-  variable: '--font-carter',
+const quicksand = Quicksand({
+  variable: '--font-quicksand',
   style: ['normal'],
   weight: ['700'],
 });
@@ -37,12 +36,11 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className={`${raleway.variable} ${carter.variable} ${space.variable} antialiased`}
+      className={`${raleway.variable} ${quicksand.variable} ${space.variable} antialiased`}
     >
       <body className='flex h-dvh overflow-hidden'>
         <Sidebar />
         <div className='flex flex-col flex-1 min-w-0 h-dvh'>
-          <Navbar />
           <main className='relative flex-1 overflow-y-auto'>{children}</main>
         </div>
       </body>

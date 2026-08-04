@@ -1,16 +1,16 @@
 export default function RatingGrade({ ratingGrade }: { ratingGrade: number }) {
   const ratingColor =
     ratingGrade >= 80
-      ? 'bg-emerald-500'
+      ? 'bg-emerald-700/70 text-lime-200'
       : ratingGrade >= 60
-        ? 'bg-amber-500'
-        : 'bg-red-500';
+        ? 'bg-amber-700/70 text-amber-200'
+        : 'bg-red-700/70 text-red-200';
 
   return (
     <div
-      className={`absolute -bottom-2 z-20 ${ratingColor} rounded-full border-2 border-mist-100 w-8 h-8 flex items-center justify-center`}
+      className={`${ratingColor} shrink-0 rounded-full w-9 h-9 flex items-center justify-center shadow-sm`}
     >
-      <h1 className='text-white text-sm font-mono font-bold'>{ratingGrade}</h1>
+      <span className='text-sm font-mono font-bold'>{ratingGrade}</span>
     </div>
   );
 }
