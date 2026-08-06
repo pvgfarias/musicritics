@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Raleway, Quicksand, Space_Mono } from 'next/font/google';
-import Sidebar from '@/components/layout/sidebar';
+import Sidebar from '@/components/layout/sidebar/sidebar';
 
 export const metadata: Metadata = {
   title: 'MusiCritics | Rate and discover new music.',

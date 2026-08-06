@@ -84,13 +84,12 @@ export default function ThemeToggle() {
     <button
       type='button'
       onClick={toggleTheme}
-      className='flex flex-row uppercase gap-3 cursor-pointer'
+      className='text-sm flex items-center gap-2'
       aria-label={label}
     >
       <Icon size={20} className='shrink-0' />
-      <p className='opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-150 whitespace-nowrap'>
-        {label}
-      </p>
+      <p className='whitespace-nowrap'>{label}</p>
+      <input type='checkbox' defaultChecked className='toggle toggle-sm' />
     </button>
   );
 }

@@ -4,8 +4,7 @@ import SidebarLinks from './sidebar-links';
 import { IconVinyl } from '@tabler/icons-react';
 import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
-import ThemeToggle from './theme-toggle';
-import UserMenu from './user-menu';
+import UserMenu from '../user-menu';
 
 export default function Sidebar() {
   const shouldReduceMotion = useReducedMotion();
@@ -33,8 +32,7 @@ export default function Sidebar() {
           </Link>
           <SidebarLinks />
           <div className='hidden h-auto w-full grow md:block' />
-          <div className='mx-4 h-px bg-slate-800' />
-          <ThemeToggle />
+          <div className='mx-4 h-px bg-gray-300 dark:bg-slate-800' />
           <UserMenu />
         </nav>
       </motion.div>
