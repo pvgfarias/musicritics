@@ -21,7 +21,7 @@ export default function RecentReviews() {
         </div>
       </div>
 
-      <div className='flex flex-col bg-foreground border border-foreground-border rounded-xl mb-4 divide-y divide-gray-200 dark:divide-mist-700 max-h-105 overflow-y-auto'>
+      <div className='flex flex-col bg-foreground rounded-xl mb-4 divide-y divide-gray-200 dark:divide-stone-800 max-h-105 overflow-y-auto'>
         {recentReviews.map(review => (
           <div
             className='flex flex-row items-center gap-3 px-4 py-3 text-dark-blue dark:text-white transition-colors hover:bg-gray-50 dark:hover:bg-mist-800/50'
@@ -44,7 +44,7 @@ export default function RecentReviews() {
               </p>
             </div>
             {review.finalGrade && (
-              <RatingGrade ratingGrade={review.finalGrade} />
+              <RatingGrade ratingGrade={review.finalGrade} inAlbum={false} />
             )}
           </div>
         ))}

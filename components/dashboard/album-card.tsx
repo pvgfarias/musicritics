@@ -35,7 +35,7 @@ export default function AlbumCard({
         <p className='font-title font-bold text-sm text-dark-blue dark:text-white line-clamp-1'>
           {rating.albumName}
         </p>
-        <p className='text-xs text-gray-600 dark:text-gray-300 line-clamp-1'>
+        <p className='text-xs text-gray-700 dark:text-gray-300 line-clamp-1'>
           {rating.artistName}
         </p>
       </div>

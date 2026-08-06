@@ -22,9 +22,9 @@ export default function SidebarItem({
       {...props}
     >
       {isActive && (
-        <span className='absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 rounded-full bg-amber-600' />
+        <span className='absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full bg-amber-600' />
       )}
-      <Icon size={20} className='shrink-0' />
+      <Icon size={20} className={isActive ? 'text-amber-600' : ''} />
       <span className='whitespace-nowrap'>{label}</span>
     </Link>
   );

@@ -1,12 +1,10 @@
 'use client';
 
 import SidebarLinks from './sidebar-links';
-import { IconPower, IconVinyl } from '@tabler/icons-react';
+import { IconVinyl } from '@tabler/icons-react';
 import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
 import ThemeToggle from './theme-toggle';
-import SidebarItem from './sidebar-item';
-import { sidebarItemClasses } from '@/lib/styles';
 import UserMenu from './user-menu';
 
 export default function Sidebar() {
@@ -19,7 +17,7 @@ export default function Sidebar() {
         initial={shouldReduceMotion ? false : { x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: shouldReduceMotion ? 0 : 0.5 }}
-        className='hidden md:flex flex-col h-dvh shrink-0 w-52 overflow-hidden py-2 bg-dark-blue text-steel-blue dark:border-r dark:border-foreground-border'
+        className='hidden md:flex flex-col h-dvh shrink-0 w-60 overflow-hidden py-2 bg-sidebar'
       >
         <nav
           className='flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 '
@@ -35,7 +33,7 @@ export default function Sidebar() {
           </Link>
           <SidebarLinks />
           <div className='hidden h-auto w-full grow md:block' />
-          <div className='mx-4 h-px bg-gray-800' />
+          <div className='mx-4 h-px bg-slate-800' />
           <ThemeToggle />
           <UserMenu />
         </nav>
