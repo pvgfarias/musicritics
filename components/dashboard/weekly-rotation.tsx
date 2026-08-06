@@ -3,7 +3,7 @@ import CardGrid from '../ui/card-grid';
 import WeeklyPicksBar from './weekly-picks-bar';
 
 export default function WeeklyRotation() {
-  const MAX_ALBUMS = 5;
+  const MAX_ALBUMS = 4;
 
   const ratings = currentRatings.filter(rating => rating.finalized === false);
 

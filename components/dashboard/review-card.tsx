@@ -12,7 +12,7 @@ export default function ReviewCard({ rating }: { rating: Rating }) {
       <div className='flex flex-row gap-4 items-center'>
         <div className='relative'>
           {rating.finalGrade !== undefined && (
-            <RatingGrade ratingGrade={rating.finalGrade} />
+            <RatingGrade ratingGrade={rating.finalGrade} inAlbum={false} />
           )}
           <Image
             src={`/${rating.image}`}

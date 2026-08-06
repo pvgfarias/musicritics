@@ -19,7 +19,7 @@ export default function Sidebar() {
         initial={shouldReduceMotion ? false : { x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: shouldReduceMotion ? 0 : 0.5 }}
-        className='hidden md:flex flex-col h-dvh shrink-0 w-60 overflow-hidden py-2 bg-dark-blue text-steel-blue dark:border-r dark:border-foreground-border'
+        className='hidden md:flex flex-col h-dvh shrink-0 w-52 overflow-hidden py-2 bg-dark-blue text-steel-blue dark:border-r dark:border-foreground-border'
       >
         <nav
           className='flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 '

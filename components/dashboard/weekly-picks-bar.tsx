@@ -1,6 +1,6 @@
 export default function WeeklyPicksBar({
-  completed = 5,
-  total = 10,
+  completed = 1,
+  total = 7,
   daysLeft = 1,
 }) {
   const pct = total > 0 ? (completed / total) * 100 : 0;
