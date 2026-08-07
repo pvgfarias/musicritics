@@ -41,7 +41,7 @@ export default function UserMenu() {
           className={cn(
             'w-60 rounded-2xl bg-sidebar border border-dark-blue/5 dark:border-white/5',
             'text-dark-blue dark:text-slate-200 shadow-xl',
-            'py-2 px-4 flex flex-col gap-2 z-[1000]',
+            'py-2 px-4 flex flex-col gap-2 z-1000',
             'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
             'data-[side=right]:slide-in-from-left-1 data-[side=left]:slide-in-from-right-1'
