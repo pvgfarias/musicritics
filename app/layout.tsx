@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import { Raleway, Quicksand, Space_Mono } from 'next/font/google';
 import Sidebar from '@/components/layout/sidebar/sidebar';
@@ -28,6 +29,20 @@ const space = Space_Mono({
   weight: ['400'],
 });
 
+// Runs before hydration so the correct theme class is set on <html>
+// before first paint. Keeps `theme` in localStorage in sync with
+// system preference when the user hasn't chosen one explicitly.
+const THEME_INIT_SCRIPT = `
+(function () {
+  try {
+    var saved = localStorage.getItem('theme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var isDark = saved === 'dark' || (!saved && prefersDark);
+    document.documentElement.classList.toggle('dark', isDark);
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,6 +53,13 @@ export default function RootLayout({
       lang='en'
       className={`${raleway.variable} ${quicksand.variable} ${space.variable} antialiased`}
     >
+      <head>
+        <Script
+          id='theme-init'
+          strategy='beforeInteractive'
+          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
+        />
+      </head>
       <body className='flex h-dvh overflow-hidden'>
         <Sidebar />
         <div className='flex flex-col flex-1 min-w-0 h-dvh'>

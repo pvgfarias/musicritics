@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 import { IconMoon, IconSun } from '@tabler/icons-react';
 
 function getServerSnapshot() {
@@ -21,8 +21,8 @@ function subscribe(callback: () => void) {
   const handleMediaChange = (e: MediaQueryListEvent) => {
     if (!window.localStorage.getItem('theme')) {
       document.documentElement.classList.toggle('dark', e.matches);
+      callback();
     }
-    callback();
   };
 
   const handleStorageChange = (event: StorageEvent) => {
@@ -45,26 +45,14 @@ function subscribe(callback: () => void) {
 }
 
 export default function ThemeToggle() {
+  // Reads the class already set by the blocking script in the root
+  // layout <head> — this component no longer sets the initial theme
+  // itself, so mounting it (e.g. opening a dropdown) can't change it.
   const isDarkMode = useSyncExternalStore(
     subscribe,
     getSnapshot,
     getServerSnapshot
   );
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const userPrefersDarkTheme = window.matchMedia(
-      '(prefers-color-scheme: dark)'
-    ).matches;
-    const savedTheme = window.localStorage.getItem('theme');
-    const theme =
-      savedTheme === 'dark' || (!savedTheme && userPrefersDarkTheme);
-
-    document.documentElement.classList.toggle('dark', theme);
-    window.localStorage.setItem('theme', theme ? 'dark' : 'light');
-    window.dispatchEvent(new Event('themechange'));
-  }, []);
 
   const toggleTheme = () => {
     if (typeof window === 'undefined') {
@@ -89,7 +77,12 @@ export default function ThemeToggle() {
     >
       <Icon size={20} className='shrink-0' />
       <p className='whitespace-nowrap'>{label}</p>
-      <input type='checkbox' defaultChecked className='toggle toggle-sm' />
+      <input
+        type='checkbox'
+        checked={isDarkMode}
+        onChange={toggleTheme}
+        className='toggle toggle-sm'
+      />
     </button>
   );
 }
