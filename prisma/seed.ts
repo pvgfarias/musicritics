@@ -2,15 +2,15 @@ import 'dotenv/config';
 import { prisma } from '../lib/prisma';
 
 async function main() {
-  // await prisma.comment.deleteMany();
-  // await prisma.trackRating.deleteMany();
-  // await prisma.rating.deleteMany();
-  // await prisma.albumSocialLink.deleteMany();
-  // await prisma.track.deleteMany();
-  // await prisma.albumArtist.deleteMany();
-  // await prisma.album.deleteMany();
-  // await prisma.artist.deleteMany();
-  // await prisma.user.deleteMany();
+  await prisma.comment.deleteMany();
+  await prisma.trackRating.deleteMany();
+  await prisma.rating.deleteMany();
+  await prisma.albumSocialLink.deleteMany();
+  await prisma.track.deleteMany();
+  await prisma.albumArtist.deleteMany();
+  await prisma.album.deleteMany();
+  await prisma.artist.deleteMany();
+  await prisma.user.deleteMany();
 
   const users = await Promise.all([
     prisma.user.create({
@@ -165,9 +165,9 @@ async function main() {
     const albumTracks = album.tracks;
     const userPool = [users[0], users[1], users[2]];
 
-    for (const user of userPool) {
+    for (const [userIndex, user] of userPool.entries()) {
       const trackScores = albumTracks.map(
-        (_, index) => 70 + ((index + user.id.length) % 20)
+        (_, index) => 70 + ((index + userIndex * 5) % 20)
       );
       const averageScore = Math.round(
         trackScores.reduce((sum, score) => sum + score, 0) / trackScores.length

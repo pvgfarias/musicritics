@@ -1,5 +1,5 @@
 // data/albums.ts
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../src/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 
 type AlbumWithRelations = Prisma.AlbumGetPayload<{
@@ -27,6 +27,23 @@ type AlbumWithRelations = Prisma.AlbumGetPayload<{
   };
 }>;
 
+const albumSummarySelect = {
+  id: true,
+  title: true,
+  slug: true,
+  coverImage: true,
+  releaseYear: true,
+  genre: true,
+  artists: {
+    select: { artist: { select: { id: true, name: true, slug: true } } },
+  },
+  _count: { select: { ratings: true } },
+} satisfies Prisma.AlbumSelect;
+
+type AlbumSummary = Prisma.AlbumGetPayload<{
+  select: typeof albumSummarySelect;
+}>;
+
 function normalizeAlbum(album: AlbumWithRelations) {
   const artistNames = album.artists
     .map(entry => entry.artist.name)
@@ -40,38 +57,55 @@ function normalizeAlbum(album: AlbumWithRelations) {
   };
 }
 
-export async function getAllAlbums() {
-  const albums = await prisma.album.findMany({
-    include: {
-      artists: {
-        include: {
-          artist: {
-            select: { id: true, name: true, slug: true, image: true },
-          },
-        },
-      },
-      tracks: {
-        orderBy: { number: 'asc' },
-        include: {
-          ratings: {
-            select: { score: true },
-          },
-        },
-      },
-      ratings: {
-        include: {
-          user: { select: { id: true, username: true, image: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-      },
-      socialLinks: {
-        orderBy: { platform: 'asc' },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+function normalizeAlbumSummary(album: AlbumSummary) {
+  const artistNames = album.artists.map(a => a.artist.name).filter(Boolean);
+  return {
+    ...album,
+    artist: artistNames.join(', '),
+    artistNames,
+    ratingCount: album._count.ratings,
+  };
+}
 
-  return albums.map(normalizeAlbum);
+export async function getAlbumsPage(page = 1, pageSize = 20) {
+  const [albums, total] = await Promise.all([
+    prisma.album.findMany({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      select: albumSummarySelect,
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.album.count(),
+  ]);
+
+  return {
+    albums: albums.map(normalizeAlbumSummary),
+    total,
+    totalPages: Math.ceil(total / pageSize),
+  };
+}
+
+export async function getAlbumsByArtist(
+  artistId: string,
+  page = 1,
+  pageSize = 20
+) {
+  const [albums, total] = await Promise.all([
+    prisma.album.findMany({
+      where: { artists: { some: { artistId } } },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      select: albumSummarySelect,
+      orderBy: { releaseYear: 'desc' },
+    }),
+    prisma.album.count({ where: { artists: { some: { artistId } } } }),
+  ]);
+
+  return {
+    albums: albums.map(normalizeAlbumSummary),
+    total,
+    totalPages: Math.ceil(total / pageSize),
+  };
 }
 
 export async function getAlbumBySlug(slug: string) {
@@ -109,45 +143,6 @@ export async function getAlbumBySlug(slug: string) {
   return normalizeAlbum(album);
 }
 
-export async function getAlbumsByArtist(artistId: string) {
-  const albums = await prisma.album.findMany({
-    where: {
-      artists: {
-        some: { artistId },
-      },
-    },
-    include: {
-      artists: {
-        include: {
-          artist: {
-            select: { id: true, name: true, slug: true, image: true },
-          },
-        },
-      },
-      tracks: {
-        orderBy: { number: 'asc' },
-        include: {
-          ratings: {
-            select: { score: true },
-          },
-        },
-      },
-      ratings: {
-        include: {
-          user: { select: { id: true, username: true, image: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-      },
-      socialLinks: {
-        orderBy: { platform: 'asc' },
-      },
-    },
-    orderBy: { releaseYear: 'desc' },
-  });
-
-  return albums.map(normalizeAlbum);
-}
-
 export async function getAlbumWithAverageRating(slug: string) {
   const album = await getAlbumBySlug(slug);
   if (!album) return null;
@@ -164,15 +159,17 @@ export async function getAlbumWithAverageRating(slug: string) {
     album.ratings as Array<{ score: number | null }>
   ).flatMap(rating => (rating.score == null ? [] : [rating.score]));
 
-  const allScores = [...trackScores, ...albumScores];
-  const avg =
-    allScores.length > 0
-      ? allScores.reduce((sum, score) => sum + score, 0) / allScores.length
-      : null;
+  const trackAvg = trackScores.length
+    ? trackScores.reduce((a, b) => a + b, 0) / trackScores.length
+    : null;
+  const albumAvg = albumScores.length
+    ? albumScores.reduce((a, b) => a + b, 0) / albumScores.length
+    : null;
 
   return {
     ...album,
-    averageRating: avg,
+    trackAverageRating: trackAvg,
+    albumAverageRating: albumAvg,
     ratingCount: album.ratings.length,
   };
 }
