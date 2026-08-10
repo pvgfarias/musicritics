@@ -1,5 +1,5 @@
 // data/albums.ts
-import { Prisma } from '../src/generated/prisma/client';
+import { Prisma } from '../app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 
 type AlbumWithRelations = Prisma.AlbumGetPayload<{

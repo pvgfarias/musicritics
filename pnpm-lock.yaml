@@ -69,9 +69,6 @@ importers:
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
-      daisyui:
-        specifier: ^5.7.16
-        version: 5.7.16
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
@@ -2047,9 +2044,6 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
-
-  daisyui@5.7.16:
-    resolution: {integrity: sha512-V9CJxvrWIXTDuP/0tpijjWaKaKJNYo2IrULJfTWs3/DjW9rPqswk1n8NCLQRLrTutmlG2Ech7nkJDpCnF+6Dzw==}
 
   damerau-levenshtein@1.0.8:
     resolution: {integrity: sha512-sdQSFB7+llfUcQHUQO3+B8ERRj0Oa4w9POWMI/puGtuf7gFywGmkaLCElnudfTiKZV+NvHqL0ifzdrI8Ro7ESA==}
@@ -5351,8 +5345,6 @@ snapshots:
       which: 2.0.2
 
   csstype@3.2.3: {}
-
-  daisyui@5.7.16: {}
 
   damerau-levenshtein@1.0.8: {}
 

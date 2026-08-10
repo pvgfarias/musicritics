@@ -1,4 +1,4 @@
-import { PrismaClient } from '../src/generated/prisma/client'; // match your generator's `output` path
+import { PrismaClient } from '../app/generated/prisma/client'; // match your generator's `output` path
 import { PrismaNeon } from '@prisma/adapter-neon';
 
 const globalForPrisma = globalThis as unknown as {
