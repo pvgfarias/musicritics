@@ -1,11 +1,9 @@
-import currentRatings from '@/data/currentRatings';
+import type { AlbumSummary } from '@/data/albums';
 import CardGrid from '../ui/card-grid';
 import WeeklyPicksBar from './weekly-picks-bar';
 
-export default function WeeklyRotation() {
+export default function WeeklyRotation({ albums }: { albums: AlbumSummary[] }) {
   const MAX_ALBUMS = 4;
-
-  const ratings = currentRatings.filter(rating => rating.finalized === false);
 
   return (
     <div className='flex flex-col w-full'>
@@ -15,7 +13,7 @@ export default function WeeklyRotation() {
         </h2>
         <WeeklyPicksBar />
       </div>
-      <CardGrid cardsList={ratings} MAX_CARDS={MAX_ALBUMS} />
+      <CardGrid cardsList={albums} MAX_CARDS={MAX_ALBUMS} viewMode='grid' />
     </div>
   );
 }

@@ -55,7 +55,7 @@ export default function SortSelector() {
         aria-haspopup='listbox'
         aria-expanded={isOpen}
         onClick={() => setIsOpen(prev => !prev)}
-        className='h-10 w-40 flex flex-row justify-between items-center rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 px-4 py-3 shadow-sm text-gray-500 text-base cursor-pointer'
+        className='h-10 max-w-40 flex flex-row justify-between items-center rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-2 gap-1 text-gray-500 text-sm cursor-pointer'
       >
         <span className='select-none'>{currentLabel}</span>
         <IconChevronDown size={20} className={isOpen ? 'rotate-180' : ''} />
@@ -63,14 +63,14 @@ export default function SortSelector() {
       {isOpen && (
         <ul
           role='listbox'
-          className='absolute top-full left-0 z-10 mt-1 rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 p-2 w-40 shadow-lg flex flex-col gap-1 text-sm'
+          className='absolute top-full left-0 z-10 mt-1 rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-2 w-40 shadow-lg flex flex-col gap-1 text-sm'
         >
           {sortOptions.map(opt => (
             <li
               key={opt.value}
               role='option'
               aria-selected={currentSort === opt.value}
-              className='cursor-pointer px-2 py-1.5 rounded hover:bg-gray-200 dark:hover:bg-mist-700'
+              className='cursor-pointer px-2 py-1.5 rounded hover:bg-foreground text-gray-500 hover:text-gray-900 dark:hover:text-white'
               onClick={() => handleSortUpdate(opt.value)}
             >
               {opt.label}

@@ -69,9 +69,9 @@ export default function GenreSelector() {
         aria-haspopup='listbox'
         aria-expanded={isOpen}
         onClick={() => setIsOpen(prev => !prev)}
-        className='h-10 w-40 flex flex-row justify-between items-center rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 px-4 py-3 md:mx-0 mx-4 shadow-sm mb-4 text-gray-500 text-base cursor-pointer'
+        className='h-10 max-w-40 flex flex-row justify-between items-center rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-2 gap-1 text-gray-500 text-sm cursor-pointer'
       >
-        <span className={`select-none ${currentGenre ? 'text-gray-900' : ''}`}>
+        <span className={`select-none ${currentGenre ? 'text-gray-500' : ''}`}>
           {currentGenre || 'Genre'}
         </span>
         <IconChevronDown
@@ -83,7 +83,7 @@ export default function GenreSelector() {
       {isOpen && (
         <ul
           role='listbox'
-          className='absolute top-full left-0 z-10 mt-1 rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 p-2 w-40 max-h-64 overflow-y-auto shadow-lg flex flex-col gap-1 text-sm'
+          className='absolute top-full left-0 z-10 mt-1 rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-2 w-40 max-h-64 overflow-y-auto shadow-lg flex flex-col gap-1 text-sm'
         >
           {genreList.map(genre => (
             <li
@@ -92,7 +92,7 @@ export default function GenreSelector() {
               aria-selected={
                 currentGenre === genre || (genre === 'All' && !currentGenre)
               }
-              className='inline-flex items-center w-full cursor-pointer px-2 py-1.5 rounded hover:bg-gray-200 dark:hover:bg-mist-700'
+              className='inline-flex items-center w-full cursor-pointer px-2 py-1.5 rounded hover:bg-foreground text-gray-500 hover:text-gray-900 dark:hover:text-white'
               onClick={() => handleGenreUpdate(genre)}
             >
               {genre}

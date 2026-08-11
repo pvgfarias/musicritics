@@ -16,7 +16,7 @@ export default function Sidebar() {
         initial={shouldReduceMotion ? false : { x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: shouldReduceMotion ? 0 : 0.5 }}
-        className='hidden md:flex flex-col h-dvh shrink-0 w-60 overflow-hidden py-2 bg-sidebar'
+        className='hidden md:flex flex-col h-dvh shrink-0 w-52 overflow-hidden py-2 bg-sidebar border-r border-gray-300 dark:border-slate-800'
       >
         <nav
           className='flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2 '

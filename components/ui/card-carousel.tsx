@@ -7,6 +7,13 @@ import AlbumCard from '../dashboard/album-card';
 import currentRatings from '@/data/currentRatings';
 import { useResponsiveCardCount } from '@/hooks/useResponsiveCardCount';
 import ReviewCard from '../dashboard/review-card';
+import type { AlbumSummary } from '@/data/albums';
+
+type Rating = (typeof currentRatings)[number];
+
+type CardCarouselProps =
+  | { cardsList: AlbumSummary[]; MAX_CARDS: number; type: 'album' }
+  | { cardsList: Rating[]; MAX_CARDS: number; type: 'review' };
 
 const containerVariants = {
   hidden: { opacity: 0, x: 60 },
@@ -31,11 +38,7 @@ export default function CardCarousel({
   cardsList,
   MAX_CARDS: fallbackMaxCards,
   type,
-}: {
-  cardsList: typeof currentRatings;
-  MAX_CARDS: number;
-  type: string;
-}) {
+}: CardCarouselProps) {
   const MAX_CARDS = useResponsiveCardCount(fallbackMaxCards);
   const totalPages = Math.ceil(cardsList.length / MAX_CARDS);
 
@@ -43,7 +46,13 @@ export default function CardCarousel({
   const hasNext = page < totalPages - 1;
   const hasPrev = page > 0;
   const start = page * MAX_CARDS;
-  const visibleCards = cardsList.slice(start, start + MAX_CARDS);
+  const albumCards =
+    type === 'album' ? (cardsList as AlbumSummary[]) : undefined;
+  const reviewCards = type === 'review' ? (cardsList as Rating[]) : undefined;
+  const visibleCards =
+    type === 'album'
+      ? (albumCards?.slice(start, start + MAX_CARDS) ?? [])
+      : (reviewCards?.slice(start, start + MAX_CARDS) ?? []);
 
   const goNext = () => hasNext && setPage(prev => prev + 1);
   const goPrev = () => hasPrev && setPage(prev => prev - 1);
@@ -52,17 +61,17 @@ export default function CardCarousel({
     <div className='md:flex flex-col gap-4'>
       {/* Mobile */}
       <div className='grid grid-cols-1 sm:grid-cols-2 place-items-center p-4 gap-4 md:hidden w-full'>
-        {cardsList.map((rating, index) =>
-          type === 'album' ? (
-            <AlbumCard
-              key={rating.id}
-              rating={rating}
-              priority={index <= 4 ? true : false}
-            />
-          ) : (
-            <ReviewCard key={rating.id} rating={rating} />
-          )
-        )}
+        {type === 'album'
+          ? albumCards?.map((rating, index) => (
+              <AlbumCard
+                key={rating.id}
+                rating={rating}
+                priority={index <= 4}
+              />
+            ))
+          : reviewCards?.map(rating => (
+              <ReviewCard key={rating.id} rating={rating} />
+            ))}
       </div>
 
       {/* Web */}
@@ -81,11 +90,11 @@ export default function CardCarousel({
               <motion.div variants={cardVariants} key={card.id}>
                 {type === 'album' ? (
                   <AlbumCard
-                    rating={card}
-                    priority={index <= 4 ? true : false}
+                    rating={card as AlbumSummary}
+                    priority={index <= 4}
                   />
                 ) : (
-                  <ReviewCard rating={card} />
+                  <ReviewCard rating={card as Rating} />
                 )}
               </motion.div>
             ))}

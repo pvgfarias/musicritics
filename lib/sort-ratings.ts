@@ -1,25 +1,30 @@
-// lib/sort-ratings.ts
-import currentRatings from '@/data/currentRatings';
-
 export type SortKey = 'recent' | 'score-desc' | 'score-asc' | 'az';
 
-export function sortRatings(
-  ratings: typeof currentRatings,
-  sort: SortKey
-): typeof currentRatings {
+export function sortRatings<
+  T extends {
+    title: string;
+    createdAt?: Date | string;
+    averageRating?: number | null;
+  },
+>(ratings: T[], sort: SortKey): T[] {
   const copy = [...ratings]; // never mutate the source array
   switch (sort) {
     case 'score-desc':
-      return copy.sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+      return copy.sort(
+        (a, b) => (b.averageRating ?? -1) - (a.averageRating ?? -1)
+      );
     case 'score-asc':
-      return copy.sort((a, b) => (a.score ?? -1) - (b.score ?? -1));
+      return copy.sort(
+        (a, b) => (a.averageRating ?? -1) - (b.averageRating ?? -1)
+      );
     case 'az':
-      return copy.sort((a, b) => a.albumName.localeCompare(b.albumName));
+      return copy.sort((a, b) => a.title.localeCompare(b.title));
     case 'recent':
     default:
-      return copy.sort(
-        (a, b) =>
-          new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime()
-      );
+      return copy.sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      });
   }
 }

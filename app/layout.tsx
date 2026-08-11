@@ -18,6 +18,7 @@ const raleway = Raleway({
 
 const quicksand = Quicksand({
   variable: '--font-quicksand',
+  subsets: ['latin'],
   style: ['normal'],
   weight: ['700'],
 });
@@ -51,6 +52,7 @@ export default function RootLayout({
   return (
     <html
       lang='en'
+      suppressHydrationWarning
       className={`${raleway.variable} ${quicksand.variable} ${space.variable} antialiased`}
     >
       <head>
@@ -60,8 +62,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
         />
       </head>
+
       <body className='flex h-dvh overflow-hidden'>
         <Sidebar />
+
         <div className='flex flex-col flex-1 min-w-0 h-dvh'>
           <main className='relative flex-1 overflow-y-auto bg-background'>
             {children}

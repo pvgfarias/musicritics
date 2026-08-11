@@ -34,15 +34,24 @@ const albumSummarySelect = {
   coverImage: true,
   releaseYear: true,
   genre: true,
+  createdAt: true,
   artists: {
     select: { artist: { select: { id: true, name: true, slug: true } } },
   },
   _count: { select: { ratings: true } },
+  ratings: { select: { score: true } },
 } satisfies Prisma.AlbumSelect;
 
-type AlbumSummary = Prisma.AlbumGetPayload<{
+type AlbumSummaryRaw = Prisma.AlbumGetPayload<{
   select: typeof albumSummarySelect;
 }>;
+
+export type AlbumSummary = AlbumSummaryRaw & {
+  artist: string;
+  artistNames: string[];
+  ratingCount: number;
+  averageRating: number | null;
+};
 
 function normalizeAlbum(album: AlbumWithRelations) {
   const artistNames = album.artists
@@ -57,13 +66,21 @@ function normalizeAlbum(album: AlbumWithRelations) {
   };
 }
 
-function normalizeAlbumSummary(album: AlbumSummary) {
+function normalizeAlbumSummary(album: AlbumSummaryRaw) {
   const artistNames = album.artists.map(a => a.artist.name).filter(Boolean);
+  const scores = album.ratings
+    .map(rating => rating.score)
+    .filter((score): score is number => score != null);
+  const averageRating = scores.length
+    ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+    : null;
+
   return {
     ...album,
     artist: artistNames.join(', '),
     artistNames,
     ratingCount: album._count.ratings,
+    averageRating,
   };
 }
 

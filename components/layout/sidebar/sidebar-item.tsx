@@ -24,7 +24,7 @@ export default function SidebarItem({
       {isActive && (
         <span className='absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full bg-ember' />
       )}
-      <Icon size={20} className={isActive ? 'text-ember' : ''} />
+      <Icon size={20} />
       <span className='whitespace-nowrap'>{label}</span>
     </Link>
   );

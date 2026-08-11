@@ -4,9 +4,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import AlbumCard from '../dashboard/album-card';
 import AlbumCardSkeleton from '../dashboard/album-card-skeleton';
-import currentRatings from '@/data/currentRatings';
 import { useSearchParams } from 'next/navigation';
 import { sortRatings, SortKey } from '@/lib/sort-ratings';
+import type { AlbumSummary } from '@/data/albums';
 
 const cardVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -16,9 +16,11 @@ const cardVariants = {
 export default function CardGrid({
   cardsList,
   MAX_CARDS,
+  viewMode,
 }: {
-  cardsList: typeof currentRatings;
+  cardsList: AlbumSummary[];
   MAX_CARDS: number;
+  viewMode: 'grid' | 'list';
 }) {
   const searchParams = useSearchParams();
   const query = searchParams.get('query');
@@ -30,21 +32,21 @@ export default function CardGrid({
     const filtered = cardsList.filter(rating => {
       if (query) {
         const q = query.toLowerCase();
-        const matchesArtist = rating.artistName.some(name =>
-          name.toLowerCase().includes(q)
+        const matchesArtist = rating.artists.some(({ artist }) =>
+          artist.name.toLowerCase().includes(q)
         );
-        const matchesAlbum = rating.albumName.toLowerCase().includes(q);
+        const matchesAlbum = rating.title.toLowerCase().includes(q);
         if (!matchesArtist && !matchesAlbum) return false;
       }
       if (genre && genre !== 'All' && rating.genre !== genre) return false;
-      if (status && status !== 'All') {
-        if (status === 'Open' && rating.finalized) return false;
-        if (status === 'Finalized' && !rating.finalized) return false;
-      }
+      // if (status && status !== 'All') {
+      //   if (status === 'Open' && rating.finalized) return false;
+      //   if (status === 'Finalized' && !rating.finalized) return false;
+      // }
       return true;
     });
     return sortRatings(filtered, sort);
-  }, [cardsList, query, genre, status, sort]);
+  }, [cardsList, query, genre, sort]);
 
   const filterKey = `${query}|${genre}|${status}|${sort}`;
 
@@ -59,7 +61,7 @@ function InfiniteGrid({
   cards,
   MAX_CARDS,
 }: {
-  cards: typeof currentRatings;
+  cards: AlbumSummary[];
   MAX_CARDS: number;
 }) {
   const PAGE_SIZE = MAX_CARDS * 2;
@@ -106,7 +108,7 @@ function InfiniteGrid({
       <div className='hidden md:flex md:flex-col md:pt-4 md:gap-4'>
         <motion.div
           layout
-          className='grid gap-4 w-full grid-cols-3 lg:grid-cols-4 xl:grid-cols-6'
+          className='grid gap-3 w-full grid-cols-[repeat(auto-fill,11.5rem)]'
         >
           <AnimatePresence initial={false}>
             {visibleCards.map((card, index) => (

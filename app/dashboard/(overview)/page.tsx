@@ -2,8 +2,9 @@ import RecentReviews from '@/components/dashboard/recent-reviews';
 import TopAlbums from '@/components/dashboard/top-albums';
 import TopSongs from '@/components/dashboard/top-songs';
 import WeeklyRotation from '@/components/dashboard/weekly-rotation';
+import { getAlbumsPage } from '@/data/albums';
 
-export default function Page() {
+export default async function Page() {
   const days = [
     'Sunday',
     'Monday',
@@ -31,11 +32,13 @@ export default function Page() {
   const day = days[d.getDay()].slice(0, 3);
   const month = months[d.getMonth()];
 
+  const { albums } = await getAlbumsPage(1, 4);
+
   return (
     <main className='bg-background'>
       <div className='flex flex-row justify-between items-center'>
         <div className='flex flex-col gap-2 pb-8'>
-          <h1 className='text-2xl font-title text-gray-900 dark:text-white underline decoration-3 decoration-ember underline-offset-4'>
+          <h1 className='text-2xl font-title text-gray-900 dark:text-white underline decoration-3 decoration-ember underline-offset-8'>
             Dashboard
           </h1>
           <p className='text-xs font-mono uppercase text-gray-500 dark:text-gray-300 '>
@@ -45,7 +48,7 @@ export default function Page() {
       </div>
       <div className='flex flex-row gap-6 w-full'>
         <div className='flex flex-col w-4/5'>
-          <WeeklyRotation />
+          <WeeklyRotation albums={albums} />
           <RecentReviews />
         </div>
         <div className='flex flex-col w-1/5 gap-4'>
