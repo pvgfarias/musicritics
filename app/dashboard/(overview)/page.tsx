@@ -35,7 +35,7 @@ export default function Page() {
     <main className='bg-background'>
       <div className='flex flex-row justify-between items-center'>
         <div className='flex flex-col gap-2 pb-8'>
-          <h1 className='text-2xl font-title text-gray-900 dark:text-white'>
+          <h1 className='text-2xl font-title text-gray-900 dark:text-white underline decoration-3 decoration-ember underline-offset-4'>
             Dashboard
           </h1>
           <p className='text-xs font-mono uppercase text-gray-500 dark:text-gray-300 '>

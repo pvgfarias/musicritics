@@ -28,7 +28,7 @@ export default function Login() {
             // onChange={handleChange}
             placeholder='email@email.com'
             required
-            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-white '
+            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-ember focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-white '
           />
         </div>
         <div>
@@ -46,13 +46,13 @@ export default function Login() {
             // value={formData.name}
             // onChange={handleChange}
             required
-            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-white'
+            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-ember focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-white'
           />
         </div>
         <button
           type='submit'
           // disabled={isSubmitting}
-          className='w-full flex items-center justify-center px-6 py-3 bg-linear-to-r from-dark-blue to-amber-500 text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
+          className='w-full flex items-center justify-center px-6 py-3 bg-linear-to-r from-dark-blue to-ember text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
         >
           Login
         </button>

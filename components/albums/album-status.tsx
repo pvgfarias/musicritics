@@ -24,7 +24,7 @@ export default function AlbumStatus() {
   };
 
   return (
-    <div className='h-12 w-60 flex flex-row items-center rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 p-1 shadow-sm mb-4 md:mx-0 mx-4'>
+    <div className='h-10 w-60 flex flex-row items-center rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 p-1 shadow-sm mb-4 md:mx-0 mx-4'>
       {OPTIONS.map(option => (
         <button
           key={option}

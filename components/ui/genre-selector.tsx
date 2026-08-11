@@ -69,7 +69,7 @@ export default function GenreSelector() {
         aria-haspopup='listbox'
         aria-expanded={isOpen}
         onClick={() => setIsOpen(prev => !prev)}
-        className='h-12 w-40 flex flex-row justify-between items-center rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 px-4 py-3 md:mx-0 mx-4 shadow-sm mb-4 text-gray-500 text-base cursor-pointer'
+        className='h-10 w-40 flex flex-row justify-between items-center rounded-md border border-gray-300 dark:border-mist-600 bg-gray-50 dark:bg-mist-900 px-4 py-3 md:mx-0 mx-4 shadow-sm mb-4 text-gray-500 text-base cursor-pointer'
       >
         <span className={`select-none ${currentGenre ? 'text-gray-900' : ''}`}>
           {currentGenre || 'Genre'}

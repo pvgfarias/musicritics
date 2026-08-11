@@ -13,7 +13,7 @@ export default function WeeklyPicksBar({
 
       <div className='h-2 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-500'>
         <div
-          className='h-full rounded-full bg-linear-to-r from-amber-200 to-amber-600 transition-all duration-700 ease-out'
+          className='h-full rounded-full bg-linear-to-r from-amber-200 to-ember transition-all duration-700 ease-out'
           style={{ width: `${pct}%` }}
         />
       </div>

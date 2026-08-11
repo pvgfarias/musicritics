@@ -16,7 +16,7 @@ export default function Hero() {
 
         <Link
           href='/register'
-          className='mt-8 inline-block rounded-full bg-dark-blue px-8 py-3 text-base font-semibold text-white transition hover:bg-amber-500'
+          className='mt-8 inline-block rounded-full bg-dark-blue px-8 py-3 text-base font-semibold text-white transition hover:bg-ember'
         >
           Start Now
         </Link>

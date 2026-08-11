@@ -25,7 +25,7 @@ export default function Sidebar() {
           {/* Title */}
           <Link
             href='/'
-            className='flex items-center gap-2 pl-4 pr-3 py-3 text-amber-600 font-title text-xl tracking-wider leading-none'
+            className='flex items-center gap-2 pl-4 pr-3 py-3 text-ember font-title text-xl tracking-wider leading-none'
           >
             <IconVinyl size={24} className='shrink-0' />
             <p className='whitespace-nowrap'>MusiCritics</p>

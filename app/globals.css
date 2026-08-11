@@ -6,6 +6,7 @@
   --sidebar: #f7eede;
   --sidebar-active: #fcdfc4;
   --dark-blue: #080b19;
+  --ember: #e8622c;
   color-scheme: light;
 }
 
@@ -27,6 +28,7 @@
   --color-dark-blue: var(--dark-blue);
   --color-sidebar: var(--sidebar);
   --color-sidebar-active: var(--sidebar-active);
+  --color-ember: var(--ember);
   --font-sans: var(--font-raleway-sans);
   --font-title: var(--font-quicksand);
   --font-mono: var(--font-space);

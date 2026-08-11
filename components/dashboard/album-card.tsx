@@ -16,10 +16,10 @@ export default function AlbumCard({
 
   return (
     <div
-      className='flex flex-col h-70 w-56 shrink-0 bg-foreground shadow-sm cursor-pointer rounded-sm border border-gray-100 dark:border-foreground-border transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-lg'
+      className='flex flex-col h-60 w-46 shrink-0 cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-lg'
       onClick={() => router.push(`dashboard/albums/${rating.id}`)}
     >
-      <div className='relative w-56 h-56 shrink-0'>
+      <div className='relative w-46 h-46 shrink-0'>
         <Image
           src={`/${rating.image}`}
           alt={`${rating.albumName} by ${rating.artistName}`}

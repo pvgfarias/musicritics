@@ -1,7 +1,9 @@
 import AlbumStatus from '@/components/albums/album-status';
 import CardGrid from '@/components/ui/card-grid';
+import CardGridSkeleton from '@/components/ui/card-grid-skeleton';
 import GenreSelector from '@/components/ui/genre-selector';
 import SearchBar from '@/components/ui/search-bar';
+import SortSelector from '@/components/ui/sort-selector';
 import currentRatings from '@/data/currentRatings';
 import { Suspense } from 'react';
 
@@ -20,9 +22,10 @@ export default function Page() {
           <SearchBar />
         </Suspense>
         <GenreSelector />
+        <SortSelector />
         <AlbumStatus />
       </div>
-      <Suspense>
+      <Suspense fallback={<CardGridSkeleton MAX_CARDS={MAX_ALBUMS} />}>
         <CardGrid cardsList={currentRatings} MAX_CARDS={MAX_ALBUMS} />
       </Suspense>
     </main>
