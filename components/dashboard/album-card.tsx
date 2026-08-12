@@ -2,7 +2,6 @@ import Image from 'next/image';
 import RatingGrade from './rating-grade';
 import { useRouter } from 'next/navigation';
 import type { AlbumSummary } from '@/data/albums';
-
 export default function AlbumCard({
   album,
   priority = false,
@@ -14,10 +13,10 @@ export default function AlbumCard({
 
   return (
     <div
-      className='flex flex-col h-60 w-46 shrink-0 cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-lg mb-2'
+      className='flex flex-col w-full shrink-0 cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-lg mb-2'
       onClick={() => router.push(`dashboard/albums/${album.id}`)}
     >
-      <div className='relative w-46 h-46 shrink-0'>
+      <div className='relative w-56 aspect-square shrink-0'>
         <Image
           src={album.coverImage ? `/${album.coverImage}` : '/albums.jpg'}
           alt={`${album.title} by ${album.artists[0]?.artist.name}`}
@@ -33,7 +32,7 @@ export default function AlbumCard({
         <p className='font-title font-bold text-sm text-dark-blue dark:text-white line-clamp-1'>
           {album.title}
         </p>
-        <p className='text-xs text-gray-700 dark:text-gray-300 line-clamp-1'>
+        <p className='text-[13px] text-gray-700 dark:text-gray-300 line-clamp-1'>
           {album.artists[0]?.artist.name}
         </p>
         <p className='text-xs text-gray-700 dark:text-gray-300 line-clamp-1'>

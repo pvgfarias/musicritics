@@ -49,7 +49,7 @@ export default function SortSelector() {
   }, []);
 
   return (
-    <div ref={containerRef} className='relative'>
+    <div ref={containerRef} className='flex-1 relative'>
       <button
         type='button'
         aria-haspopup='listbox'

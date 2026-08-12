@@ -15,20 +15,20 @@ export default function AlbumViewMode({
         type='button'
         onClick={() => onViewModeChange('grid')}
         className={`flex flex-1 items-center justify-center transition-colors duration-200 ${
-          viewMode === 'grid' ? 'bg-ember text-gray-900' : 'text-gray-500'
+          viewMode === 'grid' ? 'bg-ember  text-white' : 'text-gray-500'
         }`}
       >
-        <IconLayoutGrid size={18} />
+        <IconLayoutGrid size={16} />
       </button>
 
       <button
         type='button'
         onClick={() => onViewModeChange('list')}
         className={`flex flex-1 items-center justify-center transition-colors duration-200 ${
-          viewMode === 'list' ? 'bg-ember text-gray-900' : 'text-gray-500'
+          viewMode === 'list' ? 'bg-ember  text-white' : 'text-gray-500'
         }`}
       >
-        <IconList size={18} />
+        <IconList size={16} />
       </button>
     </div>
   );
