@@ -62,12 +62,8 @@ export default function CardCarousel({
       {/* Mobile */}
       <div className='grid grid-cols-1 sm:grid-cols-2 place-items-center p-4 gap-4 md:hidden w-full'>
         {type === 'album'
-          ? albumCards?.map((rating, index) => (
-              <AlbumCard
-                key={rating.id}
-                rating={rating}
-                priority={index <= 4}
-              />
+          ? albumCards?.map((album, index) => (
+              <AlbumCard key={album.id} album={album} priority={index <= 4} />
             ))
           : reviewCards?.map(rating => (
               <ReviewCard key={rating.id} rating={rating} />
@@ -90,7 +86,7 @@ export default function CardCarousel({
               <motion.div variants={cardVariants} key={card.id}>
                 {type === 'album' ? (
                   <AlbumCard
-                    rating={card as AlbumSummary}
+                    album={card as AlbumSummary}
                     priority={index <= 4}
                   />
                 ) : (

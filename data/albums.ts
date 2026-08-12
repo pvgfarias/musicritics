@@ -39,7 +39,7 @@ const albumSummarySelect = {
     select: { artist: { select: { id: true, name: true, slug: true } } },
   },
   _count: { select: { ratings: true } },
-  ratings: { select: { score: true } },
+  ratings: { select: { score: true, finalized: true } },
 } satisfies Prisma.AlbumSelect;
 
 type AlbumSummaryRaw = Prisma.AlbumGetPayload<{
@@ -51,6 +51,7 @@ export type AlbumSummary = AlbumSummaryRaw & {
   artistNames: string[];
   ratingCount: number;
   averageRating: number | null;
+  finalized: boolean;
 };
 
 function normalizeAlbum(album: AlbumWithRelations) {
@@ -74,6 +75,7 @@ function normalizeAlbumSummary(album: AlbumSummaryRaw) {
   const averageRating = scores.length
     ? scores.reduce((sum, score) => sum + score, 0) / scores.length
     : null;
+  const finalized = album.ratings.some(rating => rating.finalized === true);
 
   return {
     ...album,
@@ -81,6 +83,7 @@ function normalizeAlbumSummary(album: AlbumSummaryRaw) {
     artistNames,
     ratingCount: album._count.ratings,
     averageRating,
+    finalized,
   };
 }
 

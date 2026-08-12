@@ -24,9 +24,7 @@ export default function AlbumDetails({ album }: AlbumDetailsProps) {
           </div>
         )}
         <Image
-          src={
-            album.coverImage ? `/${album.coverImage}` : '/placeholder-album.jpg'
-          }
+          src={album.coverImage ? `/${album.coverImage}` : '/albums.jpg'}
           alt={`${album.title} by ${album.artist}`}
           width={250}
           height={250}

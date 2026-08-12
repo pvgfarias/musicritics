@@ -39,14 +39,14 @@ export default function CardGrid({
         if (!matchesArtist && !matchesAlbum) return false;
       }
       if (genre && genre !== 'All' && rating.genre !== genre) return false;
-      // if (status && status !== 'All') {
-      //   if (status === 'Open' && rating.finalized) return false;
-      //   if (status === 'Finalized' && !rating.finalized) return false;
-      // }
+      if (status && status !== 'All') {
+        if (status === 'Open' && rating.finalized) return false;
+        if (status === 'Finalized' && !rating.finalized) return false;
+      }
       return true;
     });
     return sortRatings(filtered, sort);
-  }, [cardsList, query, genre, sort]);
+  }, [cardsList, query, status, genre, sort]);
 
   const filterKey = `${query}|${genre}|${status}|${sort}`;
 
@@ -99,8 +99,8 @@ function InfiniteGrid({
     <>
       {/* Mobile */}
       <div className='grid grid-cols-2 sm:grid-cols-3 place-items-center p-4 gap-4 md:hidden w-full'>
-        {visibleCards.map((rating, index) => (
-          <AlbumCard key={rating.id} rating={rating} priority={index < 3} />
+        {visibleCards.map((album, index) => (
+          <AlbumCard key={album.id} album={album} priority={index < 3} />
         ))}
       </div>
 
@@ -111,16 +111,16 @@ function InfiniteGrid({
           className='grid gap-3 w-full grid-cols-[repeat(auto-fill,11.5rem)]'
         >
           <AnimatePresence initial={false}>
-            {visibleCards.map((card, index) => (
+            {visibleCards.map((album, index) => (
               <motion.div
                 layout
                 variants={cardVariants}
                 initial='hidden'
                 animate='show'
                 exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                key={card.id}
+                key={album.id}
               >
-                <AlbumCard rating={card} priority={index < MAX_CARDS} />
+                <AlbumCard album={album} priority={index < MAX_CARDS} />
               </motion.div>
             ))}
             {isLoadingMore &&
