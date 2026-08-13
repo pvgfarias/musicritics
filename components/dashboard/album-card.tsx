@@ -14,7 +14,7 @@ export default function AlbumCard({
   return (
     <div
       className='flex flex-col w-full shrink-0 cursor-pointer transition-all duration-200 ease-out hover:-translate-y-1.5 hover:rotate-[-0.4deg] hover:shadow-lg mb-2'
-      onClick={() => router.push(`dashboard/albums/${album.id}`)}
+      onClick={() => router.push(`/dashboard/albums/${album.slug}`)}
     >
       <div className='relative w-56 aspect-square shrink-0'>
         <Image

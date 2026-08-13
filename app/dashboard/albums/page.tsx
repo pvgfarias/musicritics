@@ -1,8 +1,11 @@
+// page.tsx
 import AlbumsClient from './albums-client';
 import { getAlbumsPage } from '@/data/albums';
 
+const PAGE_SIZE = 15;
+
 export default async function Page() {
-  const albums = await getAlbumsPage(1, 30);
+  const { albums } = await getAlbumsPage(1, PAGE_SIZE);
 
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2'>
@@ -10,7 +13,11 @@ export default async function Page() {
         Albums
       </h1>
 
-      <AlbumsClient albums={albums.albums} />
+      <AlbumsClient
+        initialAlbums={albums}
+        initialHasMore={albums.length === PAGE_SIZE}
+        pageSize={PAGE_SIZE}
+      />
     </main>
   );
 }
