@@ -1,6 +1,6 @@
 import type { AlbumSummary } from '@/data/albums';
 import WeeklyPicksBar from './weekly-picks-bar';
-import AlbumDisplay from '../albums/album-display';
+import AlbumDisplay from '../albums/display/album-display';
 
 export default function WeeklyRotation({ albums }: { albums: AlbumSummary[] }) {
   return (

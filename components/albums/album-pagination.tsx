@@ -24,7 +24,7 @@ export default function AlbumPagination({
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <nav className='flex flex-row items-center justify-center gap-2 mt-6'>
+    <nav className='flex flex-row items-center justify-center gap-2 mt-6 mb-6 text-gray-500 dark:text-white'>
       <Link
         href={hrefForPage(Math.max(1, currentPage - 1))}
         aria-disabled={currentPage === 1}

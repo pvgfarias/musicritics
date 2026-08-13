@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useState } from 'react';
-import AlbumCard from '../dashboard/album-card';
+import AlbumCard from '../albums/cards/album-card';
 import currentRatings from '@/data/currentRatings';
 import { useResponsiveCardCount } from '@/hooks/useResponsiveCardCount';
 import ReviewCard from '../dashboard/review-card';

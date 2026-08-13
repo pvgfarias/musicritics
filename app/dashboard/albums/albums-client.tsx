@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from 'react';
 import AlbumViewMode from '@/components/albums/album-view-mode';
-import AlbumDisplay from '@/components/albums/album-display';
+import AlbumDisplay from '@/components/albums/display/album-display';
 import AlbumPagination from '@/components/albums/album-pagination';
 import AlbumStatus from '@/components/albums/album-status';
 import GenreSelector from '@/components/ui/genre-selector';

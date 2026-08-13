@@ -1,8 +1,9 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
-import AlbumCard from '../dashboard/album-card';
+import AlbumCard from '../cards/album-card';
 import type { AlbumSummary } from '@/data/albums';
+import Link from 'next/dist/client/link';
 
 const cardVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -37,7 +38,12 @@ export function AlbumGrid({ albumList }: { albumList: AlbumSummary[] }) {
                 exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                 key={album.id}
               >
-                <AlbumCard album={album} priority={index < MAX_ALBUMS} />
+                <Link
+                  href={`/dashboard/albums/${album.slug}`}
+                  className='w-full'
+                >
+                  <AlbumCard album={album} priority={index < MAX_ALBUMS} />
+                </Link>
               </motion.div>
             ))}
           </AnimatePresence>

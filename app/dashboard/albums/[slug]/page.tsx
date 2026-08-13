@@ -18,9 +18,10 @@ export default async function AlbumPage({
   if (!album) notFound();
 
   return (
-    <main className='max-w-7xl m-auto'>
+    <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2'>
+      <h1>Get</h1>
       <div className='flex flex-col gap-8'>
-        <div className='flex flex-row justify-center items-center bg-surface border border-gray-300 dark:border-slate-800'>
+        <div className='flex flex-row justify-center items-center '>
           <AlbumDetails album={album} />
           <AlbumStats album={album} />
         </div>
@@ -49,7 +50,7 @@ export default async function AlbumPage({
             <h2 className='text-2xl font-title font-extrabold'>Comments</h2>
           </div>
 
-          <div className='flex flex-col gap-4 bg-foreground px-8 py-4 h-80 overflow-y-auto'>
+          {/* <div className='flex flex-col gap-4 bg-foreground px-8 py-4 h-80 overflow-y-auto'>
             {album.ratings?.length ? (
               album.ratings.map(rating => (
                 <div key={rating.id} className='flex flex-col'>
@@ -78,7 +79,7 @@ export default async function AlbumPage({
             ) : (
               <p className='text-gray-700'>No ratings yet.</p>
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </main>
