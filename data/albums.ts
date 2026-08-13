@@ -1,6 +1,7 @@
 // data/albums.ts
 import { Prisma } from '../app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
+import { SortKey } from '@/lib/sort-ratings';
 
 type AlbumWithRelations = Prisma.AlbumGetPayload<{
   include: {
@@ -54,6 +55,56 @@ export type AlbumSummary = AlbumSummaryRaw & {
   finalized: boolean;
 };
 
+type AlbumsQuery = {
+  page?: number;
+  pageSize?: number;
+  query?: string;
+  genre?: string;
+  status?: string;
+  sort?: SortKey;
+};
+
+function buildAlbumWhere({
+  query,
+  genre,
+  status,
+}: Pick<AlbumsQuery, 'query' | 'genre' | 'status'>): Prisma.AlbumWhereInput {
+  return {
+    ...(query && {
+      OR: [
+        { title: { contains: query, mode: 'insensitive' } },
+        {
+          artists: {
+            some: {
+              artist: { name: { contains: query, mode: 'insensitive' } },
+            },
+          },
+        },
+      ],
+    }),
+    ...(genre && genre !== 'All' && { genre }),
+    ...(status &&
+      status !== 'All' && {
+        ratings: { some: { finalized: status === 'Finalized' } },
+      }),
+  };
+}
+
+function sortKeyToOrderBy(
+  sort?: SortKey
+): Prisma.AlbumOrderByWithRelationInput {
+  switch (sort) {
+    case 'az':
+      return { title: 'asc' };
+    case 'za':
+      return { title: 'desc' };
+    // add your other SortKey cases here (e.g. 'rating', 'oldest'...)
+    case 'recent':
+    default:
+      return { createdAt: 'desc' };
+  }
+}
+
 function normalizeAlbum(album: AlbumWithRelations) {
   const artistNames = album.artists
     .map(entry => entry.artist.name)
@@ -87,15 +138,25 @@ function normalizeAlbumSummary(album: AlbumSummaryRaw) {
   };
 }
 
-export async function getAlbumsPage(page = 1, pageSize = 20) {
+export async function getAlbumsPage({
+  page = 1,
+  pageSize = 20,
+  query,
+  genre,
+  status,
+  sort,
+}: AlbumsQuery = {}) {
+  const where = buildAlbumWhere({ query, genre, status });
+
   const [albums, total] = await Promise.all([
     prisma.album.findMany({
+      where,
       skip: (page - 1) * pageSize,
       take: pageSize,
       select: albumSummarySelect,
-      orderBy: { createdAt: 'desc' },
+      orderBy: sortKeyToOrderBy(sort),
     }),
-    prisma.album.count(),
+    prisma.album.count({ where }),
   ]);
 
   return {

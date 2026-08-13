@@ -31,6 +31,7 @@ export default function SortSelector() {
     } else {
       params.set('sort', sort);
     }
+    params.delete('page');
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
     setIsOpen(false);
   };

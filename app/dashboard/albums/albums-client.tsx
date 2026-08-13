@@ -1,34 +1,27 @@
-// albums-client.tsx
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import AlbumViewMode from '@/components/albums/album-view-mode';
 import AlbumDisplay from '@/components/albums/album-display';
+import AlbumPagination from '@/components/albums/album-pagination';
 import AlbumStatus from '@/components/albums/album-status';
 import GenreSelector from '@/components/ui/genre-selector';
 import SearchBar from '@/components/ui/search-bar';
 import SortSelector from '@/components/ui/sort-selector';
-import { useInfiniteAlbums } from '@/hooks/use-infinite-albums';
-import { useState } from 'react';
 import type { AlbumSummary } from '@/data/albums';
 
 type AlbumsClientProps = {
-  initialAlbums: AlbumSummary[];
-  initialHasMore: boolean;
-  pageSize: number;
+  albums: AlbumSummary[];
+  currentPage: number;
+  totalPages: number;
 };
 
 export default function AlbumsClient({
-  initialAlbums,
-  initialHasMore,
-  pageSize,
+  albums,
+  currentPage,
+  totalPages,
 }: AlbumsClientProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const { albums, hasMore, isLoadingMore, sentinelRef } = useInfiniteAlbums(
-    initialAlbums,
-    initialHasMore,
-    pageSize
-  );
 
   return (
     <div>
@@ -41,13 +34,12 @@ export default function AlbumsClient({
           <AlbumViewMode viewMode={viewMode} onViewModeChange={setViewMode} />
         </Suspense>
       </div>
-      <AlbumDisplay
-        albumList={albums}
-        viewMode={viewMode}
-        hasMore={hasMore}
-        isLoadingMore={isLoadingMore}
-        sentinelRef={sentinelRef}
-      />
+
+      <AlbumDisplay albumList={albums} viewMode={viewMode} />
+
+      <Suspense>
+        <AlbumPagination currentPage={currentPage} totalPages={totalPages} />
+      </Suspense>
     </div>
   );
 }

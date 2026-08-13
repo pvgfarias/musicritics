@@ -1,19 +1,8 @@
 import Image from 'next/image';
 import RatingGrade from '../dashboard/rating-grade';
 import type { AlbumSummary } from '@/data/albums';
-import type { RefObject } from 'react';
 
-export function AlbumList({
-  albumList,
-  hasMore,
-  isLoadingMore,
-  sentinelRef,
-}: {
-  albumList: AlbumSummary[];
-  hasMore: boolean;
-  isLoadingMore: boolean;
-  sentinelRef: RefObject<HTMLDivElement | null>;
-}) {
+export function AlbumList({ albumList }: { albumList: AlbumSummary[] }) {
   return (
     <>
       {albumList.map(album => (
@@ -54,13 +43,6 @@ export function AlbumList({
           </div>
         </div>
       ))}
-
-      {isLoadingMore && (
-        <div className='p-2 text-sm text-gray-500 dark:text-slate-400'>
-          Loading more...
-        </div>
-      )}
-      {hasMore && <div ref={sentinelRef} className='h-px w-full' aria-hidden />}
     </>
   );
 }

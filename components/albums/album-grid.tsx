@@ -2,9 +2,7 @@
 
 import { motion, AnimatePresence } from 'motion/react';
 import AlbumCard from '../dashboard/album-card';
-import AlbumCardSkeleton from '../dashboard/album-card-skeleton';
 import type { AlbumSummary } from '@/data/albums';
-import type { RefObject } from 'react';
 
 const cardVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -13,17 +11,7 @@ const cardVariants = {
 
 const MAX_ALBUMS = 5;
 
-export function AlbumGrid({
-  albumList,
-  hasMore,
-  isLoadingMore,
-  sentinelRef,
-}: {
-  albumList: AlbumSummary[];
-  hasMore: boolean;
-  isLoadingMore: boolean;
-  sentinelRef: RefObject<HTMLDivElement | null>;
-}) {
+export function AlbumGrid({ albumList }: { albumList: AlbumSummary[] }) {
   return (
     <>
       {/* Mobile */}
@@ -52,15 +40,9 @@ export function AlbumGrid({
                 <AlbumCard album={album} priority={index < MAX_ALBUMS} />
               </motion.div>
             ))}
-            {isLoadingMore &&
-              Array.from({ length: MAX_ALBUMS }).map((_, i) => (
-                <AlbumCardSkeleton key={`skeleton-${i}`} />
-              ))}
           </AnimatePresence>
         </motion.div>
       </div>
-
-      {hasMore && <div ref={sentinelRef} className='h-px w-full' aria-hidden />}
     </>
   );
 }

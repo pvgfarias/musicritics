@@ -1,11 +1,31 @@
-// page.tsx
 import AlbumsClient from './albums-client';
 import { getAlbumsPage } from '@/data/albums';
+import type { SortKey } from '@/lib/sort-ratings';
 
 const PAGE_SIZE = 15;
 
-export default async function Page() {
-  const { albums } = await getAlbumsPage(1, PAGE_SIZE);
+type PageProps = {
+  searchParams: Promise<{
+    page?: string;
+    query?: string;
+    genre?: string;
+    status?: string;
+    sort?: string;
+  }>;
+};
+
+export default async function Page({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const page = Math.max(1, Number(params.page) || 1);
+
+  const { albums, totalPages } = await getAlbumsPage({
+    page,
+    pageSize: PAGE_SIZE,
+    query: params.query,
+    genre: params.genre,
+    status: params.status,
+    sort: (params.sort as SortKey) ?? 'recent',
+  });
 
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2'>
@@ -14,9 +34,9 @@ export default async function Page() {
       </h1>
 
       <AlbumsClient
-        initialAlbums={albums}
-        initialHasMore={albums.length === PAGE_SIZE}
-        pageSize={PAGE_SIZE}
+        albums={albums}
+        currentPage={page}
+        totalPages={totalPages}
       />
     </main>
   );

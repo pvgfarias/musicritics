@@ -35,6 +35,7 @@ export default function GenreSelector() {
     } else {
       params.set('genre', genre);
     }
+    params.delete('page');
     router.push(`${pathname}?${params.toString()}`);
     setIsOpen(false);
   };
