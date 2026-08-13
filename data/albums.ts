@@ -22,6 +22,11 @@ type AlbumWithRelations = Prisma.AlbumGetPayload<{
     ratings: {
       include: {
         user: { select: { id: true; username: true; image: true } };
+        comment: {
+          include: {
+            author: { select: { id: true; username: true; image: true } };
+          };
+        };
       };
     };
     socialLinks: true;
@@ -46,6 +51,8 @@ const albumSummarySelect = {
 type AlbumSummaryRaw = Prisma.AlbumGetPayload<{
   select: typeof albumSummarySelect;
 }>;
+
+export type AlbumFull = Awaited<ReturnType<typeof getAlbumWithAverageRating>>;
 
 export type AlbumSummary = AlbumSummaryRaw & {
   artist: string;
@@ -96,9 +103,6 @@ function sortKeyToOrderBy(
   switch (sort) {
     case 'az':
       return { title: 'asc' };
-    case 'za':
-      return { title: 'desc' };
-    // add your other SortKey cases here (e.g. 'rating', 'oldest'...)
     case 'recent':
     default:
       return { createdAt: 'desc' };
@@ -211,6 +215,11 @@ export async function getAlbumBySlug(slug: string) {
       ratings: {
         include: {
           user: { select: { id: true, username: true, image: true } },
+          comment: {
+            include: {
+              author: { select: { id: true, username: true, image: true } },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
       },

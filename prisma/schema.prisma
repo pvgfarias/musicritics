@@ -81,7 +81,7 @@ model Rating {
   albumId String
   album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
 
-  comments Comment[]
+  comment Comment?
 
   @@unique([userId, albumId])
 }
@@ -109,7 +109,7 @@ model Comment {
   authorId String?
   author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
-  ratingId String
+  ratingId String @unique
   rating   Rating @relation(fields: [ratingId], references: [id], onDelete: Cascade)
 }
 

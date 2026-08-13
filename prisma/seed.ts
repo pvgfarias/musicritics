@@ -18,7 +18,7 @@ async function main() {
         email: 'alex@example.com',
         username: 'alex',
         name: 'Alex Chen',
-        image: 'https://i.pravatar.cc/150?img=12',
+        image: 'user.jpg',
       },
     }),
     prisma.user.create({
@@ -26,7 +26,7 @@ async function main() {
         email: 'maya@example.com',
         username: 'maya',
         name: 'Maya Ortiz',
-        image: 'https://i.pravatar.cc/150?img=32',
+        image: 'user.jpg',
       },
     }),
     prisma.user.create({
@@ -34,7 +34,7 @@ async function main() {
         email: 'noah@example.com',
         username: 'noah',
         name: 'Noah Brooks',
-        image: 'https://i.pravatar.cc/150?img=15',
+        image: 'user.jpg',
       },
     }),
     prisma.user.create({
@@ -42,7 +42,7 @@ async function main() {
         email: 'zoe@example.com',
         username: 'zoe',
         name: 'Zoe Kim',
-        image: 'https://i.pravatar.cc/150?img=20',
+        image: 'user.jpg',
       },
     }),
   ]);
