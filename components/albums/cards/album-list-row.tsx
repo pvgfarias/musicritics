@@ -37,7 +37,7 @@ export default function AlbumListRow({ album }: { album: AlbumSummary }) {
 
         <div className='flex flex-row gap-6 items-center'>
           <span className='text-sm text-gray-500 dark:text-slate-400'>
-            {album.releaseYear}
+            {album.releaseDate?.toString()}
           </span>
 
           {album.averageRating && (

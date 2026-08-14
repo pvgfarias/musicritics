@@ -25,7 +25,7 @@ export default function AlbumCard({
           priority={priority}
         />
 
-        {album.averageRating && (
+        {album.finalized && album.averageRating && (
           <RatingGrade ratingGrade={album.averageRating} inAlbum={true} />
         )}
       </div>

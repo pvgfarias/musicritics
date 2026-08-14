@@ -43,9 +43,9 @@ export default function AlbumHeader({
               Genre: {album.genre}
             </p>
           )}
-          {album.releaseYear && (
+          {album.releaseDate && (
             <p className='text-md font-text text-gray-600 dark:text-gray-400'>
-              Released: {album.releaseYear}
+              Released: {album.releaseDate.toString()}
             </p>
           )}
         </div>

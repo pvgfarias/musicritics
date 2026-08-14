@@ -15,7 +15,14 @@ type AlbumWithRelations = Prisma.AlbumGetPayload<{
     tracks: {
       include: {
         ratings: {
-          select: { score: true };
+          include: {
+            user: { select: { id: true; username: true; image: true } };
+            comment: {
+              include: {
+                author: { select: { id: true; username: true; image: true } };
+              };
+            };
+          };
         };
       };
     };
@@ -38,14 +45,15 @@ const albumSummarySelect = {
   title: true,
   slug: true,
   coverImage: true,
-  releaseYear: true,
+  releaseDate: true,
   genre: true,
+  finalized: true,
   createdAt: true,
   artists: {
     select: { artist: { select: { id: true, name: true, slug: true } } },
   },
   _count: { select: { ratings: true } },
-  ratings: { select: { score: true, finalized: true } },
+  ratings: { select: { score: true } },
 } satisfies Prisma.AlbumSelect;
 
 type AlbumSummaryRaw = Prisma.AlbumGetPayload<{
@@ -59,7 +67,6 @@ export type AlbumSummary = AlbumSummaryRaw & {
   artistNames: string[];
   ratingCount: number;
   averageRating: number | null;
-  finalized: boolean;
 };
 
 type AlbumsQuery = {
@@ -70,6 +77,11 @@ type AlbumsQuery = {
   status?: string;
   sort?: SortKey;
 };
+
+// An album accepts new ratings from users as long as it hasn't been finalized.
+export function isAlbumOpenForRatings(album: { finalized: boolean }) {
+  return !album.finalized;
+}
 
 function buildAlbumWhere({
   query,
@@ -92,7 +104,7 @@ function buildAlbumWhere({
     ...(genre && genre !== 'All' && { genre }),
     ...(status &&
       status !== 'All' && {
-        ratings: { some: { finalized: status === 'Finalized' } },
+        finalized: status === 'Finalized',
       }),
   };
 }
@@ -130,7 +142,6 @@ function normalizeAlbumSummary(album: AlbumSummaryRaw) {
   const averageRating = scores.length
     ? scores.reduce((sum, score) => sum + score, 0) / scores.length
     : null;
-  const finalized = album.ratings.some(rating => rating.finalized === true);
 
   return {
     ...album,
@@ -138,7 +149,6 @@ function normalizeAlbumSummary(album: AlbumSummaryRaw) {
     artistNames,
     ratingCount: album._count.ratings,
     averageRating,
-    finalized,
   };
 }
 
@@ -181,7 +191,7 @@ export async function getAlbumsByArtist(
       skip: (page - 1) * pageSize,
       take: pageSize,
       select: albumSummarySelect,
-      orderBy: { releaseYear: 'desc' },
+      orderBy: { releaseDate: 'desc' },
     }),
     prisma.album.count({ where: { artists: { some: { artistId } } } }),
   ]);
@@ -208,7 +218,16 @@ export async function getAlbumBySlug(slug: string) {
         orderBy: { number: 'asc' },
         include: {
           ratings: {
-            select: { score: true },
+            include: {
+              user: { select: { id: true, username: true, image: true } },
+              comment: {
+                include: {
+                  author: {
+                    select: { id: true, username: true, image: true },
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -261,5 +280,6 @@ export async function getAlbumWithAverageRating(slug: string) {
     trackAverageRating: trackAvg,
     albumAverageRating: albumAvg,
     ratingCount: album.ratings.length,
+    openForRatings: isAlbumOpenForRatings(album),
   };
 }

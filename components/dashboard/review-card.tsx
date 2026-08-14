@@ -34,7 +34,7 @@ export default function ReviewCard({ rating }: { rating: Rating }) {
             <span className='line-clamp-1'>{rating.artistName}</span>
           </p>
           <h3 className='text-xs font-mono text-gray-400 uppercase'>
-            {rating.releaseYear} • {rating.genre}
+            {rating.releaseDate} • {rating.genre}
           </h3>
         </div>
         <button className='bg-transparent font-semibold text-dark-blue border-dark-blue border-2 transition-all duration-200 hover:bg-gray-100 cursor-pointer p-2 text-xs rounded-md h-1/2'>

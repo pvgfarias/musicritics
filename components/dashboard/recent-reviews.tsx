@@ -40,7 +40,7 @@ export default function RecentReviews() {
                 {review.artistName}
               </p>
               <p className='text-gray-500 dark:text-gray-400'>
-                {review.releaseYear}
+                {review.releaseDate}
               </p>
             </div>
             {review.finalGrade && (

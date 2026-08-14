@@ -143,6 +143,8 @@ async function main() {
 
   const albums = [];
 
+  // releaseYear kept here only as seed input; converted to a real releaseDate
+  // (Jan 1 of that year) below when the album is created.
   const albumSeedData = [
     {
       title: 'Revengeseekerz',
@@ -151,6 +153,8 @@ async function main() {
       releaseYear: 2025,
       genre: 'Hyperpop',
       artistId: artists[0].id,
+      // still open for ratings
+      finalized: false,
       socialLinks: [
         {
           platform: 'Spotify',
@@ -188,6 +192,8 @@ async function main() {
       releaseYear: 2025,
       genre: 'Shoegaze',
       artistId: artists[1].id,
+      // still open for ratings
+      finalized: false,
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -203,6 +209,8 @@ async function main() {
       releaseYear: 2024,
       genre: 'Synthpop',
       artistId: artists[3].id,
+      // still open for ratings
+      finalized: false,
       socialLinks: [
         {
           platform: 'Spotify',
@@ -304,6 +312,8 @@ async function main() {
       releaseYear: 2025,
       genre: 'Chillwave',
       artistId: artists[9].id,
+      // still open for ratings
+      finalized: false,
       socialLinks: [
         {
           platform: 'Spotify',
@@ -354,6 +364,8 @@ async function main() {
       releaseYear: 2026,
       genre: 'Experimental',
       artistId: artists[12].id,
+      // still open for ratings — brand new release
+      finalized: false,
       socialLinks: [
         {
           platform: 'Spotify',
@@ -399,6 +411,8 @@ async function main() {
       releaseYear: 2024,
       genre: 'Shoegaze',
       artistId: artists[5].id,
+      // still open for ratings
+      finalized: false,
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -489,6 +503,8 @@ async function main() {
       releaseYear: 2024,
       genre: 'Post-punk',
       artistId: artists[11].id,
+      // still open for ratings
+      finalized: false,
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -530,8 +546,11 @@ async function main() {
         title: albumSeed.title,
         slug: albumSeed.slug,
         coverImage: albumSeed.coverImage,
-        releaseYear: albumSeed.releaseYear,
+        releaseDate: new Date(albumSeed.releaseYear, 0, 1),
         genre: albumSeed.genre,
+        // Most seeded albums are treated as finalized/closed; a couple are
+        // left open (finalized: false) so there's something to rate.
+        finalized: albumSeed.finalized ?? true,
         socialLinks: {
           create: albumSeed.socialLinks,
         },
@@ -575,20 +594,8 @@ async function main() {
           userId: user.id,
           albumId: album.id,
           score: averageScore,
-          finalized: album.title === 'Revengeseekerz' ? false : true,
         },
       });
-
-      for (let index = 0; index < albumTracks.length; index += 1) {
-        const track = albumTracks[index];
-        await prisma.trackRating.create({
-          data: {
-            userId: user.id,
-            trackId: track.id,
-            score: trackScores[index],
-          },
-        });
-      }
 
       if (user.id === users[0].id) {
         await prisma.comment.create({
@@ -598,6 +605,29 @@ async function main() {
             ratingId: rating.id,
           },
         });
+      }
+
+      for (let index = 0; index < albumTracks.length; index += 1) {
+        const track = albumTracks[index];
+        const trackRating = await prisma.trackRating.create({
+          data: {
+            userId: user.id,
+            trackId: track.id,
+            score: trackScores[index],
+          },
+        });
+
+        // Seed a comment on the opening track for the first user, as an
+        // example of a track-level comment.
+        if (user.id === users[0].id && index === 0) {
+          await prisma.comment.create({
+            data: {
+              body: `"${track.title}" is a great opener.`,
+              authorId: user.id,
+              trackRatingId: trackRating.id,
+            },
+          });
+        }
       }
     }
   }
