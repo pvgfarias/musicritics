@@ -3,8 +3,21 @@ import TopAlbums from '@/components/dashboard/top-albums';
 import TopSongs from '@/components/dashboard/top-songs';
 import WeeklyRotation from '@/components/dashboard/weekly-rotation';
 import { getAlbumsPage } from '@/data/albums';
+import { SortKey } from '@/lib/sort-ratings';
 
-export default async function Page() {
+const PAGE_SIZE = 5;
+
+type PageProps = {
+  searchParams: Promise<{
+    page?: string;
+    query?: string;
+    genre?: string;
+    status?: string;
+    sort?: string;
+  }>;
+};
+
+export default async function Page({ searchParams }: PageProps) {
   const days = [
     'Sunday',
     'Monday',
@@ -31,8 +44,17 @@ export default async function Page() {
   const d = new Date();
   const day = days[d.getDay()].slice(0, 3);
   const month = months[d.getMonth()];
+  const params = await searchParams;
+  const page = Math.max(1, Number(params.page) || 1);
 
-  const { albums } = await getAlbumsPage(1, 4);
+  const { albums, totalPages } = await getAlbumsPage({
+    page,
+    pageSize: PAGE_SIZE,
+    query: params.query,
+    genre: params.genre,
+    status: params.status,
+    sort: (params.sort as SortKey) ?? 'recent',
+  });
 
   return (
     <main className='bg-background'>
