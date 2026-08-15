@@ -256,28 +256,33 @@ export async function getAlbumWithAverageRating(slug: string) {
   const album = await getAlbumBySlug(slug);
   if (!album) return null;
 
-  const trackScores = (
-    album.tracks as Array<{ ratings: Array<{ score: number | null }> }>
-  ).flatMap(track =>
-    track.ratings
+  const tracksWithRatings = album.tracks.map(track => {
+    const scores = track.ratings
       .map(rating => rating.score)
-      .filter((score): score is number => score != null)
+      .filter((score): score is number => score != null);
+
+    const averageRating = scores.length
+      ? scores.reduce((a, b) => a + b, 0) / scores.length
+      : null;
+
+    return {
+      ...track,
+      averageRating,
+      ratingCount: scores.length,
+    };
+  });
+
+  const albumScores = album.ratings.flatMap(rating =>
+    rating.score == null ? [] : [rating.score]
   );
 
-  const albumScores = (
-    album.ratings as Array<{ score: number | null }>
-  ).flatMap(rating => (rating.score == null ? [] : [rating.score]));
-
-  const trackAvg = trackScores.length
-    ? trackScores.reduce((a, b) => a + b, 0) / trackScores.length
-    : null;
   const albumAvg = albumScores.length
     ? albumScores.reduce((a, b) => a + b, 0) / albumScores.length
     : null;
 
   return {
     ...album,
-    trackAverageRating: trackAvg,
+    tracks: tracksWithRatings,
     albumAverageRating: albumAvg,
     ratingCount: album.ratings.length,
     openForRatings: isAlbumOpenForRatings(album),

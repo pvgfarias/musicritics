@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
-import { Raleway, Quicksand, Space_Mono } from 'next/font/google';
+import { Raleway, Zilla_Slab, Space_Mono } from 'next/font/google';
 import Sidebar from '@/components/layout/sidebar/sidebar';
 
 export const metadata: Metadata = {
@@ -16,8 +16,8 @@ const raleway = Raleway({
   weight: ['500'],
 });
 
-const quicksand = Quicksand({
-  variable: '--font-quicksand',
+const zilla_slab = Zilla_Slab({
+  variable: '--font-zilla-slab',
   subsets: ['latin'],
   style: ['normal'],
   weight: ['700'],
@@ -53,7 +53,7 @@ export default function RootLayout({
     <html
       lang='en'
       suppressHydrationWarning
-      className={`${raleway.variable} ${quicksand.variable} ${space.variable} antialiased`}
+      className={`${raleway.variable} ${zilla_slab.variable} ${space.variable} antialiased`}
     >
       <head>
         <Script
