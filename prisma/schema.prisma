@@ -10,14 +10,74 @@ datasource db {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
+  emailVerified Boolean @default(false)
   username  String   @unique
+  displayUsername String?
   name      String?
   image     String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  // Auth related
+  role String @default("user")
+  banned Boolean? @default(false)
+  banReason String?
+  banExpires DateTime?
+  sessions Session[]
+  accounts Account[]
+
+  // User album, track and comments.
   ratings      Rating[]
   trackRatings TrackRating[]
   comments     Comment[]
+
+  @@map("user")
+}
+
+model Session {
+  id  String  @id @default(cuid())
+  expiresAt DateTime
+  token String  @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  ipAddress String?
+  userAgent String? 
+  impersonatedBy String?
+
+  userId  String 
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id  String  @id @default(cuid())
+  accountId String 
+  providerId  String 
+  userId  String 
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken String? 
+  refreshToken  String?
+  idToken String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope String?
+  password  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id  String  @id @default(cuid())
+  identifier  String 
+  value String 
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("verification")
 }
 
 model Artist {
@@ -71,8 +131,8 @@ model AlbumArtist {
 
 model Rating {
   id        String   @id @default(cuid())
-  score     Int? // user's grade for the album
-  ratedAt   DateTime @default(now()) // date of the rating itself
+  score     Int? 
+  ratedAt   DateTime @default(now()) 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -89,8 +149,8 @@ model Rating {
 
 model TrackRating {
   id        String   @id @default(cuid())
-  score     Int? // user's grade for this track
-  ratedAt   DateTime @default(now()) // date of the rating itself
+  score     Int? 
+  ratedAt   DateTime @default(now()) 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
