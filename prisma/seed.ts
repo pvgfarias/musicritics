@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { hashPassword } from 'better-auth/crypto';
 import { prisma } from '../lib/prisma';
 
 async function main() {
@@ -10,42 +11,74 @@ async function main() {
   await prisma.albumArtist.deleteMany();
   await prisma.album.deleteMany();
   await prisma.artist.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.verification.deleteMany();
   await prisma.user.deleteMany();
 
-  const users = await Promise.all([
-    prisma.user.create({
-      data: {
-        email: 'alex@example.com',
-        username: 'alex',
-        name: 'Alex Chen',
-        image: 'user.jpg',
-      },
-    }),
-    prisma.user.create({
-      data: {
-        email: 'maya@example.com',
-        username: 'maya',
-        name: 'Maya Ortiz',
-        image: 'user.jpg',
-      },
-    }),
-    prisma.user.create({
-      data: {
-        email: 'noah@example.com',
-        username: 'noah',
-        name: 'Noah Brooks',
-        image: 'user.jpg',
-      },
-    }),
-    prisma.user.create({
-      data: {
-        email: 'zoe@example.com',
-        username: 'zoe',
-        name: 'Zoe Kim',
-        image: 'user.jpg',
-      },
-    }),
-  ]);
+  // All seeded users share this password for local testing convenience.
+  const SEED_PASSWORD = 'password123';
+  const hashedPassword = await hashPassword(SEED_PASSWORD);
+
+  const userSeedData = [
+    {
+      email: 'alex@example.com',
+      username: 'alex',
+      name: 'Alex Chen',
+      image: 'user.jpg',
+      role: 'admin',
+    },
+    {
+      email: 'maya@example.com',
+      username: 'maya',
+      name: 'Maya Ortiz',
+      image: 'user.jpg',
+      role: 'moderator',
+    },
+    {
+      email: 'noah@example.com',
+      username: 'noah',
+      name: 'Noah Brooks',
+      image: 'user.jpg',
+      role: 'user',
+    },
+    {
+      email: 'zoe@example.com',
+      username: 'zoe',
+      name: 'Zoe Kim',
+      image: 'user.jpg',
+      role: 'user',
+    },
+  ];
+
+  const users = await Promise.all(
+    userSeedData.map(async userData => {
+      const user = await prisma.user.create({
+        data: {
+          email: userData.email,
+          username: userData.username,
+          name: userData.name,
+          image: userData.image,
+          role: userData.role,
+          emailVerified: true, // seeded users skip the verification email flow
+        },
+      });
+
+      // Give each seeded user a working credential login so you can actually
+      // sign in as them locally (email + "password123") without going
+      // through the OAuth or email-verification flow.
+      await prisma.account.create({
+        data: {
+          accountId: user.id,
+          providerId: 'credential',
+          userId: user.id,
+          password: hashedPassword,
+        },
+      });
+
+      return user;
+    })
+  );
 
   const artists = await Promise.all([
     prisma.artist.create({
@@ -633,6 +666,11 @@ async function main() {
   }
 
   console.log('Seed completed successfully.');
+  console.log(`Test login for any seeded user: <email> / ${SEED_PASSWORD}`);
+  console.log('  alex@example.com  -> admin');
+  console.log('  maya@example.com  -> moderator');
+  console.log('  noah@example.com  -> user');
+  console.log('  zoe@example.com   -> user');
 }
 
 main()

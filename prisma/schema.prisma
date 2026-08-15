@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
@@ -8,23 +9,23 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  emailVerified Boolean @default(false)
-  username  String   @unique
+  id              String   @id @default(cuid())
+  email           String   @unique
+  emailVerified   Boolean  @default(false)
+  username        String   @unique
   displayUsername String?
-  name      String?
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  name            String?
+  image           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Auth related
-  role String @default("user")
-  banned Boolean? @default(false)
-  banReason String?
+  role       String    @default("user")
+  banned     Boolean?  @default(false)
+  banReason  String?
   banExpires DateTime?
-  sessions Session[]
-  accounts Account[]
+  sessions   Session[]
+  accounts   Account[]
 
   // User album, track and comments.
   ratings      Rating[]
@@ -35,49 +36,52 @@ model User {
 }
 
 model Session {
-  id  String  @id @default(cuid())
-  expiresAt DateTime
-  token String  @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  ipAddress String?
-  userAgent String? 
+  id             String   @id @default(cuid())
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
   impersonatedBy String?
 
-  userId  String 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
+  @@index([userId])
 }
 
 model Account {
-  id  String  @id @default(cuid())
-  accountId String 
-  providerId  String 
-  userId  String 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accessToken String? 
-  refreshToken  String?
-  idToken String?
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
   accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
-  scope String?
-  password  String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   @@map("account")
+  @@index([userId])
 }
 
 model Verification {
-  id  String  @id @default(cuid())
-  identifier  String 
-  value String 
-  expiresAt DateTime
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("verification")
+  @@index([identifier])
 }
 
 model Artist {
@@ -120,6 +124,7 @@ model Track {
 }
 
 // Explicit join table for the many-to-many Artist <-> Album relation
+
 model AlbumArtist {
   album    Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
   albumId  String
@@ -131,8 +136,8 @@ model AlbumArtist {
 
 model Rating {
   id        String   @id @default(cuid())
-  score     Int? 
-  ratedAt   DateTime @default(now()) 
+  score     Int?
+  ratedAt   DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -149,8 +154,8 @@ model Rating {
 
 model TrackRating {
   id        String   @id @default(cuid())
-  score     Int? 
-  ratedAt   DateTime @default(now()) 
+  score     Int?
+  ratedAt   DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
