@@ -5,10 +5,14 @@ import { IconVinyl } from '@tabler/icons-react';
 import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
 import UserMenu from '../user-menu';
+import { useSession } from '@/lib/auth-client';
 
 export default function Sidebar() {
   const shouldReduceMotion = useReducedMotion();
-  const isAuthenticated = true;
+  const { data: session, isPending } = useSession();
+  const isAuthenticated = !!session;
+
+  if (isPending) return null;
 
   return (
     <div className={isAuthenticated ? '' : 'hidden'}>
