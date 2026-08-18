@@ -1,13 +1,22 @@
+'use client';
+
 import { AlbumFull } from '@/data/albums';
 import { IconDisc, IconRefresh } from '@tabler/icons-react';
 import Image from 'next/image';
+import { useSession } from '@/lib/auth-client';
 
 export default function AlbumHeader({
   album,
 }: {
   album: Exclude<AlbumFull, null>;
 }) {
+  const { data: session } = useSession();
+  const user = session?.user;
+
   if (!album) return null;
+  if (!user) return null;
+
+  const userRating = album.ratings.find(rating => rating.userId === user.id);
 
   return (
     <div className='flex flex-col gap-4 w-full'>
@@ -76,8 +85,9 @@ export default function AlbumHeader({
                 My Score
               </span>
               <p className='font-title text-gray-600 dark:text-gray-500'>
-                {/* TODO: Once the auth is setup add user rating here if it exists. Add edit or go rate the album if it's currently in rotation. */}
-                <span className='text-5xl text-ember'>88</span>
+                <span className='text-5xl text-ember'>
+                  {userRating ? userRating.score : '-'}
+                </span>
                 <sup className='text-lg text-gray-400 dark:text-gray-500 ml-0.5'>
                   /100
                 </sup>
