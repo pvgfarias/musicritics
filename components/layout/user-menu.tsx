@@ -7,10 +7,27 @@ import { IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
 import { sidebarItemClasses } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import ThemeToggle from './theme-toggle';
-
-// npm install @radix-ui/react-dropdown-menu
+import { useRouter } from 'next/navigation';
+import { authClient, useSession } from '@/lib/auth-client';
 
 export default function UserMenu() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const user = session?.user;
+
+  async function handleLogout() {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push('/login');
+          router.refresh();
+        },
+      },
+    });
+  }
+
+  if (!user) return null;
+
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
@@ -22,13 +39,15 @@ export default function UserMenu() {
           )}
         >
           <Image
-            src='/jr.jpg'
-            alt='User avatar'
+            src={`/${user.image}` || '/default-avatar.jpg'}
+            alt={user.name ?? 'User avatar'}
             width={32}
             height={32}
             className='rounded-full shrink-0'
           />
-          <span className='whitespace-nowrap truncate'>User Name</span>
+          <span className='whitespace-nowrap truncate'>
+            {user.displayUsername ?? user.username ?? user.name}{' '}
+          </span>
         </button>
       </DropdownMenu.Trigger>
 
@@ -67,7 +86,6 @@ export default function UserMenu() {
             </Link>
           </DropdownMenu.Item>
 
-          {/* Not a Link/button, so it doesn't need menu-item keyboard behavior */}
           <div className='px-1'>
             <ThemeToggle />
           </div>
@@ -75,13 +93,13 @@ export default function UserMenu() {
           <div className='mx-4 h-px bg-dark-blue/10 dark:bg-white/10' />
 
           <DropdownMenu.Item asChild>
-            <Link
-              href='/logout'
+            <button
+              onClick={handleLogout}
               className='flex py-2 items-center gap-2 text-sm font-medium rounded-md px-1 outline-none text-red-600 hover:bg-sidebar-active dark:text-red-400 focus-visible:bg-sidebar-active'
             >
               <IconLogout size={18} />
               Sign out
-            </Link>
+            </button>
           </DropdownMenu.Item>
 
           <DropdownMenu.Arrow width={12} height={8} className='fill-sidebar' />
