@@ -1,23 +1,21 @@
 'use client';
 
 import { AlbumFull } from '@/data/albums';
-import { IconDisc } from '@tabler/icons-react';
+import { IconDisc, IconRefresh } from '@tabler/icons-react';
 import Image from 'next/image';
-import { useSession } from '@/lib/auth-client';
-import AlbumRatingDialog from './album-rating-dialog';
+import AlbumRatingDialog from './rating/album-rating-dialog';
+import { AlbumTrackForRating } from '@/data/tracks';
+type AlbumUserRating = Exclude<AlbumFull, null>['ratings'][number];
 
 export default function AlbumHeader({
   album,
+  tracks,
+  userRating,
 }: {
   album: Exclude<AlbumFull, null>;
+  tracks: AlbumTrackForRating[];
+  userRating: AlbumUserRating | undefined;
 }) {
-  const { data: session } = useSession();
-  if (!album) return null;
-
-  const userRating = session?.user
-    ? album.ratings.find(rating => rating.userId === session.user.id)
-    : undefined;
-
   return (
     <div className='flex flex-col gap-4 w-full'>
       <div className='flex flex-row gap-14 '>
@@ -37,7 +35,11 @@ export default function AlbumHeader({
               />
             </div>
           )}
-          {!album.finalized && <AlbumRatingDialog album={album} />}
+          {!album.finalized && (
+            <div className='absolute flex justify-center items-center gap-2 bg-ember font-mono text-gray-200 px-2 py-1 text-xs rounded-full bottom-2 right-2'>
+              <IconRefresh size={12} /> Weekly Rotation &rarr;
+            </div>
+          )}
         </div>
 
         <div className='flex flex-col gap-4 w-full'>
@@ -51,16 +53,20 @@ export default function AlbumHeader({
             {album.artist}
           </h2>
           <div className='flex flex-row gap-2 justify-start items-center text-xs '>
-            <p className='rounded-full bg-orange-200 dark:bg-slate-800 text-gray-600 dark:text-white p-2'>
-              {album.genre}
-            </p>
-
             {album.releaseDate && (
               <p className='font-mono text-gray-600 dark:text-gray-500'>
                 {`Released: ${album.releaseDate.toLocaleString('default', { month: 'long' })} ${album.releaseDate.getDate()}, ${album.releaseDate.getFullYear()}`}
               </p>
             )}
           </div>
+          {!album.finalized && (
+            <AlbumRatingDialog
+              album={album}
+              userRating={userRating}
+              tracks={tracks}
+            />
+          )}
+
           <div className='h-px bg-gray-300 dark:bg-slate-800 w-full mt-4' />
           <div className='flex flex-row justify-start items-center gap-8'>
             <div className='flex flex-col justify-start h-full'>

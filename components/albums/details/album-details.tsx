@@ -1,16 +1,23 @@
 import type { AlbumFull } from '@/data/albums';
+import type { AlbumTrackForRating } from '@/data/tracks';
 import AlbumHeader from './album-header';
 import AlbumTracks from './album-tracks';
 import AlbumReviews from './album-reviews';
 
+type AlbumUserRating = Exclude<AlbumFull, null>['ratings'][number];
+
 export default function AlbumDetails({
   album,
+  tracks,
+  userRating,
 }: {
   album: Exclude<AlbumFull, null>;
+  tracks: AlbumTrackForRating[];
+  userRating: AlbumUserRating | undefined;
 }) {
   return (
     <div className='flex flex-col gap-8 w-full'>
-      <AlbumHeader album={album} />
+      <AlbumHeader album={album} tracks={tracks} userRating={userRating} />
       <AlbumTracks album={album} />
       <AlbumReviews album={album} />
     </div>

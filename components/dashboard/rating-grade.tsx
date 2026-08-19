@@ -5,7 +5,7 @@ type RatingGradeProps = {
   /** Renders as an absolutely-positioned overlay badge (e.g. on an album cover). */
   inAlbum?: boolean;
   /** Smaller footprint for secondary badges, like a "your score" chip next to a primary badge. */
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
   /** Optional label announced to screen readers, e.g. "Public rating" or "Your rating". */
   label?: string;
 };
@@ -13,12 +13,13 @@ type RatingGradeProps = {
 const SIZE_CLASSES: Record<NonNullable<RatingGradeProps['size']>, string> = {
   sm: 'h-6 w-6 text-xs',
   md: 'h-9 w-9 text-sm',
+  lg: 'h-12 w-12 text-lg',
 };
 
 function getRatingColor(ratingGrade: number) {
-  if (ratingGrade >= 80) return 'bg-emerald-700/70 text-lime-200';
-  if (ratingGrade >= 60) return 'bg-amber-700/70 text-amber-200';
-  return 'bg-red-700/70 text-red-200';
+  if (ratingGrade >= 80) return 'text-lime-400';
+  if (ratingGrade >= 60) return ' text-amber-400';
+  return ' text-red-400';
 }
 
 export default function RatingGrade({
