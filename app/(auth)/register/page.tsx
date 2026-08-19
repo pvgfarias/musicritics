@@ -8,37 +8,39 @@ import { useState } from 'react';
 
 export default function Login() {
   const router = useRouter();
-  const [identifier, setIdentifier] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     setIsSubmitting(true);
 
-    const isEmail = identifier.includes('@');
-
-    const { error } = isEmail
-      ? await authClient.signIn.email({
-          email: identifier,
-          password,
-        })
-      : await authClient.signIn.username({
-          username: identifier,
-          password,
-        });
+    const { error } = await authClient.signUp.email({
+      email,
+      password,
+      username,
+      name: username,
+    });
 
     setIsSubmitting(false);
 
     if (error) {
-      setError(error.message ?? 'Invalid email or password.');
+      setError(error.message ?? 'Something went wrong. Please try again.');
       return;
     }
 
-    router.push('/dashboard');
-    router.refresh();
+    router.push('/login?verify=1');
   }
 
   return (
@@ -53,19 +55,36 @@ export default function Login() {
       >
         <div>
           <label
-            htmlFor='identifier'
+            htmlFor='username'
             className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left'
           >
             Email or Username
           </label>
           <input
             type='text'
-            id='identifier'
-            name='identifier'
-            value={identifier}
-            onChange={e => setIdentifier(e.target.value)}
-            placeholder='email@email.com or username'
-            autoComplete='username'
+            id='username'
+            name='username'
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            placeholder='yourname'
+            required
+            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-white '
+          />
+        </div>
+        <div>
+          <label
+            htmlFor='email'
+            className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left'
+          >
+            Email
+          </label>
+          <input
+            type='email'
+            id='email'
+            name='email'
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder='email@email.com'
             required
             className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-white '
           />
@@ -85,7 +104,24 @@ export default function Login() {
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
-            autoComplete='current-password'
+            className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-white'
+          />
+        </div>
+        <div>
+          <label
+            htmlFor='confirmPassword'
+            className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left'
+          >
+            Confirm Password
+          </label>
+          <input
+            type='password'
+            id='confirmPassword'
+            name='confirmPassword'
+            placeholder='**********'
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            required
             className='w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white dark:bg-slate-700 text-gray-900 dark:text-white'
           />
         </div>
@@ -99,7 +135,7 @@ export default function Login() {
           disabled={isSubmitting}
           className='w-full flex items-center justify-center px-6 py-3 bg-linear-to-r from-dark-blue to-amber-500 text-white rounded-lg font-semibold hover:opacity-90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'
         >
-          {isSubmitting ? 'Logging in...' : 'Login'}
+          {isSubmitting ? 'Creating account...' : 'Register'}
         </button>
         <div className='flex items-center gap-3'>
           <div className='h-px flex-1 bg-gray-300 dark:bg-slate-700' />

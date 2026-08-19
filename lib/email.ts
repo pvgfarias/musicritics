@@ -12,7 +12,7 @@ export async function sendVerificationEmail({
   url: string;
 }) {
   await brevo.transactionalEmails.sendTransacEmail({
-    sender: { name: 'MusiCritics', email: 'onboarding@musicritics.vercel.app' },
+    sender: { name: 'MusiCritics', email: 'pve1356@gmail.com' },
     to: [{ email: emailRecipient }],
     subject: 'MusiCritics - Verify Your Email',
     textContent: `<p>Click below to verify your email and finish signing up.</p>
@@ -29,9 +29,9 @@ export async function sendResetPasswordEmail({
   url: string;
 }) {
   await brevo.transactionalEmails.sendTransacEmail({
-    sender: { name: 'MusiCritics', email: 'onboarding@musicritics.vercel.app' },
+    sender: { name: 'MusiCritics', email: 'pve1356@gmail.com' },
     to: [{ email: emailRecipient }],
-    subject: 'MusiCritics - Verify Your Email',
+    subject: 'MusiCritics - Reset Your Password',
     textContent: `<p>Click below to reset your password.</p>
                         <p><a href="${url}">Reset password</a></p>
                         <p>If you didn't request this, ignore this email.</p>`,

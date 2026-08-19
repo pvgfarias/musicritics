@@ -1,9 +1,10 @@
 'use client';
 
 import { AlbumFull } from '@/data/albums';
-import { IconDisc, IconRefresh } from '@tabler/icons-react';
+import { IconDisc } from '@tabler/icons-react';
 import Image from 'next/image';
 import { useSession } from '@/lib/auth-client';
+import AlbumRatingDialog from './album-rating-dialog';
 
 export default function AlbumHeader({
   album,
@@ -11,12 +12,11 @@ export default function AlbumHeader({
   album: Exclude<AlbumFull, null>;
 }) {
   const { data: session } = useSession();
-  const user = session?.user;
-
   if (!album) return null;
-  if (!user) return null;
 
-  const userRating = album.ratings.find(rating => rating.userId === user.id);
+  const userRating = session?.user
+    ? album.ratings.find(rating => rating.userId === session.user.id)
+    : undefined;
 
   return (
     <div className='flex flex-col gap-4 w-full'>
@@ -37,11 +37,7 @@ export default function AlbumHeader({
               />
             </div>
           )}
-          {!album.finalized && (
-            <div className='absolute flex justify-center items-center gap-2 bg-ember font-mono text-gray-200 px-2 py-1 text-xs rounded-full bottom-2 right-2'>
-              <IconRefresh size={12} /> Weekly Rotation ➜
-            </div>
-          )}
+          {!album.finalized && <AlbumRatingDialog album={album} />}
         </div>
 
         <div className='flex flex-col gap-4 w-full'>
@@ -67,31 +63,43 @@ export default function AlbumHeader({
           </div>
           <div className='h-px bg-gray-300 dark:bg-slate-800 w-full mt-4' />
           <div className='flex flex-row justify-start items-center gap-8'>
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col justify-start h-full'>
               <span className='font-mono text-xs text-gray-600 dark:text-gray-500 uppercase tracking-widest'>
                 Public Score
               </span>
-              <p className='font-title text-gray-600 dark:text-gray-500'>
-                <span className='text-5xl text-dark-blue dark:text-white'>
-                  {album.albumAverageRating}
-                </span>
-                <sup className='text-lg text-gray-400 dark:text-gray-500 ml-0.5'>
-                  /100
-                </sup>
-              </p>
+              {album.finalized ? (
+                <p className='font-title text-gray-600 dark:text-gray-500'>
+                  <span className='text-5xl text-dark-blue dark:text-white'>
+                    {album.albumAverageRating}
+                  </span>
+                  <sup className='text-lg text-gray-400 dark:text-gray-500 ml-0.5'>
+                    /100
+                  </sup>
+                </p>
+              ) : (
+                <p className='font-mono text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-2'>
+                  Coming soon...
+                </p>
+              )}
             </div>
-            <div className='flex flex-col gap-2'>
+            <div className='flex flex-col justify-start h-full'>
               <span className='font-mono text-xs text-gray-600 dark:text-gray-500 uppercase tracking-widest'>
                 My Score
               </span>
-              <p className='font-title text-gray-600 dark:text-gray-500'>
-                <span className='text-5xl text-ember'>
-                  {userRating ? userRating.score : '-'}
-                </span>
-                <sup className='text-lg text-gray-400 dark:text-gray-500 ml-0.5'>
-                  /100
-                </sup>
-              </p>
+              {userRating ? (
+                <p className='font-title text-gray-600 dark:text-gray-500'>
+                  <span className='text-5xl text-ember'>
+                    {userRating.score}
+                  </span>
+                  <sup className='text-lg text-gray-400 dark:text-gray-500 ml-0.5'>
+                    /100
+                  </sup>
+                </p>
+              ) : (
+                <p className='font-mono text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-2'>
+                  No rating yet...
+                </p>
+              )}
             </div>
           </div>
         </div>
