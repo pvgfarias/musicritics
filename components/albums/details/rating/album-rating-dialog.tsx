@@ -11,7 +11,8 @@ import {
 
 import type { AlbumFull } from '@/data/albums';
 import { IconStar, IconStarFilled } from '@tabler/icons-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
+import { saveAlbumRating } from '@/app/actions/rate-album';
 import TrackRatingRow from './album-track-rating-row';
 import { AlbumTrackForRating } from '@/data/tracks';
 import Image from 'next/image';
@@ -30,6 +31,7 @@ export default function AlbumRatingDialog({
   tracks: AlbumTrackForRating[];
 }) {
   // seed straight from each track's existing score — null if never rated
+
   const [scores, setScores] = useState<Record<string, number | null>>(() =>
     Object.fromEntries(tracks.map(t => [t.id, t.score]))
   );
@@ -45,6 +47,8 @@ export default function AlbumRatingDialog({
   }, [scores]);
 
   const [comment, setComment] = useState(userRating?.comment?.body || '');
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const handleScoreChange = (trackId: string, score: number) => {
     setScores(prev => ({ ...prev, [trackId]: score }));
@@ -54,6 +58,27 @@ export default function AlbumRatingDialog({
     setTrackComments(prev => ({ ...prev, [trackId]: trackComment }));
   };
 
+  const handleSave = () => {
+    setError(null);
+    startTransition(async () => {
+      try {
+        await saveAlbumRating({
+          albumId: album.id,
+          albumSlug: album.slug,
+          albumComment: comment,
+          trackRatings: tracks.map(t => ({
+            trackId: t.id,
+            score: scores[t.id],
+            comment: trackComments[t.id] ?? '',
+          })),
+        });
+        // dialog will pick up fresh data via revalidatePath;
+        // close it manually if you want — see note below
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Something went wrong.');
+      }
+    });
+  };
   return (
     <Dialog>
       <DialogTrigger>
@@ -131,14 +156,19 @@ export default function AlbumRatingDialog({
             className='text-sm bg-transparent border border-gray-700 rounded-md p-2 resize-none focus:border-ember outline-none'
             rows={3}
           />
+          {error && <p className='text-sm text-red-400'>{error}</p>}
           <div className='flex justify-end gap-2'>
             <DialogClose>
               <span className='text-sm text-gray-400 px-3 py-1.5 rounded-full hover:text-gray-200'>
                 Cancel
               </span>
             </DialogClose>
-            <button className='text-sm px-4 py-1.5 rounded-full bg-ember text-white font-medium'>
-              Save Rating
+            <button
+              onClick={handleSave}
+              disabled={isPending}
+              className='text-sm px-4 py-1.5 rounded-full bg-ember text-white font-medium disabled:opacity-50'
+            >
+              {isPending ? 'Saving…' : 'Save Rating'}
             </button>
           </div>
         </div>
