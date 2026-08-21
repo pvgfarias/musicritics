@@ -62,6 +62,8 @@ type AlbumSummaryRaw = Prisma.AlbumGetPayload<{
 
 export type AlbumFull = Awaited<ReturnType<typeof getAlbumWithAverageRating>>;
 
+export type AlbumTrack = Exclude<AlbumFull, null>['tracks'][number];
+
 export type AlbumSummary = AlbumSummaryRaw & {
   artist: string;
   artistNames: string[];

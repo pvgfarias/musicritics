@@ -1,3 +1,4 @@
+import RatingGrade from '@/components/dashboard/rating-grade';
 import { AlbumFull } from '@/data/albums';
 import Image from 'next/image';
 
@@ -14,7 +15,7 @@ export default function AlbumReviews({
         <h2 className='text-2xl font-title text-gray-950 dark:text-white md:text-left text-center'>
           Reviews
         </h2>
-        <p className='font-mono text-xs text-gray-600 dark:text-gray-500'>
+        <p className='font-mono text-xs text-gray-600 dark:text-gray-400'>
           {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
         </p>
       </div>
@@ -46,7 +47,7 @@ export default function AlbumReviews({
                     )}
                   </div>
                   <span className='text-md font-text text-ember'>
-                    {rating.score}
+                    <RatingGrade ratingGrade={rating.score} size='md' />
                   </span>
                 </li>
 

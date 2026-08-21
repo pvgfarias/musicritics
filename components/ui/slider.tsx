@@ -1,14 +1,37 @@
 import { Slider as SliderPrimitive } from '@base-ui/react/slider';
 import { cn } from '@/lib/utils';
 
+function scoreColors(score: number) {
+  if (score < 60) {
+    return {
+      indicator: 'bg-red-500',
+      trackHover: 'group-hover/track:bg-red-950',
+      thumbRing: 'ring-red-500/30',
+    };
+  }
+  if (score < 80) {
+    return {
+      indicator: 'bg-amber-500',
+      trackHover: 'group-hover/track:bg-amber-950',
+      thumbRing: 'ring-amber-500/30',
+    };
+  }
+  return {
+    indicator: 'bg-emerald-500',
+    trackHover: 'group-hover/track:bg-emerald-950',
+    thumbRing: 'ring-emerald-500/30',
+  };
+}
+
 function Slider({
   className,
   defaultValue,
   value,
   min = 0,
   max = 100,
+  score,
   ...props
-}: SliderPrimitive.Root.Props) {
+}: SliderPrimitive.Root.Props & { score?: number }) {
   const normalizedValue = Array.isArray(value)
     ? value
     : typeof value === 'number'
@@ -16,6 +39,9 @@ function Slider({
       : Array.isArray(defaultValue)
         ? defaultValue
         : [min];
+
+  const resolvedScore = score ?? normalizedValue[0] ?? 0;
+  const c = scoreColors(resolvedScore);
 
   return (
     <SliderPrimitive.Root
@@ -29,15 +55,16 @@ function Slider({
       {...props}
     >
       <SliderPrimitive.Control className='relative flex w-full touch-none items-center select-none data-disabled:opacity-50'>
-        {/* Added explicit h-1.5 (height) and bg-neutral-800 for the track */}
         <SliderPrimitive.Track
           data-slot='slider-track'
-          className='relative h-1.5 w-full grow overflow-hidden rounded-md bg-neutral-800 select-none'
+          className={cn(
+            'group/track relative h-1.5 w-full grow overflow-hidden rounded-md bg-neutral-800 transition-colors select-none',
+            c.trackHover
+          )}
         >
-          {/* Added explicit h-full and bg-white (or bg-amber-500) for the active range */}
           <SliderPrimitive.Indicator
             data-slot='slider-range'
-            className='h-full bg-white select-none'
+            className={cn('h-full transition-colors select-none', c.indicator)}
           />
         </SliderPrimitive.Track>
 
@@ -45,7 +72,12 @@ function Slider({
           <SliderPrimitive.Thumb
             data-slot='slider-thumb'
             key={index}
-            className='relative block size-4 shrink-0 rounded-full border border-ring bg-white ring-ring/30 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-2 focus-visible:ring-2 focus-visible:outline-hidden active:ring-2 disabled:pointer-events-none disabled:opacity-50'
+            className={cn(
+              'relative block size-4 shrink-0 rounded-full border border-ring bg-white transition-[transform,box-shadow] select-none after:absolute after:-inset-2',
+              'hover:scale-110 focus-visible:scale-110 focus-visible:outline-hidden active:scale-125 active:ring-2',
+              c.thumbRing,
+              'disabled:pointer-events-none disabled:opacity-50'
+            )}
           />
         ))}
       </SliderPrimitive.Control>

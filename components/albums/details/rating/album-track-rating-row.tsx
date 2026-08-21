@@ -28,12 +28,12 @@ export default function TrackRatingRow({
   const displayScore = score ?? 50;
 
   return (
-    <div className='flex flex-col gap-1.5 py-2.5'>
-      <div className='flex items-center gap-2'>
-        <span className='font-mono text-[11px] text-gray-500 w-4'>
-          {track.number}
+    <div className='flex flex-col gap-1 py-1 '>
+      <div className='flex flex-row justify-start items-center py-4 gap-6'>
+        <span className='font-mono text-xs text-gray-600 dark:text-gray-500 group-hover:text-ember'>
+          {String(track.number).padStart(2, '0')}
         </span>
-        <span className='text-sm text-gray-200 truncate grow'>
+        <span className='text-md font-text text-gray-800 dark:text-gray-200 flex-1'>
           {track.title}
         </span>
         <button
@@ -50,7 +50,6 @@ export default function TrackRatingRow({
           {score === null ? '–' : <RatingGrade ratingGrade={score} size='sm' />}
         </span>
       </div>
-
       <Slider
         min={1}
         max={100}
@@ -71,7 +70,7 @@ export default function TrackRatingRow({
             if (!comment) setShowComment(false);
           }}
           placeholder='Add a note…'
-          className='text-xs bg-transparent border border-gray-700 rounded-md p-1.5 resize-none focus:border-ember outline-none'
+          className='text-xs bg-transparent border border-gray-700 rounded-md p-1.5 resize-none focus:border-ember outline-none mt-2'
           rows={1}
           autoFocus
         />

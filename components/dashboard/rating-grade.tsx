@@ -17,9 +17,11 @@ const SIZE_CLASSES: Record<NonNullable<RatingGradeProps['size']>, string> = {
 };
 
 function getRatingColor(ratingGrade: number) {
-  if (ratingGrade >= 80) return 'text-lime-400';
+  if (ratingGrade >= 80) return 'text-emerald-400';
+  if (ratingGrade >= 70) return 'text-lime-400';
   if (ratingGrade >= 60) return ' text-amber-400';
-  return ' text-red-400';
+  if (ratingGrade >= 40) return 'text-orange-400';
+  return 'text-red-400';
 }
 
 export default function RatingGrade({

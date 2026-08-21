@@ -18,7 +18,7 @@ export default function AlbumDetails({
   return (
     <div className='flex flex-col gap-8 w-full'>
       <AlbumHeader album={album} tracks={tracks} userRating={userRating} />
-      <AlbumTracks album={album} />
+      <AlbumTracks album={album} tracks={tracks} />
       <AlbumReviews album={album} />
     </div>
   );

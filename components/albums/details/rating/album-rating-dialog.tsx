@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 
 import type { AlbumFull } from '@/data/albums';
-import { IconBubble, IconStar, IconStarFilled } from '@tabler/icons-react';
+import { IconStar, IconStarFilled } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import TrackRatingRow from './album-track-rating-row';
 import { AlbumTrackForRating } from '@/data/tracks';
@@ -45,7 +45,6 @@ export default function AlbumRatingDialog({
   }, [scores]);
 
   const [comment, setComment] = useState(userRating?.comment?.body || '');
-  const [showComment, setShowComment] = useState(false);
 
   const handleScoreChange = (trackId: string, score: number) => {
     setScores(prev => ({ ...prev, [trackId]: score }));
@@ -53,15 +52,6 @@ export default function AlbumRatingDialog({
 
   const handleTrackCommentChange = (trackId: string, trackComment: string) => {
     setTrackComments(prev => ({ ...prev, [trackId]: trackComment }));
-  };
-
-  const handleSaveComment = () => {
-    setComment(comment.trim());
-    setShowComment(false);
-  };
-  const handleCancelComment = () => {
-    setComment(comment);
-    setShowComment(false);
   };
 
   return (
@@ -133,25 +123,23 @@ export default function AlbumRatingDialog({
 
         <div className='h-px bg-gray-300 dark:bg-slate-800' />
 
-        <div className='flex flex-col gap-4 pb-4 px-4'>
-          <div className='flex flex-col gap-2 pb-4 pt-3 px-4'>
-            <textarea
-              value={comment}
-              onChange={e => setComment(e.target.value)}
-              placeholder='Add a review about this album…'
-              className='text-sm bg-transparent border border-gray-700 rounded-md p-2 resize-none focus:border-ember outline-none'
-              rows={2}
-            />
-            <div className='flex justify-end gap-2'>
-              <DialogClose>
-                <span className='text-sm text-gray-400 px-3 py-1.5 rounded-full hover:text-gray-200'>
-                  Cancel
-                </span>
-              </DialogClose>
-              <button className='text-sm px-4 py-1.5 rounded-full bg-ember text-white font-medium'>
-                Save Rating
-              </button>
-            </div>
+        <div className='flex flex-col pb-4 px-4 gap-4'>
+          <textarea
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            placeholder='Add a review about this album…'
+            className='text-sm bg-transparent border border-gray-700 rounded-md p-2 resize-none focus:border-ember outline-none'
+            rows={3}
+          />
+          <div className='flex justify-end gap-2'>
+            <DialogClose>
+              <span className='text-sm text-gray-400 px-3 py-1.5 rounded-full hover:text-gray-200'>
+                Cancel
+              </span>
+            </DialogClose>
+            <button className='text-sm px-4 py-1.5 rounded-full bg-ember text-white font-medium'>
+              Save Rating
+            </button>
           </div>
         </div>
       </DialogContent>
