@@ -6,11 +6,14 @@ import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
 import UserMenu from '../user-menu';
 import { useSession } from '@/lib/auth-client';
+import { adminLinks, adminOnlyLinks, userLinks } from '@/lib/sidebar-links';
 
 export default function Sidebar() {
   const shouldReduceMotion = useReducedMotion();
   const { data: session, isPending } = useSession();
   const isAuthenticated = !!session;
+  const role = session?.user.role;
+  const isPrivileged = role === 'admin' || role === 'moderator';
 
   if (isPending) return null;
 
@@ -34,9 +37,28 @@ export default function Sidebar() {
             <IconVinyl size={24} className='shrink-0' />
             <p className='whitespace-nowrap'>MusiCritics</p>
           </Link>
-          <SidebarLinks />
+          <SidebarLinks links={userLinks} />
+
+          {isPrivileged && (
+            <div>
+              <div className='h-px bg-gray-300 dark:bg-slate-800' />
+              <div className='flex flex-col gap-1 pt-4'>
+                <span className='px-2 text-xs uppercase text-gray-500 dark:text-white'>
+                  Admin
+                </span>
+                <SidebarLinks
+                  links={
+                    role === 'admin'
+                      ? [...adminLinks, ...adminOnlyLinks]
+                      : adminLinks
+                  }
+                />
+              </div>
+            </div>
+          )}
+
           <div className='hidden h-auto w-full grow md:block' />
-          <div className='mx-4 h-px bg-gray-300 dark:bg-slate-800' />
+          <div className='h-px bg-gray-300 dark:bg-slate-800' />
           <UserMenu />
         </nav>
       </motion.div>

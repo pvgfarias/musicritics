@@ -1,31 +1,27 @@
+// components/sidebar-links.tsx
 'use client';
-import {
-  IconHome,
-  IconDisc,
-  IconStar,
-  IconPlaylist,
-  IconMicrophone2,
-} from '@tabler/icons-react';
 import { usePathname } from 'next/navigation';
+import { Icon } from '@tabler/icons-react';
 import SidebarItem from './sidebar-item';
 
-const links = [
-  { name: 'Home', href: '/dashboard', icon: IconHome },
-  { name: 'Artists', href: '/dashboard/artists', icon: IconMicrophone2 },
-  { name: 'Albums', href: '/dashboard/albums', icon: IconDisc },
-  { name: 'Songs', href: '/dashboard/songs', icon: IconPlaylist },
-  { name: 'Ratings', href: '/dashboard/ratings', icon: IconStar },
-];
-export default function SidebarLinks() {
+export type SidebarLink = {
+  name: string;
+  href: string;
+  icon: Icon;
+  exact?: boolean;
+};
+
+export default function SidebarLinks({ links }: { links: SidebarLink[] }) {
   const pathname = usePathname();
 
   return (
     <div className='flex flex-col gap-1 w-full'>
       {links.map(link => {
         const LinkIcon = link.icon;
-        const isCurrentPath =
-          pathname === link.href ||
-          (pathname.startsWith(link.href + '/') && link.name !== 'Home');
+        const isCurrentPath = link.exact
+          ? pathname === link.href
+          : pathname === link.href || pathname.startsWith(link.href + '/');
+
         return (
           <SidebarItem
             key={link.name}
