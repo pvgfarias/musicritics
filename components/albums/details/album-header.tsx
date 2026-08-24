@@ -37,8 +37,8 @@ export default function AlbumHeader({
             </div>
           )}
           {!album.finalized && (
-            <div className='absolute flex justify-center items-center gap-2 bg-ember font-mono text-gray-200 px-2 py-1 text-xs rounded-full bottom-2 right-2'>
-              <IconRefresh size={12} /> Weekly Rotation &rarr;
+            <div className='absolute flex justify-center items-center gap-2 bg-ember font-mono text-gray-200 px-2.5 py-1 text-xs rounded-full bottom-2 right-2 uppercase'>
+              <IconRefresh size={12} /> Weekly Rotation
             </div>
           )}
         </div>

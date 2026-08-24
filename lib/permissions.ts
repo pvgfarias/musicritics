@@ -16,7 +16,7 @@ export const user = ac.newRole({
 
 export const moderator = ac.newRole({
   album: ['create', 'update', 'finalize', 'manageRotation'],
-  rating: ['create', 'update:own', 'delete:own'],
+  rating: ['create', 'update:own', 'delete:own', 'delete:any'],
 });
 
 export const admin = ac.newRole({
