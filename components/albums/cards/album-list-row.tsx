@@ -2,7 +2,13 @@ import { AlbumSummary } from '@/data/albums';
 import Image from 'next/image';
 import RatingGrade from '../../dashboard/rating-grade';
 
-export default function AlbumListRow({ album }: { album: AlbumSummary }) {
+export default function AlbumListRow({
+  album,
+  actions,
+}: {
+  album: AlbumSummary;
+  actions?: React.ReactNode;
+}) {
   return (
     <div
       key={album.id}
@@ -14,7 +20,11 @@ export default function AlbumListRow({ album }: { album: AlbumSummary }) {
       <div className='flex flex-row justify-start items-center gap-2 p-2'>
         <div className='relative w-12.5 h-12.5 shrink-0 overflow-hidden rounded-sm'>
           <Image
-            src={album.coverImage ? `/${album.coverImage}` : '/albums.jpg'}
+            src={
+              album.coverImage?.includes('http')
+                ? `${album.coverImage}`
+                : `/${album.coverImage}`
+            }
             alt={`${album.title} by ${album.artists[0]?.artist.name}`}
             fill
             className='object-cover transition-transform duration-200 group-hover:scale-105'
@@ -37,13 +47,24 @@ export default function AlbumListRow({ album }: { album: AlbumSummary }) {
 
         <div className='flex flex-row gap-6 items-center'>
           <span className='text-sm text-gray-500 dark:text-slate-400'>
-            {album.releaseDate?.toString()}
+            {album.releaseDate?.getFullYear()}
           </span>
 
           {album.averageRating && (
             <RatingGrade ratingGrade={album.averageRating} inAlbum={false} />
           )}
         </div>
+        {actions && (
+          <div
+            className='flex flex-row gap-2 items-center shrink-0'
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            {actions}
+          </div>
+        )}
       </div>
     </div>
   );

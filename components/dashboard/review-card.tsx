@@ -2,7 +2,6 @@ import Image from 'next/image';
 
 import currentRatings from '@/data/currentRatings';
 import RatingGrade from './rating-grade';
-import Link from 'next/link';
 
 type Rating = (typeof currentRatings)[number];
 

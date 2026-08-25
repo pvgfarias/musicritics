@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import AlbumCard from '../cards/album-card';
 import type { AlbumSummary } from '@/data/albums';
-import Link from 'next/dist/client/link';
+import Link from 'next/link';
 
 const cardVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -12,13 +12,24 @@ const cardVariants = {
 
 const MAX_ALBUMS = 5;
 
-export function AlbumGrid({ albumList }: { albumList: AlbumSummary[] }) {
+export function AlbumGrid({
+  albumList,
+  renderCardActions,
+}: {
+  albumList: AlbumSummary[];
+  renderCardActions?: (album: AlbumSummary) => React.ReactNode;
+}) {
   return (
     <>
       {/* Mobile */}
       <div className='grid grid-cols-2 sm:grid-cols-3 place-items-center p-4 gap-4 md:hidden w-full'>
         {albumList.map((album, index) => (
-          <AlbumCard key={album.id} album={album} priority={index < 3} />
+          <AlbumCard
+            key={album.id}
+            album={album}
+            priority={index < 3}
+            actions={renderCardActions?.(album)}
+          />
         ))}
       </div>
 
@@ -42,7 +53,11 @@ export function AlbumGrid({ albumList }: { albumList: AlbumSummary[] }) {
                   href={`/dashboard/albums/${album.slug}`}
                   className='w-full'
                 >
-                  <AlbumCard album={album} priority={index < MAX_ALBUMS} />
+                  <AlbumCard
+                    album={album}
+                    priority={index < MAX_ALBUMS}
+                    actions={renderCardActions?.(album)}
+                  />
                 </Link>
               </motion.div>
             ))}

@@ -1,5 +1,6 @@
 import { requireDashboardAccess } from '@/lib/auth-helpers';
 import { IconCheck, IconPlus } from '@tabler/icons-react';
+import Link from 'next/link';
 
 export default async function Page() {
   const session = await requireDashboardAccess();
@@ -10,17 +11,23 @@ export default async function Page() {
       <h1 className='text-3xl font-title text-gray-900 dark:text-white underline decoration-3 decoration-ember underline-offset-8 mb-6'>
         Admin Panel
       </h1>
-      <button>
+      <Link href='/admin/albums'>
         <IconPlus />
         Create Album
-      </button>
-      <button>
+      </Link>
+      <Link href='/admin/artists'>
         <IconPlus />
         Create Artist
-      </button>
+      </Link>
       <button>
         <IconCheck /> Finalize Weekly Rotation
       </button>
+      <div>
+        <h3>Weekly Rotation</h3>
+      </div>
+      <div>
+        <h3>Recent Reviews</h3>
+      </div>
     </main>
   );
 }

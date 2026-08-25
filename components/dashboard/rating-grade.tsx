@@ -1,13 +1,9 @@
 type RatingGradeProps = {
-  /** Score out of 100. Pass null/undefined when there's nothing to show yet
-   *  (e.g. an open album with no public average, or a user who hasn't rated). */
   ratingGrade: number | null | undefined;
-  /** Renders as an absolutely-positioned overlay badge (e.g. on an album cover). */
   inAlbum?: boolean;
-  /** Smaller footprint for secondary badges, like a "your score" chip next to a primary badge. */
   size?: 'sm' | 'md' | 'lg';
-  /** Optional label announced to screen readers, e.g. "Public rating" or "Your rating". */
   label?: string;
+  withBackground?: boolean;
 };
 
 const SIZE_CLASSES: Record<NonNullable<RatingGradeProps['size']>, string> = {
@@ -16,12 +12,20 @@ const SIZE_CLASSES: Record<NonNullable<RatingGradeProps['size']>, string> = {
   lg: 'h-12 w-12 text-lg',
 };
 
-function getRatingColor(ratingGrade: number) {
-  if (ratingGrade >= 80) return 'text-emerald-400';
-  if (ratingGrade >= 70) return 'text-lime-400';
-  if (ratingGrade >= 60) return ' text-amber-400';
-  if (ratingGrade >= 40) return 'text-orange-400';
-  return 'text-red-400';
+function getRatingColor(ratingGrade: number, withBackground = false): string {
+  const COLOR_MAP = [
+    { threshold: 80, color: 'emerald' },
+    { threshold: 70, color: 'lime' },
+    { threshold: 60, color: 'amber' },
+    { threshold: 40, color: 'orange' },
+  ] as const;
+
+  const color =
+    COLOR_MAP.find(({ threshold }) => ratingGrade >= threshold)?.color ?? 'red';
+
+  return withBackground
+    ? `text-${color}-400 bg-${color}-800`
+    : `text-${color}-400`;
 }
 
 export default function RatingGrade({
@@ -29,12 +33,13 @@ export default function RatingGrade({
   inAlbum = false,
   size = 'md',
   label,
+  withBackground = false,
 }: RatingGradeProps) {
   const hasScore = ratingGrade != null;
   const displayScore = hasScore ? Math.round(ratingGrade) : null;
 
   const colorClasses = hasScore
-    ? getRatingColor(displayScore!)
+    ? getRatingColor(displayScore!, withBackground)
     : 'bg-neutral-700/70 text-neutral-300';
 
   const positioning = inAlbum ? 'absolute top-2 right-2' : '';

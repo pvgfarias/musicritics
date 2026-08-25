@@ -6,6 +6,7 @@ import {
   IconPlaylist,
   IconMicrophone2,
   IconUser,
+  IconDeviceImacCog,
 } from '@tabler/icons-react';
 import type { SidebarLink } from '@/components/layout/sidebar/sidebar-links';
 
@@ -18,6 +19,7 @@ export const userLinks: SidebarLink[] = [
 ];
 
 export const adminLinks: SidebarLink[] = [
+  { name: 'Dashboard', href: '/admin', icon: IconDeviceImacCog, exact: true },
   { name: 'Manage Artists', href: '/admin/artists', icon: IconMicrophone2 },
   { name: 'Manage Albums', href: '/admin/albums', icon: IconDisc },
   { name: 'Manage Songs', href: '/admin/songs', icon: IconPlaylist },

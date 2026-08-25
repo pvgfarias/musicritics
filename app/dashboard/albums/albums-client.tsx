@@ -14,12 +14,16 @@ type AlbumsClientProps = {
   albums: AlbumSummary[];
   currentPage: number;
   totalPages: number;
+  renderCardActions?: (album: AlbumSummary) => React.ReactNode;
+  toolbarExtra?: React.ReactNode;
 };
 
 export default function AlbumsClient({
   albums,
   currentPage,
   totalPages,
+  renderCardActions,
+  toolbarExtra,
 }: AlbumsClientProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -33,9 +37,14 @@ export default function AlbumsClient({
           <AlbumStatus />
           <AlbumViewMode viewMode={viewMode} onViewModeChange={setViewMode} />
         </Suspense>
+        {toolbarExtra}
       </div>
 
-      <AlbumDisplay albumList={albums} viewMode={viewMode} />
+      <AlbumDisplay
+        albumList={albums}
+        viewMode={viewMode}
+        renderCardActions={renderCardActions}
+      />
 
       <Suspense>
         <AlbumPagination currentPage={currentPage} totalPages={totalPages} />

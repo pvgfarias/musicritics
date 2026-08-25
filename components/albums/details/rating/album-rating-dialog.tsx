@@ -103,7 +103,11 @@ export default function AlbumRatingDialog({
         <DialogHeader className='flex flex-col gap-1 px-4 pt-4'>
           <div className='flex flex-row gap-2'>
             <Image
-              src={album.coverImage ? `/${album.coverImage}` : '/albums.jpg'}
+              src={
+                album.coverImage?.includes('http')
+                  ? `${album.coverImage}`
+                  : `/${album.coverImage}`
+              }
               alt={`${album.title} cover`}
               width={75}
               height={75}

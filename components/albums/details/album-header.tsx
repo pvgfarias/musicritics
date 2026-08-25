@@ -23,7 +23,11 @@ export default function AlbumHeader({
         <div className='relative w-87.5 h-87.5 shrink-0'>
           {album.coverImage ? (
             <Image
-              src={album.coverImage ? `/${album.coverImage}` : '/albums.jpg'}
+              src={
+                album.coverImage?.includes('http')
+                  ? `${album.coverImage}`
+                  : `/${album.coverImage}`
+              }
               alt={`${album.title} cover`}
               fill
               className='rounded-md'

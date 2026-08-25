@@ -5,9 +5,11 @@ import type { AlbumSummary } from '@/data/albums';
 export default function AlbumCard({
   album,
   priority = false,
+  actions,
 }: {
   album: AlbumSummary;
   priority: boolean;
+  actions?: React.ReactNode;
 }) {
   return (
     <div
@@ -18,7 +20,11 @@ export default function AlbumCard({
     >
       <div className='relative w-56 aspect-square shrink-0 overflow-hidden rounded-t-sm'>
         <Image
-          src={album.coverImage ? `/${album.coverImage}` : '/albums.jpg'}
+          src={
+            album.coverImage?.includes('http')
+              ? `${album.coverImage}`
+              : `/${album.coverImage}`
+          }
           alt={`${album.title} by ${album.artists[0]?.artist.name}`}
           fill
           className='object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]'
@@ -26,7 +32,23 @@ export default function AlbumCard({
         />
 
         {album.finalized && album.averageRating && (
-          <RatingGrade ratingGrade={album.averageRating} inAlbum={true} />
+          <RatingGrade
+            ratingGrade={album.averageRating}
+            inAlbum={true}
+            withBackground={true}
+          />
+        )}
+
+        {actions && (
+          <div
+            className='absolute top-2 right-2 flex gap-1 z-10'
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            {actions}
+          </div>
         )}
       </div>
 
