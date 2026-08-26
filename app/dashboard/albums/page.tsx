@@ -1,6 +1,8 @@
 import AlbumsClient from './albums-client';
 import { getAlbumsPage } from '@/data/albums';
 import type { SortKey } from '@/lib/sort-ratings';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
 const PAGE_SIZE = 15;
 
@@ -27,6 +29,9 @@ export default async function Page({ searchParams }: PageProps) {
     sort: (params.sort as SortKey) ?? 'recent',
   });
 
+  const session = await auth.api.getSession({ headers: await headers() });
+  const user = session?.user;
+
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2'>
       <h1 className='text-3xl font-title text-gray-900 dark:text-white underline decoration-3 decoration-ember underline-offset-8 mb-6'>
@@ -37,6 +42,7 @@ export default async function Page({ searchParams }: PageProps) {
         albums={albums}
         currentPage={page}
         totalPages={totalPages}
+        user={user}
       />
     </main>
   );

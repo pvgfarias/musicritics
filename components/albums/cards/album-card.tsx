@@ -1,16 +1,24 @@
 import Image from 'next/image';
 import RatingGrade from '../../dashboard/rating-grade';
 import type { AlbumSummary } from '@/data/albums';
+import type { User } from '@/lib/auth';
+import { IconUser, IconWorld } from '@tabler/icons-react';
 
 export default function AlbumCard({
   album,
   priority = false,
   actions,
+  user,
 }: {
   album: AlbumSummary;
   priority: boolean;
   actions?: React.ReactNode;
+  user?: User;
 }) {
+  const userRating = user
+    ? album.ratings.find(rating => rating.user.id === user.id)
+    : undefined;
+
   return (
     <div
       className='group flex flex-col w-full shrink-0 cursor-pointer rounded-sm mb-2
@@ -31,17 +39,9 @@ export default function AlbumCard({
           priority={priority}
         />
 
-        {album.finalized && album.averageRating && (
-          <RatingGrade
-            ratingGrade={album.averageRating}
-            inAlbum={true}
-            withBackground={true}
-          />
-        )}
-
         {actions && (
           <div
-            className='absolute top-2 right-2 flex gap-1 z-10'
+            className='absolute top-2 left-1 flex gap-1 z-10 cursor-pointer'
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();
@@ -61,9 +61,22 @@ export default function AlbumCard({
           {album.artists[0]?.artist.name}
         </p>
 
-        <p className='text-xs text-gray-700 dark:text-gray-300 line-clamp-1'>
-          {album.ratingCount} ratings.
-        </p>
+        <div className='flex flex-row gap-2'>
+          <div className='flex flex-row justify-center items-center gap-1 bg-sidebar text-orange-800 dark:text-orange-200  dark:bg-orange-800 rounded-md px-1'>
+            <IconUser size={16} />
+
+            {userRating?.score && (
+              <RatingGrade ratingGrade={userRating.score} size='sm' />
+            )}
+          </div>
+
+          {album.finalized && album.averageRating && (
+            <div className='flex flex-row justify-center items-center gap-1 bg-foreground text-gray-800 dark:text-gray-200 rounded-md px-0.5'>
+              <IconWorld size={16} />
+              <RatingGrade ratingGrade={album.averageRating} size='sm' />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

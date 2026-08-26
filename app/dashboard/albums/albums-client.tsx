@@ -9,6 +9,7 @@ import GenreSelector from '@/components/ui/genre-selector';
 import SearchBar from '@/components/ui/search-bar';
 import SortSelector from '@/components/ui/sort-selector';
 import type { AlbumSummary } from '@/data/albums';
+import type { User } from '@/lib/auth';
 
 type AlbumsClientProps = {
   albums: AlbumSummary[];
@@ -16,6 +17,7 @@ type AlbumsClientProps = {
   totalPages: number;
   renderCardActions?: (album: AlbumSummary) => React.ReactNode;
   toolbarExtra?: React.ReactNode;
+  user?: User;
 };
 
 export default function AlbumsClient({
@@ -24,9 +26,10 @@ export default function AlbumsClient({
   totalPages,
   renderCardActions,
   toolbarExtra,
+  user,
 }: AlbumsClientProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-
+  console.log('Albums - Client: ', user);
   return (
     <div>
       <div className='flex flex-row justify-start items-center gap-2 md:gap-4 mb-2'>
@@ -44,6 +47,7 @@ export default function AlbumsClient({
         albumList={albums}
         viewMode={viewMode}
         renderCardActions={renderCardActions}
+        user={user}
       />
 
       <Suspense>

@@ -54,7 +54,7 @@ export default function RatingGrade({
             ? `Rating: ${displayScore} out of 100`
             : 'Not yet rated'
       }
-      className={`${colorClasses} ${SIZE_CLASSES[size]} ${positioning} shrink-0 rounded-full flex items-center justify-center shadow-sm`}
+      className={`${colorClasses} ${SIZE_CLASSES[size]} ${positioning} shrink-0 flex items-center justify-center `}
     >
       <span className='font-mono font-bold' aria-hidden='true'>
         {hasScore ? displayScore : '—'}

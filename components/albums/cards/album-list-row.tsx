@@ -1,14 +1,22 @@
 import { AlbumSummary } from '@/data/albums';
 import Image from 'next/image';
 import RatingGrade from '../../dashboard/rating-grade';
+import type { User } from '@/lib/auth';
+import { IconClock, IconUser, IconWorld } from '@tabler/icons-react';
 
 export default function AlbumListRow({
   album,
   actions,
+  user,
 }: {
   album: AlbumSummary;
   actions?: React.ReactNode;
+  user?: User;
 }) {
+  const userRating = user
+    ? album.ratings.find(rating => rating.user.id === user.id)
+    : undefined;
+  console.log('Albums - Row: ', user, userRating);
   return (
     <div
       key={album.id}
@@ -50,13 +58,38 @@ export default function AlbumListRow({
             {album.releaseDate?.getFullYear()}
           </span>
 
-          {album.averageRating && (
-            <RatingGrade ratingGrade={album.averageRating} inAlbum={false} />
-          )}
+          <div className='flex flex-col justify-center items-center gap-1.5 w-4'>
+            <IconUser size={16} className='text-gray-600 dark:text-gray-400' />
+            <span className='font-mono text-xs text-gray-500'>
+              {userRating?.score ? (
+                <RatingGrade ratingGrade={userRating.score} size='sm' />
+              ) : (
+                '—'
+              )}
+            </span>
+          </div>
+
+          <div className='flex flex-row items-center gap-2.5 w-4'>
+            <div className='flex flex-col justify-center items-center gap-1'>
+              <IconWorld
+                size={16}
+                className='text-gray-600 dark:text-gray-400'
+              />
+              <span className='text-gray-600 dark:text-white'>
+                {album.finalized && album.averageRating ? (
+                  <RatingGrade ratingGrade={album.averageRating} size='sm' />
+                ) : album.finalized ? (
+                  '-'
+                ) : (
+                  <IconClock size={14} className='text-gray-500 mt-1' />
+                )}
+              </span>
+            </div>
+          </div>
         </div>
         {actions && (
           <div
-            className='flex flex-row gap-2 items-center shrink-0'
+            className='flex flex-row gap-2 items-center shrink-0 ml-2'
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();

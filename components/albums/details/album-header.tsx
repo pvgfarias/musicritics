@@ -6,6 +6,7 @@ import Image from 'next/image';
 import AlbumRatingDialog from './rating/album-rating-dialog';
 import { AlbumTrackForRating } from '@/data/tracks';
 import RatingGrade from '@/components/dashboard/rating-grade';
+import { AlbumPlatformLink } from './album-platform-link';
 type AlbumUserRating = Exclude<AlbumFull, null>['ratings'][number];
 
 export default function AlbumHeader({
@@ -71,6 +72,16 @@ export default function AlbumHeader({
               tracks={tracks}
             />
           )}
+
+          <div className='flex flex-row gap-3'>
+            {album?.socialLinks.map(link => (
+              <AlbumPlatformLink
+                key={link.platform}
+                platform={link.platform}
+                url={link.url}
+              />
+            ))}
+          </div>
 
           <div className='h-px bg-gray-300 dark:bg-slate-800 w-full mt-4' />
           <div className='flex flex-row justify-start items-center gap-8'>

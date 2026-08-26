@@ -53,7 +53,9 @@ const albumSummarySelect = {
     select: { artist: { select: { id: true, name: true, slug: true } } },
   },
   _count: { select: { ratings: true } },
-  ratings: { select: { score: true } },
+  ratings: {
+    select: { user: { select: { id: true } }, score: true },
+  },
 } satisfies Prisma.AlbumSelect;
 
 type AlbumSummaryRaw = Prisma.AlbumGetPayload<{

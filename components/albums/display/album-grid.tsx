@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import AlbumCard from '../cards/album-card';
 import type { AlbumSummary } from '@/data/albums';
 import Link from 'next/link';
+import type { User } from '@/lib/auth';
 
 const cardVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -15,9 +16,11 @@ const MAX_ALBUMS = 5;
 export function AlbumGrid({
   albumList,
   renderCardActions,
+  user,
 }: {
   albumList: AlbumSummary[];
   renderCardActions?: (album: AlbumSummary) => React.ReactNode;
+  user?: User;
 }) {
   return (
     <>
@@ -29,6 +32,7 @@ export function AlbumGrid({
             album={album}
             priority={index < 3}
             actions={renderCardActions?.(album)}
+            user={user}
           />
         ))}
       </div>
@@ -57,6 +61,7 @@ export function AlbumGrid({
                     album={album}
                     priority={index < MAX_ALBUMS}
                     actions={renderCardActions?.(album)}
+                    user={user}
                   />
                 </Link>
               </motion.div>

@@ -95,9 +95,9 @@ export function CreateAlbumDialog() {
         New album
       </DialogTrigger>
 
-      <DialogContent className='max-h-[90vh] max-w-2xl overflow-y-auto'>
+      <DialogContent className='max-h-[90vh] max-w-2xl overflow-y-auto p-4'>
         <DialogHeader>
-          <DialogTitle>Create album</DialogTitle>
+          <DialogTitle>Create Album</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-5'>
@@ -143,7 +143,7 @@ export function CreateAlbumDialog() {
             </div>
 
             <div className='flex flex-col gap-1'>
-              <label className='text-sm font-medium'>Release date</label>
+              <label className='text-sm font-medium'>Release Date</label>
               <input
                 type='date'
                 onChange={e =>
