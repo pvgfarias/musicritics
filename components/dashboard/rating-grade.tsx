@@ -11,21 +11,30 @@ const SIZE_CLASSES: Record<NonNullable<RatingGradeProps['size']>, string> = {
   md: 'h-9 w-9 text-sm',
   lg: 'h-12 w-12 text-lg',
 };
+const COLOR_MAP = [
+  {
+    threshold: 80,
+    color: 'emerald',
+    text: 'text-emerald-400',
+    bg: 'bg-emerald-800',
+  },
+  { threshold: 70, color: 'lime', text: 'text-lime-400', bg: 'bg-lime-800' },
+  { threshold: 60, color: 'amber', text: 'text-amber-400', bg: 'bg-amber-800' },
+  {
+    threshold: 40,
+    color: 'orange',
+    text: 'text-orange-400',
+    bg: 'bg-orange-800',
+  },
+] as const;
+
+const DEFAULT = { text: 'text-red-400', bg: 'bg-red-800' };
 
 function getRatingColor(ratingGrade: number, withBackground = false): string {
-  const COLOR_MAP = [
-    { threshold: 80, color: 'emerald' },
-    { threshold: 70, color: 'lime' },
-    { threshold: 60, color: 'amber' },
-    { threshold: 40, color: 'orange' },
-  ] as const;
+  const match =
+    COLOR_MAP.find(({ threshold }) => ratingGrade >= threshold) ?? DEFAULT;
 
-  const color =
-    COLOR_MAP.find(({ threshold }) => ratingGrade >= threshold)?.color ?? 'red';
-
-  return withBackground
-    ? `text-${color}-400 bg-${color}-800`
-    : `text-${color}-400`;
+  return withBackground ? `${match.text} ${match.bg}` : match.text;
 }
 
 export default function RatingGrade({

@@ -34,9 +34,14 @@ export function DeleteAlbumDialog({
   function handleDelete() {
     startTransition(async () => {
       try {
-        await deleteAlbum(albumId);
-        toast.success(`"${albumTitle ?? 'Album'}" deleted`);
-        onOpenChange(false);
+        const result = await deleteAlbum(albumId);
+
+        if (result.success) {
+          toast.success(`"${albumTitle ?? 'Album'}" deleted`);
+          onOpenChange(false);
+        } else {
+          toast.error(result.error);
+        }
       } catch (err) {
         toast.error(`Failed to delete album. Please try again. Error: ${err}.`);
       }

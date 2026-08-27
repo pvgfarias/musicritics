@@ -29,7 +29,7 @@ export default function AlbumsClient({
   user,
 }: AlbumsClientProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  console.log('Albums - Client: ', user);
+
   return (
     <div>
       <div className='flex flex-row justify-start items-center gap-2 md:gap-4 mb-2'>

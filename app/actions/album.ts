@@ -6,7 +6,6 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { isAlbumOpenForRatings } from '@/data/albums';
 import { Prisma } from '../generated/prisma/client';
-
 import {
   createAlbumSchema,
   type CreateAlbumInput,
@@ -68,7 +67,6 @@ export async function toggleRotation(
   revalidatePath('/dashboard/albums');
   return { success: true };
 }
-
 export async function createAlbum(
   input: CreateAlbumInput
 ): Promise<CreateAlbumResult> {
@@ -84,7 +82,6 @@ export async function createAlbum(
       field: first.path.join('.'),
     };
   }
-
   const data = parsed.data;
 
   try {
@@ -95,15 +92,11 @@ export async function createAlbum(
         coverImage: data.coverImage,
         releaseDate: data.releaseDate,
         genre: data.genre,
-        artists: {
-          create: data.artistIds.map(artistId => ({ artistId })),
-        },
+        artists: { create: data.artistIds.map(artistId => ({ artistId })) },
         tracks: {
           create: data.tracks.map(t => ({ title: t.title, number: t.number })),
         },
-        socialLinks: {
-          create: data.socialLinks,
-        },
+        socialLinks: { create: data.socialLinks },
       },
       select: { id: true },
     });
@@ -121,10 +114,25 @@ export async function createAlbum(
   }
 }
 
+export async function getAlbumForEdit(albumId: string) {
+  const allowed = await requirePermission({ album: ['update'] });
+  if (!allowed) throw new Error('Unauthorized');
+
+  return prisma.album.findUniqueOrThrow({
+    where: { id: albumId },
+    include: {
+      tracks: { orderBy: { number: 'asc' } },
+      socialLinks: true,
+      artists: { include: { artist: true } },
+    },
+  });
+}
+
 export async function updateAlbum(
+  albumId: string,
   input: CreateAlbumInput
 ): Promise<CreateAlbumResult> {
-  const allowed = await requirePermission({ album: ['create'] });
+  const allowed = await requirePermission({ album: ['update'] });
   if (!allowed) throw new Error('Unauthorized');
 
   const parsed = createAlbumSchema.safeParse(input);
@@ -136,28 +144,35 @@ export async function updateAlbum(
       field: first.path.join('.'),
     };
   }
-
   const data = parsed.data;
 
   try {
-    const album = await prisma.album.create({
-      data: {
-        title: data.title,
-        slug: data.slug,
-        coverImage: data.coverImage,
-        releaseDate: data.releaseDate,
-        genre: data.genre,
-        artists: {
-          create: data.artistIds.map(artistId => ({ artistId })),
+    const album = await prisma.$transaction(async tx => {
+      // Relations (tracks, socialLinks, artist links) need to be replaced
+      // wholesale since the form doesn't track per-row IDs for diffing.
+      await tx.track.deleteMany({ where: { albumId } });
+      await tx.albumSocialLink.deleteMany({ where: { albumId } });
+      await tx.albumArtist.deleteMany({ where: { albumId } });
+
+      return tx.album.update({
+        where: { id: albumId },
+        data: {
+          title: data.title,
+          slug: data.slug,
+          coverImage: data.coverImage,
+          releaseDate: data.releaseDate,
+          genre: data.genre,
+          artists: { create: data.artistIds.map(artistId => ({ artistId })) },
+          tracks: {
+            create: data.tracks.map(t => ({
+              title: t.title,
+              number: t.number,
+            })),
+          },
+          socialLinks: { create: data.socialLinks },
         },
-        tracks: {
-          create: data.tracks.map(t => ({ title: t.title, number: t.number })),
-        },
-        socialLinks: {
-          create: data.socialLinks,
-        },
-      },
-      select: { id: true },
+        select: { id: true },
+      });
     });
 
     revalidatePath('/dashboard/albums');

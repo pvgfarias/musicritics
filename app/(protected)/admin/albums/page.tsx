@@ -1,4 +1,4 @@
-import AdminAlbumsView from '@/components/admin/admin-albums-view';
+import AdminAlbumsView from '@/components/admin/album/admin-albums-view';
 import { getAlbumsPage } from '@/data/albums';
 import { auth } from '@/lib/auth';
 import type { SortKey } from '@/lib/sort-ratings';

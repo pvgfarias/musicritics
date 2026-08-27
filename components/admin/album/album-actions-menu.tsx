@@ -17,7 +17,8 @@ import {
 } from '@tabler/icons-react';
 import { type AlbumSummary } from '@/data/albums';
 import { toggleRotation } from '@/app/actions/album';
-import { DeleteAlbumDialog } from './delete-album-dialog';
+import { DeleteAlbumDialog } from './dialog/delete-album-dialog';
+import { EditAlbumDialog } from './dialog/edit-album-dialog';
 
 export function AlbumActionsMenu({ album }: { album: AlbumSummary }) {
   const [editOpen, setEditOpen] = useState(false);
@@ -66,11 +67,11 @@ export function AlbumActionsMenu({ album }: { album: AlbumSummary }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* <EditAlbumDialog
+      <EditAlbumDialog
         album={album}
         open={editOpen}
         onOpenChange={setEditOpen}
-      /> */}
+      />
       <DeleteAlbumDialog
         albumId={album.id}
         open={deleteOpen}

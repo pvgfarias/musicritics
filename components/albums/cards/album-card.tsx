@@ -2,7 +2,7 @@ import Image from 'next/image';
 import RatingGrade from '../../dashboard/rating-grade';
 import type { AlbumSummary } from '@/data/albums';
 import type { User } from '@/lib/auth';
-import { IconUser, IconWorld } from '@tabler/icons-react';
+import { IconRefresh, IconUser, IconWorld } from '@tabler/icons-react';
 
 export default function AlbumCard({
   album,
@@ -38,7 +38,11 @@ export default function AlbumCard({
           className='object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]'
           priority={priority}
         />
-
+        {!album.finalized && (
+          <div className='absolute flex justify-center items-center gap-2 bg-ember font-mono text-gray-200 px-1.5 py-0.5 text-[10px] rounded-md bottom-2 right-2 uppercase'>
+            <IconRefresh size={10} /> Weekly Rotation
+          </div>
+        )}
         {actions && (
           <div
             className='absolute top-2 left-1 flex gap-1 z-10 cursor-pointer'
@@ -62,7 +66,7 @@ export default function AlbumCard({
         </p>
 
         <div className='flex flex-row gap-2'>
-          <div className='flex flex-row justify-center items-center gap-1 bg-sidebar text-orange-800 dark:text-orange-200  dark:bg-orange-800 rounded-md px-1'>
+          <div className='flex flex-row justify-center items-center gap-1 text-gray-800 dark:text-gray-200   rounded-md px-1'>
             <IconUser size={16} />
 
             {userRating?.score && (
