@@ -90,10 +90,23 @@ export default function AlbumHeader({
                 My Score
               </span>
               {userRating ? (
-                <RatingGrade ratingGrade={userRating.score} size='lg' />
+                <div className='relative group inline-block'>
+                  <RatingGrade ratingGrade={userRating.score} size='lg' />
+
+                  {album.finalized && (
+                    <div
+                      className='pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 
+                   w-56 rounded-md bg-gray-900 dark:bg-gray-800 px-3 py-2 
+                   text-xs text-gray-200 font-mono text-center
+                   opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-10'
+                    >
+                      Your rating for this album is finalized.
+                    </div>
+                  )}
+                </div>
               ) : (
                 <p className='font-mono text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-2'>
-                  No rating yet...
+                  No rating...
                 </p>
               )}
             </div>

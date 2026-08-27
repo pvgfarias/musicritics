@@ -91,19 +91,72 @@ export async function saveAlbumRating({
       authorId: userId,
     });
 
-    for (const t of trackRatings) {
-      const trackRating = await tx.trackRating.upsert({
-        where: { userId_trackId: { userId, trackId: t.trackId } },
-        create: { userId, trackId: t.trackId, score: t.score },
-        update: { score: t.score },
-      });
+    const trackIds = trackRatings.map(t => t.trackId);
 
-      await syncComment(tx, {
-        trackRatingId: trackRating.id,
-        body: t.comment,
-        authorId: userId,
-      });
+    // 1 round trip: fetch existing trackRatings for all tracks at once
+    const existingTrackRatings = await tx.trackRating.findMany({
+      where: { userId, trackId: { in: trackIds } },
+    });
+    const existingByTrackId = new Map(
+      existingTrackRatings.map(tr => [tr.trackId, tr])
+    );
+
+    // Upserts still need to happen per-row (no upsertMany in Prisma),
+    // but we can at least fire them without the extra findUnique each time
+    const trackRatingResults = await Promise.all(
+      trackRatings.map(t =>
+        tx.trackRating.upsert({
+          where: { userId_trackId: { userId, trackId: t.trackId } },
+          create: { userId, trackId: t.trackId, score: t.score },
+          update: { score: t.score },
+        })
+      )
+    );
+
+    const trackRatingIds = trackRatingResults.map(tr => tr.id);
+
+    // 1 round trip: fetch existing comments for all trackRatings at once
+    const existingComments = await tx.comment.findMany({
+      where: { trackRatingId: { in: trackRatingIds } },
+    });
+    const commentByTrackRatingId = new Map(
+      existingComments.map(c => [c.trackRatingId, c])
+    );
+
+    // Batch comment writes by operation type instead of one-by-one find+branch
+    const toDelete: string[] = [];
+    const toUpdate: { id: string; body: string }[] = [];
+    const toCreate: { trackRatingId: string; body: string }[] = [];
+
+    for (const tr of trackRatingResults) {
+      const input = trackRatings.find(t => t.trackId === tr.trackId)!;
+      const trimmed = input.comment.trim();
+      const existing = commentByTrackRatingId.get(tr.id);
+
+      if (!trimmed) {
+        if (existing) toDelete.push(existing.id);
+      } else if (existing) {
+        toUpdate.push({ id: existing.id, body: trimmed });
+      } else {
+        toCreate.push({ trackRatingId: tr.id, body: trimmed });
+      }
     }
+
+    await Promise.all([
+      toDelete.length &&
+        tx.comment.deleteMany({ where: { id: { in: toDelete } } }),
+      ...toUpdate.map(u =>
+        tx.comment.update({ where: { id: u.id }, data: { body: u.body } })
+      ),
+      toCreate.length &&
+        tx.comment.createMany({
+          data: toCreate.map(c => ({
+            trackRatingId: c.trackRatingId,
+            body: c.body,
+            authorId: userId,
+          })),
+        }),
+    ]);
   });
 
   revalidatePath(`/albums/${albumSlug}`);

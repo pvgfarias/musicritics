@@ -30,8 +30,6 @@ export default function AlbumRatingDialog({
   userRating: AlbumUserRating | undefined;
   tracks: AlbumTrackForRating[];
 }) {
-  // seed straight from each track's existing score — null if never rated
-
   const [scores, setScores] = useState<Record<string, number | null>>(() =>
     Object.fromEntries(tracks.map(t => [t.id, t.score]))
   );
@@ -46,6 +44,7 @@ export default function AlbumRatingDialog({
     return Math.round(rated.reduce((a, b) => a + b, 0) / rated.length);
   }, [scores]);
 
+  const [open, setOpen] = useState(false);
   const [comment, setComment] = useState(userRating?.comment?.body || '');
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -72,15 +71,14 @@ export default function AlbumRatingDialog({
             comment: trackComments[t.id] ?? '',
           })),
         });
-        // dialog will pick up fresh data via revalidatePath;
-        // close it manually if you want — see note below
+        setOpen(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong.');
       }
     });
   };
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
         <div className='group w-32 flex flex-row justify-center items-center gap-1.5 text-sm font-medium text-ember border border-ember/30 hover:bg-ember hover:text-white transition-colors duration-200 rounded-full px-3 py-1'>
           {!userRating?.score ? (
