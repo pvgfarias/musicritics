@@ -1,15 +1,12 @@
 import { ArtistSummary } from '@/data/artists';
-import { User } from '@/lib/auth';
 import Image from 'next/image';
 
 export default function ArtistListRow({
   artist,
   actions,
-  user,
 }: {
   artist: ArtistSummary;
   actions?: React.ReactNode;
-  user?: User;
 }) {
   return (
     <div

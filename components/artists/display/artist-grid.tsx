@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import ArtistCard from '../cards/artist-card';
 import type { ArtistSummary } from '@/data/artists';
 import Link from 'next/link';
-import type { User } from '@/lib/auth';
 
 const cardVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -16,11 +15,9 @@ const MAX_ARTISTS = 5;
 export function ArtistGrid({
   artistList,
   renderCardActions,
-  user,
 }: {
   artistList: ArtistSummary[];
   renderCardActions?: (artist: ArtistSummary) => React.ReactNode;
-  user?: User;
 }) {
   return (
     <>
@@ -32,7 +29,6 @@ export function ArtistGrid({
             artist={artist}
             priority={index < 3}
             actions={renderCardActions?.(artist)}
-            user={user}
           />
         ))}
       </div>
@@ -61,7 +57,6 @@ export function ArtistGrid({
                     artist={artist}
                     priority={index < MAX_ARTISTS}
                     actions={renderCardActions?.(artist)}
-                    user={user}
                   />
                 </Link>
               </motion.div>

@@ -1,17 +1,16 @@
+import RatingGrade from '@/components/dashboard/rating-grade';
 import { ArtistSummary } from '@/data/artists';
-import { User } from '@/lib/auth';
+import { IconDisc, IconUser, IconWorld } from '@tabler/icons-react';
 import Image from 'next/image';
 
 export default function ArtistCard({
   artist,
   priority = false,
   actions,
-  user,
 }: {
   artist: ArtistSummary;
   priority: boolean;
   actions?: React.ReactNode;
-  user?: User;
 }) {
   return (
     <div
@@ -33,10 +32,25 @@ export default function ArtistCard({
           priority={priority}
         />
       </div>
-      <div className='flex flex-col p-2.5 justify-start gap-0.5 flex-1'>
+      <div className='flex flex-col gap-1 p-2.5'>
         <p className='font-title font-bold text-sm text-dark-blue dark:text-white line-clamp-1 transition-colors duration-200 group-hover:text-orange-500'>
           {artist.name}
         </p>
+
+        <div className='flex flex-row gap-2'>
+          <div className='flex flex-row justify-center items-center gap-1 text-dark-blue dark:text-white'>
+            <IconDisc size={16} />
+            <p className='font-title font-bold text-sm'>{artist.albumsCount}</p>
+          </div>
+          <div className='flex flex-row justify-center items-center gap-1 text-dark-blue dark:text-white'>
+            <IconWorld size={16} />
+            <RatingGrade ratingGrade={artist.averageRating} size='sm' />
+          </div>
+          <div className='flex flex-row justify-center items-center gap-1 text-dark-blue dark:text-white'>
+            <IconUser size={16} />
+            <RatingGrade ratingGrade={artist.userAverageRating} size='sm' />
+          </div>
+        </div>
       </div>
     </div>
   );

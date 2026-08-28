@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
@@ -103,6 +102,9 @@ model Album {
   finalized   Boolean   @default(false) // false = open for ratings, true = closed/finalized
   createdAt   DateTime  @default(now())
 
+  averageRating Float?
+  ratingCount   Int    @default(0)
+
   artists     AlbumArtist[]
   tracks      Track[]
   ratings     Rating[]
@@ -123,8 +125,6 @@ model Track {
   @@index([albumId])
 }
 
-// Explicit join table for the many-to-many Artist <-> Album relation
-
 model AlbumArtist {
   album    Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
   albumId  String
@@ -132,6 +132,7 @@ model AlbumArtist {
   artistId String
 
   @@id([albumId, artistId])
+  @@index([artistId])
 }
 
 model Rating {
@@ -150,6 +151,7 @@ model Rating {
   comment Comment?
 
   @@unique([userId, albumId])
+  @@index([albumId])
 }
 
 model TrackRating {
@@ -168,6 +170,7 @@ model TrackRating {
   comment Comment?
 
   @@unique([userId, trackId])
+  @@index([trackId])
 }
 
 model Comment {

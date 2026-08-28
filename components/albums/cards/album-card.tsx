@@ -15,10 +15,6 @@ export default function AlbumCard({
   actions?: React.ReactNode;
   user?: User;
 }) {
-  const userRating = user
-    ? album.ratings.find(rating => rating.user.id === user.id)
-    : undefined;
-
   return (
     <div
       className='group flex flex-col w-full shrink-0 cursor-pointer rounded-sm mb-2
@@ -66,15 +62,17 @@ export default function AlbumCard({
         </p>
 
         <div className='flex flex-row gap-2'>
-          <div className='flex flex-row justify-center items-center gap-1 text-gray-800 dark:text-gray-200   rounded-md px-1'>
-            <IconUser size={16} />
+          {user && (
+            <div className='flex flex-row justify-center items-center gap-1 text-gray-800 dark:text-gray-200 rounded-md px-1'>
+              <IconUser size={16} />
 
-            {userRating?.score && (
-              <RatingGrade ratingGrade={userRating.score} size='sm' />
-            )}
-          </div>
+              {album.userRating != null && (
+                <RatingGrade ratingGrade={album.userRating} size='sm' />
+              )}
+            </div>
+          )}
 
-          {album.finalized && album.averageRating && (
+          {album.finalized && album.averageRating != null && (
             <div className='flex flex-row justify-center items-center gap-1 bg-foreground text-gray-800 dark:text-gray-200 rounded-md px-0.5'>
               <IconWorld size={16} />
               <RatingGrade ratingGrade={album.averageRating} size='sm' />

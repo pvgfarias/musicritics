@@ -6,7 +6,6 @@ import SearchBar from '@/components/ui/search-bar';
 import SortSelector from '@/components/ui/sort-selector';
 import ViewMode from '@/components/ui/view-mode';
 import { ArtistSummary } from '@/data/artists';
-import { User } from '@/lib/auth';
 import { Suspense, useState } from 'react';
 
 type ArtistsClientProps = {
@@ -15,7 +14,6 @@ type ArtistsClientProps = {
   totalPages: number;
   renderCardActions?: (artist: ArtistSummary) => React.ReactNode;
   toolbarExtra?: React.ReactNode;
-  user?: User;
 };
 
 export default function ArtistsClient({
@@ -24,7 +22,6 @@ export default function ArtistsClient({
   totalPages,
   renderCardActions,
   toolbarExtra,
-  user,
 }: ArtistsClientProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -43,7 +40,6 @@ export default function ArtistsClient({
         artistList={artists}
         viewMode={viewMode}
         renderCardActions={renderCardActions}
-        user={user}
       />
 
       <Suspense>

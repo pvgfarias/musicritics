@@ -1,22 +1,15 @@
 import { AlbumSummary } from '@/data/albums';
 import Image from 'next/image';
 import RatingGrade from '../../dashboard/rating-grade';
-import type { User } from '@/lib/auth';
 import { IconClock, IconUser, IconWorld } from '@tabler/icons-react';
 
 export default function AlbumListRow({
   album,
   actions,
-  user,
 }: {
   album: AlbumSummary;
   actions?: React.ReactNode;
-  user?: User;
 }) {
-  const userRating = user
-    ? album.ratings.find(rating => rating.user.id === user.id)
-    : undefined;
-
   return (
     <div
       key={album.id}
@@ -61,8 +54,8 @@ export default function AlbumListRow({
           <div className='flex flex-col justify-center items-center gap-1.5 w-4'>
             <IconUser size={16} className='text-gray-600 dark:text-gray-400' />
             <span className='font-mono text-xs text-gray-500'>
-              {userRating?.score ? (
-                <RatingGrade ratingGrade={userRating.score} size='sm' />
+              {album.userRating ? (
+                <RatingGrade ratingGrade={album.userRating} size='sm' />
               ) : (
                 '—'
               )}

@@ -26,7 +26,6 @@ export default function AlbumsClient({
   totalPages,
   renderCardActions,
   toolbarExtra,
-  user,
 }: AlbumsClientProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -47,7 +46,6 @@ export default function AlbumsClient({
         albumList={albums}
         viewMode={viewMode}
         renderCardActions={renderCardActions}
-        user={user}
       />
 
       <Suspense>

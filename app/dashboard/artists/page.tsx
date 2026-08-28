@@ -15,6 +15,9 @@ type PageProps = {
 };
 
 export default async function ArtistPage({ searchParams }: PageProps) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const user = session?.user;
+
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
 
@@ -23,10 +26,8 @@ export default async function ArtistPage({ searchParams }: PageProps) {
     pageSize: PAGE_SIZE,
     query: params.query,
     sort: (params.sort as SortKey) ?? 'az',
+    userId: user?.id,
   });
-
-  const session = await auth.api.getSession({ headers: await headers() });
-  const user = session?.user;
 
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2'>
@@ -37,7 +38,6 @@ export default async function ArtistPage({ searchParams }: PageProps) {
         artists={artists}
         currentPage={page}
         totalPages={totalPages}
-        user={user}
       />
     </main>
   );
