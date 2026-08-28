@@ -12,7 +12,6 @@ export function AlbumList({
   renderCardActions?: (album: AlbumSummary) => React.ReactNode;
   user?: User;
 }) {
-  console.log('Albums - List: ', user);
   return (
     <>
       {albumList.map(album => (

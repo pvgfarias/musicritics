@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-export default function AlbumPagination({
+export default function Pagination({
   currentPage,
   totalPages,
 }: {

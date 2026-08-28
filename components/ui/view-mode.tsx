@@ -1,14 +1,14 @@
 import { IconLayoutGrid, IconList } from '@tabler/icons-react';
 
-type AlbumViewModeProps = {
+type ViewModeProps = {
   viewMode: 'grid' | 'list';
   onViewModeChange: (mode: 'grid' | 'list') => void;
 };
 
-export default function AlbumViewMode({
+export default function ViewMode({
   viewMode,
   onViewModeChange,
-}: AlbumViewModeProps) {
+}: ViewModeProps) {
   return (
     <div className='flex h-10 w-18 overflow-hidden rounded-md border border-gray-300 bg-foreground dark:border-slate-800'>
       <button

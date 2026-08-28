@@ -1,33 +1,31 @@
 'use client';
 
-import { Suspense, useState } from 'react';
-import AlbumDisplay from '@/components/albums/display/album-display';
-import AlbumStatus from '@/components/albums/album-status';
-import GenreSelector from '@/components/ui/genre-selector';
+import ArtistDisplay from '@/components/artists/display/artist-display';
+import Pagination from '@/components/ui/pagination';
 import SearchBar from '@/components/ui/search-bar';
 import SortSelector from '@/components/ui/sort-selector';
-import type { AlbumSummary } from '@/data/albums';
-import type { User } from '@/lib/auth';
 import ViewMode from '@/components/ui/view-mode';
-import Pagination from '@/components/ui/pagination';
+import { ArtistSummary } from '@/data/artists';
+import { User } from '@/lib/auth';
+import { Suspense, useState } from 'react';
 
-type AlbumsClientProps = {
-  albums: AlbumSummary[];
+type ArtistsClientProps = {
+  artists: ArtistSummary[];
   currentPage: number;
   totalPages: number;
-  renderCardActions?: (album: AlbumSummary) => React.ReactNode;
+  renderCardActions?: (artist: ArtistSummary) => React.ReactNode;
   toolbarExtra?: React.ReactNode;
   user?: User;
 };
 
-export default function AlbumsClient({
-  albums,
+export default function ArtistsClient({
+  artists,
   currentPage,
   totalPages,
   renderCardActions,
   toolbarExtra,
   user,
-}: AlbumsClientProps) {
+}: ArtistsClientProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (
@@ -35,16 +33,14 @@ export default function AlbumsClient({
       <div className='flex flex-row justify-start items-center gap-2 md:gap-4 mb-2'>
         <Suspense>
           <SearchBar />
-          <GenreSelector />
           <SortSelector />
-          <AlbumStatus />
           <ViewMode viewMode={viewMode} onViewModeChange={setViewMode} />
         </Suspense>
         {toolbarExtra}
       </div>
 
-      <AlbumDisplay
-        albumList={albums}
+      <ArtistDisplay
+        artistList={artists}
         viewMode={viewMode}
         renderCardActions={renderCardActions}
         user={user}

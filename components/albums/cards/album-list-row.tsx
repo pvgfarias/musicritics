@@ -16,7 +16,7 @@ export default function AlbumListRow({
   const userRating = user
     ? album.ratings.find(rating => rating.user.id === user.id)
     : undefined;
-  console.log('Albums - Row: ', user, userRating);
+
   return (
     <div
       key={album.id}
