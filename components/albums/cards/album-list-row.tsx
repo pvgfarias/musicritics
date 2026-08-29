@@ -1,7 +1,8 @@
 import { AlbumSummary } from '@/data/albums';
 import Image from 'next/image';
 import RatingGrade from '../../dashboard/rating-grade';
-import { IconClock, IconUser, IconWorld } from '@tabler/icons-react';
+import { IconClock } from '@tabler/icons-react';
+import { ALBUM_ROW_GRID } from '../display/album-list';
 
 export default function AlbumListRow({
   album,
@@ -18,7 +19,7 @@ export default function AlbumListRow({
             transition-colors duration-150
             hover:bg-gray-100 dark:hover:bg-slate-900'
     >
-      <div className='flex flex-row justify-start items-center gap-2 p-2'>
+      <div className={`${ALBUM_ROW_GRID} p-2`}>
         <div className='relative w-12.5 h-12.5 shrink-0 overflow-hidden rounded-sm'>
           <Image
             src={
@@ -40,49 +41,37 @@ export default function AlbumListRow({
           <p className='text-[13px] text-gray-700 dark:text-gray-300 line-clamp-1'>
             {album.artists[0]?.artist.name}
           </p>
-
-          <p className='text-xs text-gray-700 dark:text-gray-300 line-clamp-1'>
-            {album.ratingCount} ratings.
-          </p>
         </div>
 
-        <div className='flex flex-row gap-6 items-center'>
-          <span className='text-sm text-gray-500 dark:text-slate-400'>
-            {album.releaseDate?.getFullYear()}
-          </span>
+        <span className='text-center text-sm text-gray-500 dark:text-slate-400'>
+          {album.releaseDate?.getFullYear()}
+        </span>
 
-          <div className='flex flex-col justify-center items-center gap-1.5 w-4'>
-            <IconUser size={16} className='text-gray-600 dark:text-gray-400' />
-            <span className='font-mono text-xs text-gray-500'>
-              {album.userRating ? (
-                <RatingGrade ratingGrade={album.userRating} size='sm' />
-              ) : (
-                '—'
-              )}
-            </span>
-          </div>
+        <span className='text-center text-sm text-gray-500 dark:text-slate-400'>
+          {album.ratingCount}
+        </span>
 
-          <div className='flex flex-row items-center gap-2.5 w-4'>
-            <div className='flex flex-col justify-center items-center gap-1'>
-              <IconWorld
-                size={16}
-                className='text-gray-600 dark:text-gray-400'
-              />
-              <span className='text-gray-600 dark:text-white'>
-                {album.finalized && album.averageRating ? (
-                  <RatingGrade ratingGrade={album.averageRating} size='sm' />
-                ) : album.finalized ? (
-                  '-'
-                ) : (
-                  <IconClock size={14} className='text-gray-500 mt-1' />
-                )}
-              </span>
-            </div>
-          </div>
+        <div className='flex justify-center'>
+          {album.userRating ? (
+            <RatingGrade ratingGrade={album.userRating} size='sm' />
+          ) : (
+            <span className='text-gray-500 dark:text-slate-400'>—</span>
+          )}
         </div>
+
+        <div className='flex justify-center text-gray-600 dark:text-white'>
+          {album.finalized && album.averageRating ? (
+            <RatingGrade ratingGrade={album.averageRating} size='sm' />
+          ) : album.finalized ? (
+            <span className='text-gray-500 dark:text-slate-400'>-</span>
+          ) : (
+            <IconClock size={14} className='text-gray-500' />
+          )}
+        </div>
+
         {actions && (
           <div
-            className='flex flex-row gap-2 items-center shrink-0 ml-2'
+            className='flex flex-row gap-2 items-center justify-end shrink-0'
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();

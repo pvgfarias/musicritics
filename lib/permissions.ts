@@ -5,6 +5,7 @@ const statement = {
   ...defaultStatements,
   album: ['create', 'update', 'delete', 'finalize', 'manageRotation'],
   rating: ['create', 'update:own', 'delete:own', 'delete:any'], // delete any?
+  artist: ['create', 'update', 'delete'],
 } as const;
 
 export const ac = createAccessControl(statement);
@@ -17,10 +18,12 @@ export const user = ac.newRole({
 export const moderator = ac.newRole({
   album: ['create', 'update', 'finalize', 'manageRotation'],
   rating: ['create', 'update:own', 'delete:own', 'delete:any'],
+  artist: ['create', 'update'],
 });
 
 export const admin = ac.newRole({
   ...adminAc.statements,
   album: ['create', 'update', 'delete', 'finalize', 'manageRotation'],
   rating: ['create', 'update:own', 'delete:own', 'delete:any'],
+  artist: ['create', 'update', 'delete'],
 });

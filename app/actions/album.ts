@@ -67,6 +67,7 @@ export async function toggleRotation(
   revalidatePath('/dashboard/albums');
   return { success: true };
 }
+
 export async function createAlbum(
   input: CreateAlbumInput
 ): Promise<CreateAlbumResult> {

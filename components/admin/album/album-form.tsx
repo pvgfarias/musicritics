@@ -5,7 +5,6 @@ import { useState } from 'react';
 
 type AlbumFormValues = {
   title: string;
-  // ...other shared fields
 };
 
 type AlbumFormProps = {
@@ -40,7 +39,7 @@ export function AlbumForm({
         placeholder='Album title'
         className='w-full rounded border px-3 py-2'
       />
-      {/* other shared fields */}
+
       <button type='submit' disabled={pending} className='...'>
         {pending ? 'Saving…' : submitLabel}
       </button>
