@@ -1,19 +1,16 @@
 import Image from 'next/image';
 import RatingGrade from '@/components/dashboard/rating-grade';
 import type { AlbumSummary } from '@/features/albums/queries';
-import type { User } from '@/features/auth/auth';
 import { IconRefresh, IconUser, IconWorld } from '@tabler/icons-react';
 
 export default function AlbumCard({
   album,
   priority = false,
   actions,
-  user,
 }: {
   album: AlbumSummary;
   priority: boolean;
   actions?: React.ReactNode;
-  user?: User;
 }) {
   return (
     <div
@@ -62,15 +59,13 @@ export default function AlbumCard({
         </p>
 
         <div className='flex flex-row gap-2'>
-          {user && (
-            <div className='flex flex-row justify-center items-center gap-1 text-gray-800 dark:text-gray-200 rounded-md px-1'>
-              <IconUser size={16} />
+          <div className='flex flex-row justify-center items-center gap-1 text-gray-800 dark:text-gray-200 rounded-md px-1'>
+            <IconUser size={16} />
 
-              {album.userRating != null && (
-                <RatingGrade ratingGrade={album.userRating} size='sm' />
-              )}
-            </div>
-          )}
+            {album.userRating != null && (
+              <RatingGrade ratingGrade={album.userRating} size='sm' />
+            )}
+          </div>
 
           {album.finalized && album.averageRating != null && (
             <div className='flex flex-row justify-center items-center gap-1 bg-foreground text-gray-800 dark:text-gray-200 rounded-md px-0.5'>

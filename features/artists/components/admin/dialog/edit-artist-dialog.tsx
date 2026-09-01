@@ -81,6 +81,9 @@ function EditArtistLoader({
             name: full.name,
             slug: full.slug,
             image: full.image,
+            bio: full.bio,
+            genre: full.genre,
+            debutDate: full.debutDate,
           },
         });
       })

@@ -10,6 +10,9 @@ export const createArtistSchema = z.object({
       'Lowercase letters, numbers, and hyphens only'
     ),
   image: z.string().nullable(),
+  bio: z.string().max(1000, 'Keep it under 1000 characters').nullable(),
+  genre: z.string().nullable(),
+  debutDate: z.date().nullable(),
 });
 
 export type CreateArtistInput = z.infer<typeof createArtistSchema>;

@@ -42,10 +42,6 @@ export default function AdminArtistsView({
         )}
       />
 
-      {/* Rendered once, at this top level — never inside a DropdownMenu's
-          subtree — so this Dialog's Portal never inherits the dropdown's
-          floating-tree registration and doesn't get its clicks silently
-          intercepted the way it did when it lived inside ArtistActionsMenu. */}
       <EditArtistDialog
         artist={editingArtist}
         open={!!editingArtist}

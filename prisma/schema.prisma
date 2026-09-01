@@ -84,10 +84,13 @@ model Verification {
 }
 
 model Artist {
-  id    String  @id @default(cuid())
-  name  String
-  slug  String  @unique
-  image String?
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  image     String?
+  bio       String?
+  genre     String?
+  debutDate DateTime?
 
   albums AlbumArtist[]
 }

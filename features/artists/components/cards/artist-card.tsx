@@ -21,13 +21,10 @@ export default function ArtistCard({
     >
       <div className='relative w-56 aspect-square shrink-0 overflow-hidden rounded-t-sm'>
         <Image
-          src={
-            artist.image?.includes('http')
-              ? `${artist.image}`
-              : `/${artist.image}`
-          }
+          src={artist.image ?? '/artists.jpg'}
           alt={`${artist.name}`}
           fill
+          sizes='224px'
           className='object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]'
           priority={priority}
         />

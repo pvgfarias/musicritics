@@ -21,6 +21,9 @@ const DEFAULT_VALUES: CreateArtistInput = {
   name: '',
   slug: '',
   image: null,
+  bio: null,
+  genre: null,
+  debutDate: null,
 };
 
 export function CreateArtistDialog() {

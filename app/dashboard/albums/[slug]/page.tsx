@@ -1,7 +1,7 @@
 import AlbumDetails from '@/features/albums/components/details/album-details';
 import { getAlbumWithAverageRating } from '@/features/albums/queries';
 import { notFound } from 'next/navigation';
-import { getAlbumTracksForRating } from '@/features/tracks/queries';
+import { getAlbumTracksForRating } from '@/features/ratings/queries';
 import { auth } from '@/features/auth/auth';
 import { headers } from 'next/headers';
 

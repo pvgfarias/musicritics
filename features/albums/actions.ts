@@ -1,7 +1,7 @@
 // actions/album.ts
 'use server';
 
-import { requirePermission } from '@/lib/auth-helpers';
+import { requirePermission } from '../auth/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { isAlbumOpenForRatings } from '@/features/albums/queries';

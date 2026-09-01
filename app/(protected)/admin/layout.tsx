@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { requireDashboardAccess } from '@/lib/auth-helpers';
+import { requireDashboardAccess } from '@/features/auth/auth-helpers';
 
 export default async function AdminLayout({
   children,

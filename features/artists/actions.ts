@@ -5,7 +5,7 @@ import {
   CreateArtistInput,
   createArtistSchema,
 } from '@/features/artists/schema';
-import { requirePermission } from '@/lib/auth-helpers';
+import { requirePermission } from '../auth/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { Prisma } from '@/app/generated/prisma/client';
@@ -32,7 +32,15 @@ export async function searchArtists(query: string) {
 export async function getArtistForEdit(artistId: string) {
   const artist = await prisma.artist.findUnique({
     where: { id: artistId },
-    select: { id: true, name: true, slug: true, image: true },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      image: true,
+      bio: true,
+      genre: true,
+      debutDate: true,
+    },
   });
 
   if (!artist) throw new Error('Artist not found');
@@ -63,6 +71,9 @@ export async function createArtist(
         name: data.name,
         slug: data.slug,
         image: data.image,
+        bio: data.bio,
+        genre: data.genre,
+        debutDate: data.debutDate,
       },
       select: { id: true },
     });
@@ -105,6 +116,9 @@ export async function updateArtist(
         name: data.name,
         slug: data.slug,
         image: data.image,
+        bio: data.bio,
+        genre: data.genre,
+        debutDate: data.debutDate,
       },
       select: { id: true },
     });

@@ -21,6 +21,9 @@ function buildArtistSummarySelect(userId?: string) {
     name: true,
     slug: true,
     image: true,
+    bio: true,
+    genre: true,
+    debutDate: true,
     _count: { select: { albums: true } },
     albums: {
       select: {
