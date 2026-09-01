@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   createAlbumSchema,
   type CreateAlbumInput,
-} from '@/lib/album-form-schema';
+} from '@/features/albums/schema';
 
 function slugify(title: string) {
   return title

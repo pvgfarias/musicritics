@@ -4,12 +4,12 @@
 import { requirePermission } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { isAlbumOpenForRatings } from '@/data/albums';
-import { Prisma } from '../generated/prisma/client';
+import { isAlbumOpenForRatings } from '@/features/albums/queries';
+import { Prisma } from '../../app/generated/prisma/client';
 import {
   createAlbumSchema,
   type CreateAlbumInput,
-} from '@/lib/album-form-schema';
+} from '@/features/albums/schema';
 
 type CreateAlbumResult =
   | { success: true; albumId: string }

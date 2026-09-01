@@ -2,7 +2,7 @@ import RecentReviews from '@/components/dashboard/recent-reviews';
 import TopAlbums from '@/components/dashboard/top-albums';
 import TopSongs from '@/components/dashboard/top-songs';
 import WeeklyRotation from '@/components/dashboard/weekly-rotation';
-import { getAlbumsPage } from '@/data/albums';
+import { getAlbumsPage } from '@/features/albums/queries';
 import { SortKey } from '@/lib/sort-ratings';
 
 const PAGE_SIZE = 5;

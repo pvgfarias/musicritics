@@ -1,4 +1,3 @@
-// app/actions/rate-album.ts
 'use server';
 
 import { prisma } from '@/lib/prisma';
@@ -6,6 +5,7 @@ import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { Prisma } from '@/app/generated/prisma/client';
+import { recomputeAlbumAggregate } from './mutations';
 
 export type TrackRatingInput = {
   trackId: string;
@@ -85,21 +85,13 @@ export async function saveAlbumRating({
       update: { score: albumScore },
     });
 
+    await recomputeAlbumAggregate(tx, albumId); // ← the fix
+
     await syncComment(tx, {
       ratingId: rating.id,
       body: albumComment,
       authorId: userId,
     });
-
-    const trackIds = trackRatings.map(t => t.trackId);
-
-    // 1 round trip: fetch existing trackRatings for all tracks at once
-    const existingTrackRatings = await tx.trackRating.findMany({
-      where: { userId, trackId: { in: trackIds } },
-    });
-    const existingByTrackId = new Map(
-      existingTrackRatings.map(tr => [tr.trackId, tr])
-    );
 
     // Upserts still need to happen per-row (no upsertMany in Prisma),
     // but we can at least fire them without the extra findUnique each time

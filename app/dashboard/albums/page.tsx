@@ -1,5 +1,5 @@
-import AlbumsClient from './albums-client';
-import { getAlbumsPage } from '@/data/albums';
+import AlbumsClient from '@/features/albums/components/albums-client';
+import { getAlbumsPage } from '@/features/albums/queries';
 import type { SortKey } from '@/lib/sort-ratings';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';

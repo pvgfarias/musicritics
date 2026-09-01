@@ -1,9 +1,9 @@
 // components/admin/admin-albums-view.tsx
 'use client';
 
-import AlbumsClient from '@/app/dashboard/albums/albums-client';
-import { CreateAlbumDialog } from './dialog/create-album-dialog';
-import type { AlbumSummary } from '@/data/albums';
+import AlbumsClient from '@/features/albums/components/albums-client';
+import { CreateAlbumDialog } from '../dialog/create-album-dialog';
+import type { AlbumSummary } from '@/features/albums/queries';
 import { AlbumActionsMenu } from './album-actions-menu';
 
 type AdminAlbumsViewProps = {

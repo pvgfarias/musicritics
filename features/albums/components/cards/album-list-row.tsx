@@ -1,6 +1,6 @@
-import { AlbumSummary } from '@/data/albums';
+import { AlbumSummary } from '@/features/albums/queries';
 import Image from 'next/image';
-import RatingGrade from '../../dashboard/rating-grade';
+import RatingGrade from '@/components/dashboard/rating-grade';
 import { IconClock } from '@tabler/icons-react';
 import { ALBUM_ROW_GRID } from '../display/album-list';
 

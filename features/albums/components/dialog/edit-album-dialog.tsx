@@ -14,12 +14,12 @@ import {
 import { IconLoader2 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 
-import { updateAlbum, getAlbumForEdit } from '@/app/actions/album';
-import { useAlbumForm } from '@/hooks/use-album-form';
-import { AlbumFormFields } from '../album-form-fields';
+import { updateAlbum, getAlbumForEdit } from '@/features/albums/actions';
+import { useAlbumForm } from '@/features/albums/use-album-form';
+import { AlbumFormFields } from '../form/album-form-fields';
 
-import type { CreateAlbumInput } from '@/lib/album-form-schema';
-import type { AlbumSummary } from '@/data/albums';
+import type { CreateAlbumInput } from '@/features/albums/schema';
+import type { AlbumSummary } from '@/features/albums/queries';
 
 type ArtistOption = {
   id: string;

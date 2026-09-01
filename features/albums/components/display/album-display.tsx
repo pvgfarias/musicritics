@@ -2,7 +2,7 @@
 
 import { AlbumList } from './album-list';
 import { AlbumGrid } from './album-grid';
-import type { AlbumSummary } from '@/data/albums';
+import type { AlbumSummary } from '@/features/albums/queries';
 
 export default function AlbumDisplay({
   albumList,

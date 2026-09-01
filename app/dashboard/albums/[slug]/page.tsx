@@ -1,5 +1,5 @@
-import AlbumDetails from '@/components/albums/details/album-details';
-import { getAlbumWithAverageRating } from '@/data/albums';
+import AlbumDetails from '@/features/albums/components/details/album-details';
+import { getAlbumWithAverageRating } from '@/features/albums/queries';
 import { notFound } from 'next/navigation';
 import { getAlbumTracksForRating } from '@/data/tracks';
 import { auth } from '@/lib/auth';

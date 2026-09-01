@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import RatingGrade from '../../dashboard/rating-grade';
-import type { AlbumSummary } from '@/data/albums';
+import RatingGrade from '@/components/dashboard/rating-grade';
+import type { AlbumSummary } from '@/features/albums/queries';
 import type { User } from '@/lib/auth';
 import { IconRefresh, IconUser, IconWorld } from '@tabler/icons-react';
 

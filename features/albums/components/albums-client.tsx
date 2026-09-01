@@ -1,12 +1,12 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import AlbumDisplay from '@/components/albums/display/album-display';
-import AlbumStatus from '@/components/albums/album-status';
+import AlbumDisplay from './display/album-display';
+import AlbumStatus from './album-status';
 import GenreSelector from '@/components/ui/genre-selector';
 import SearchBar from '@/components/ui/search-bar';
 import SortSelector from '@/components/ui/sort-selector';
-import type { AlbumSummary } from '@/data/albums';
+import type { AlbumSummary } from '@/features/albums/queries';
 import type { User } from '@/lib/auth';
 import ViewMode from '@/components/ui/view-mode';
 import Pagination from '@/components/ui/pagination';

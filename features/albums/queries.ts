@@ -1,5 +1,5 @@
 // data/albums.ts
-import { Prisma } from '../app/generated/prisma/client';
+import { Prisma } from '../../app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import { SortKey } from '@/lib/sort-ratings';
 
@@ -305,56 +305,4 @@ export async function getAlbumWithAverageRating(slug: string) {
     ratingCount: album.ratingCount,
     openForRatings: isAlbumOpenForRatings(album),
   };
-}
-
-// --- Rating mutations -------------------------------------------------
-// These are the only supported entry points for writing an album Rating.
-// Going through prisma.rating.create/update/delete directly instead of
-// these will leave Album.averageRating / Album.ratingCount stale.
-
-export async function upsertAlbumRating(
-  userId: string,
-  albumId: string,
-  score: number
-) {
-  return prisma.$transaction(async tx => {
-    const rating = await tx.rating.upsert({
-      where: { userId_albumId: { userId, albumId } },
-      create: { userId, albumId, score },
-      update: { score },
-    });
-
-    await recomputeAlbumAggregate(tx, albumId);
-
-    return rating;
-  });
-}
-
-export async function deleteAlbumRating(userId: string, albumId: string) {
-  return prisma.$transaction(async tx => {
-    await tx.rating.delete({
-      where: { userId_albumId: { userId, albumId } },
-    });
-
-    await recomputeAlbumAggregate(tx, albumId);
-  });
-}
-
-async function recomputeAlbumAggregate(
-  tx: Prisma.TransactionClient,
-  albumId: string
-) {
-  const agg = await tx.rating.aggregate({
-    where: { albumId },
-    _avg: { score: true },
-    _count: { score: true },
-  });
-
-  await tx.album.update({
-    where: { id: albumId },
-    data: {
-      averageRating: agg._avg.score,
-      ratingCount: agg._count.score,
-    },
-  });
 }

@@ -15,10 +15,10 @@ import {
   IconTrash,
   IconRotate,
 } from '@tabler/icons-react';
-import { type AlbumSummary } from '@/data/albums';
-import { toggleRotation } from '@/app/actions/album';
-import { DeleteAlbumDialog } from './dialog/delete-album-dialog';
-import { EditAlbumDialog } from './dialog/edit-album-dialog';
+import { type AlbumSummary } from '@/features/albums/queries';
+import { toggleRotation } from '@/features/albums/actions';
+import { DeleteAlbumDialog } from '../dialog/delete-album-dialog';
+import { EditAlbumDialog } from '../dialog/edit-album-dialog';
 
 export function AlbumActionsMenu({ album }: { album: AlbumSummary }) {
   const [editOpen, setEditOpen] = useState(false);

@@ -1,4 +1,4 @@
-import { AlbumFull } from '@/data/albums';
+import { AlbumFull } from '@/features/albums/queries';
 import { AlbumTrackForRating } from '@/data/tracks';
 import AlbumTracksRow from './album-tracks-row';
 

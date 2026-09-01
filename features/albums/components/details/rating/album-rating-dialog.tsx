@@ -9,10 +9,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-import type { AlbumFull } from '@/data/albums';
+import type { AlbumFull } from '@/features/albums/queries';
 import { IconStar, IconStarFilled } from '@tabler/icons-react';
 import { useMemo, useState, useTransition } from 'react';
-import { saveAlbumRating } from '@/app/actions/rate-album';
+import { saveAlbumRating } from '@/features/ratings/actions';
 import TrackRatingRow from './album-track-rating-row';
 import { AlbumTrackForRating } from '@/data/tracks';
 import Image from 'next/image';

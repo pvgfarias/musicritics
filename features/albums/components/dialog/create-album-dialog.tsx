@@ -12,10 +12,10 @@ import {
 } from '@/components/ui/dialog';
 import { IconLoader2 } from '@tabler/icons-react';
 import { toast } from 'sonner';
-import { createAlbum } from '@/app/actions/album';
-import { useAlbumForm } from '@/hooks/use-album-form';
-import { AlbumFormFields } from '../album-form-fields';
-import type { CreateAlbumInput } from '@/lib/album-form-schema';
+import { createAlbum } from '@/features/albums/actions';
+import { useAlbumForm } from '@/features/albums/use-album-form';
+import { AlbumFormFields } from '../form/album-form-fields';
+import type { CreateAlbumInput } from '@/features/albums/schema';
 
 const DEFAULT_VALUES: CreateAlbumInput = {
   title: '',

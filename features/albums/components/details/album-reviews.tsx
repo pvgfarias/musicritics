@@ -1,5 +1,5 @@
 import RatingGrade from '@/components/dashboard/rating-grade';
-import { AlbumFull } from '@/data/albums';
+import { AlbumFull } from '@/features/albums/queries';
 import Image from 'next/image';
 
 export default function AlbumReviews({

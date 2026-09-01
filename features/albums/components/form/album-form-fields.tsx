@@ -4,7 +4,7 @@
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { AlbumCoverUploadField } from './album-cover-upload-field';
 import { ArtistPickerField } from './artist-picker-field';
-import type { AlbumFormState } from '@/hooks/use-album-form';
+import type { AlbumFormState } from '@/features/albums/use-album-form';
 
 export function AlbumFormFields({
   form,

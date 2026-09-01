@@ -1,6 +1,6 @@
 'use client';
 
-import { AlbumFull } from '@/data/albums';
+import { AlbumFull } from '@/features/albums/queries';
 import { IconDisc, IconRefresh } from '@tabler/icons-react';
 import Image from 'next/image';
 import AlbumRatingDialog from './rating/album-rating-dialog';

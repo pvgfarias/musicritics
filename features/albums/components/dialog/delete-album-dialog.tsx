@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { IconLoader2 } from '@tabler/icons-react';
-import { deleteAlbum } from '@/app/actions/album';
+import { deleteAlbum } from '@/features/albums/actions';
 
 type DeleteAlbumDialogProps = {
   albumId: string;

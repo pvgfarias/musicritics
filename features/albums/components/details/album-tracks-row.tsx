@@ -10,7 +10,7 @@ import {
   IconUser,
   IconWorld,
 } from '@tabler/icons-react';
-import { AlbumTrack } from '@/data/albums';
+import { AlbumTrack } from '@/features/albums/queries';
 
 export default function AlbumTracksRow({
   track,

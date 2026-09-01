@@ -1,5 +1,5 @@
-import AdminAlbumsView from '@/components/admin/album/admin-albums-view';
-import { getAlbumsPage } from '@/data/albums';
+import AdminAlbumsView from '@/features/albums/components/admin/admin-albums-view';
+import { getAlbumsPage } from '@/features/albums/queries';
 import { auth } from '@/lib/auth';
 import type { SortKey } from '@/lib/sort-ratings';
 import { headers } from 'next/headers';

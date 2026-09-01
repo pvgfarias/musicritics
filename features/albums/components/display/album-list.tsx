@@ -1,4 +1,4 @@
-import type { AlbumSummary } from '@/data/albums';
+import type { AlbumSummary } from '@/features/albums/queries';
 import AlbumListRow from '../cards/album-list-row';
 import Link from 'next/link';
 import {

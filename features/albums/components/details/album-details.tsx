@@ -1,4 +1,4 @@
-import type { AlbumFull } from '@/data/albums';
+import type { AlbumFull } from '@/features/albums/queries';
 import type { AlbumTrackForRating } from '@/data/tracks';
 import AlbumHeader from './album-header';
 import AlbumTracks from './album-tracks';
