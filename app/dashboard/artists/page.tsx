@@ -1,5 +1,5 @@
 import { getArtistsPage } from '@/features/artists/queries';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/auth';
 import { SortKey } from '@/lib/sort-ratings';
 import { headers } from 'next/headers';
 import ArtistsClient from '@/features/artists/components/artists-client';

@@ -5,8 +5,8 @@ import { IconVinyl } from '@tabler/icons-react';
 import { motion, useReducedMotion } from 'motion/react';
 import Link from 'next/link';
 import UserMenu from '../user-menu';
-import { useSession } from '@/lib/auth-client';
-import { adminLinks, adminOnlyLinks, userLinks } from '@/lib/sidebar-links';
+import { useSession } from '@/features/auth/auth-client';
+import { adminLinks, adminOnlyLinks, userLinks } from './sidebarLinks';
 
 export default function Sidebar() {
   const shouldReduceMotion = useReducedMotion();

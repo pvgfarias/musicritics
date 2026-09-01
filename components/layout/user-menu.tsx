@@ -8,7 +8,7 @@ import { sidebarItemClasses } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import ThemeToggle from './theme-toggle';
 import { useRouter } from 'next/navigation';
-import { authClient, useSession } from '@/lib/auth-client';
+import { authClient, useSession } from '@/features/auth/auth-client';
 
 export default function UserMenu() {
   const router = useRouter();

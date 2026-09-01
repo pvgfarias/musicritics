@@ -1,7 +1,7 @@
 'use client';
 
-import GoogleSignInButton from '@/components/auth/google-signin-button';
-import { authClient } from '@/lib/auth-client';
+import GoogleSignInButton from '@/features/auth/components/google-signin-button';
+import { authClient } from '@/features/auth/auth-client';
 import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';

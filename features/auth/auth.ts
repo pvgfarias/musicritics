@@ -2,8 +2,13 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin, username } from 'better-auth/plugins';
 import { prisma } from '@/lib/prisma';
-import { ac, admin as adminRole, moderator, user } from '@/lib/permissions';
-import { sendVerificationEmail, sendResetPasswordEmail } from '@/lib/email';
+import {
+  ac,
+  admin as adminRole,
+  moderator,
+  user,
+} from '@/features/permissions/access';
+import { sendVerificationEmail, sendResetPasswordEmail } from './email';
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),

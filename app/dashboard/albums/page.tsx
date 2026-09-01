@@ -1,7 +1,7 @@
 import AlbumsClient from '@/features/albums/components/albums-client';
 import { getAlbumsPage } from '@/features/albums/queries';
 import type { SortKey } from '@/lib/sort-ratings';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/auth';
 import { headers } from 'next/headers';
 
 const PAGE_SIZE = 15;

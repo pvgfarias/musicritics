@@ -1,6 +1,6 @@
 'use client';
 
-import { authClient } from '@/lib/auth-client';
+import { authClient } from '@/features/auth/auth-client';
 
 export default function GoogleSignInButton() {
   async function handleGoogleSignIn() {

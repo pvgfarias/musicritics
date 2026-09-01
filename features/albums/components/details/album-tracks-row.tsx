@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import RatingGrade from '@/components/dashboard/rating-grade';
-import { AlbumTrackForRating } from '@/data/tracks';
+import { AlbumTrackForRating } from '@/features/tracks/queries';
 import {
   IconBubble,
   IconClock,

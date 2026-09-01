@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import AlbumCard from '../cards/album-card';
 import type { AlbumSummary } from '@/features/albums/queries';
 import Link from 'next/link';
-import type { User } from '@/lib/auth';
+import type { User } from '@/features/auth/auth';
 
 const cardVariants = {
   hidden: { y: 20, opacity: 0 },

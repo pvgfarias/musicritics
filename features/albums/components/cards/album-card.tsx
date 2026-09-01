@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import RatingGrade from '@/components/dashboard/rating-grade';
 import type { AlbumSummary } from '@/features/albums/queries';
-import type { User } from '@/lib/auth';
+import type { User } from '@/features/auth/auth';
 import { IconRefresh, IconUser, IconWorld } from '@tabler/icons-react';
 
 export default function AlbumCard({

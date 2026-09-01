@@ -68,7 +68,7 @@ export default async function Page({ searchParams }: PageProps) {
           </p>
         </div>
       </div>
-      <div className='flex flex-row gap-6 w-full'>
+      {/* <div className='flex flex-row gap-6 w-full'>
         <div className='flex flex-col w-4/5'>
           <WeeklyRotation albums={albums} />
           <RecentReviews />
@@ -77,7 +77,7 @@ export default async function Page({ searchParams }: PageProps) {
           <TopAlbums />
           <TopSongs />
         </div>
-      </div>
+      </div> */}
     </main>
   );
 }

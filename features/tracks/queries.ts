@@ -1,5 +1,5 @@
 // data/tracks.ts
-import { Prisma } from '../app/generated/prisma/client';
+import { Prisma } from '@/app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 
 type TrackWithRelations = Prisma.TrackGetPayload<{
@@ -52,11 +52,6 @@ export type TrackSummary = TrackSummaryRaw & {
   averageRating: number | null;
 };
 
-export type AlbumTrackForRating = Awaited<
-  ReturnType<typeof getAlbumTracksForRating>
->[number];
-
-// A track accepts new ratings from users as long as its album hasn't been finalized.
 export function isTrackOpenForRatings(track: {
   album: { finalized: boolean };
 }) {
@@ -158,48 +153,4 @@ export async function getTrackWithAverageRating(id: string) {
     ratingCount: track.ratings.length,
     openForRatings: isTrackOpenForRatings(track),
   };
-}
-
-// Fetches the current user's existing score + comment for a single track,
-// e.g. to prefill a rating widget when a track is opened on its own.
-export async function getUserTrackRating(trackId: string, userId: string) {
-  return prisma.trackRating.findUnique({
-    where: { userId_trackId: { userId, trackId } },
-    include: { comment: true },
-  });
-}
-
-// Fetches every track on an album alongside the given user's existing
-// score + comment for each one (or null if they haven't rated it yet).
-// Built for the album rating dialog, so each slider/comment box can be
-// prefilled with the user's prior rating.
-export async function getAlbumTracksForRating(albumId: string, userId: string) {
-  const tracks = await prisma.track.findMany({
-    where: { albumId },
-    orderBy: { number: 'asc' },
-    select: {
-      id: true,
-      title: true,
-      number: true,
-      ratings: {
-        where: { userId },
-        select: {
-          score: true,
-          comment: { select: { body: true } },
-        },
-      },
-    },
-  });
-
-  return tracks.map(track => {
-    const existing = track.ratings[0] ?? null;
-
-    return {
-      id: track.id,
-      title: track.title,
-      number: track.number,
-      score: existing?.score ?? null,
-      comment: existing?.comment?.body ?? '',
-    };
-  });
 }

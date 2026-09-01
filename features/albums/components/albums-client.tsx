@@ -7,7 +7,7 @@ import GenreSelector from '@/components/ui/genre-selector';
 import SearchBar from '@/components/ui/search-bar';
 import SortSelector from '@/components/ui/sort-selector';
 import type { AlbumSummary } from '@/features/albums/queries';
-import type { User } from '@/lib/auth';
+import type { User } from '@/features/auth/auth';
 import ViewMode from '@/components/ui/view-mode';
 import Pagination from '@/components/ui/pagination';
 

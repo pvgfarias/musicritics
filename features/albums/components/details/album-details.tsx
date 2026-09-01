@@ -1,5 +1,5 @@
 import type { AlbumFull } from '@/features/albums/queries';
-import type { AlbumTrackForRating } from '@/data/tracks';
+import type { AlbumTrackForRating } from '@/features/tracks/queries';
 import AlbumHeader from './album-header';
 import AlbumTracks from './album-tracks';
 import AlbumReviews from './album-reviews';

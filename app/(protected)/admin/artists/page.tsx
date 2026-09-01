@@ -1,6 +1,6 @@
 import AdminArtistsView from '@/features/artists/components/admin/admin-artists-view';
 import { getArtistsPage } from '@/features/artists/queries';
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/auth/auth';
 import type { SortKey } from '@/lib/sort-ratings';
 import { headers } from 'next/headers';
 

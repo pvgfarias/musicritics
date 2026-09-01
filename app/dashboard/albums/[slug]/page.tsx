@@ -1,8 +1,8 @@
 import AlbumDetails from '@/features/albums/components/details/album-details';
 import { getAlbumWithAverageRating } from '@/features/albums/queries';
 import { notFound } from 'next/navigation';
-import { getAlbumTracksForRating } from '@/data/tracks';
-import { auth } from '@/lib/auth';
+import { getAlbumTracksForRating } from '@/features/tracks/queries';
+import { auth } from '@/features/auth/auth';
 import { headers } from 'next/headers';
 
 export default async function AlbumPage({

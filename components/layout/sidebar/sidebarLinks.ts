@@ -8,7 +8,7 @@ import {
   IconUser,
   IconDeviceImacCog,
 } from '@tabler/icons-react';
-import type { SidebarLink } from '@/components/layout/sidebar/sidebar-links';
+import type { SidebarLink } from './sidebar-links';
 
 export const userLinks: SidebarLink[] = [
   { name: 'Home', href: '/dashboard', icon: IconHome, exact: true },

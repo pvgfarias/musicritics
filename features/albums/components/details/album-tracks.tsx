@@ -1,5 +1,5 @@
 import { AlbumFull } from '@/features/albums/queries';
-import { AlbumTrackForRating } from '@/data/tracks';
+import { AlbumTrackForRating } from '@/features/tracks/queries';
 import AlbumTracksRow from './album-tracks-row';
 
 export default function AlbumTracks({

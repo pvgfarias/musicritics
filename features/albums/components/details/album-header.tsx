@@ -4,7 +4,7 @@ import { AlbumFull } from '@/features/albums/queries';
 import { IconDisc, IconRefresh } from '@tabler/icons-react';
 import Image from 'next/image';
 import AlbumRatingDialog from './rating/album-rating-dialog';
-import { AlbumTrackForRating } from '@/data/tracks';
+import { AlbumTrackForRating } from '@/features/tracks/queries';
 import RatingGrade from '@/components/dashboard/rating-grade';
 import { AlbumPlatformLink } from './album-platform-link';
 type AlbumUserRating = Exclude<AlbumFull, null>['ratings'][number];

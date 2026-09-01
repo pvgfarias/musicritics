@@ -1,7 +1,7 @@
 'use client';
 
 import Hero from '@/components/home/hero';
-import { useSession } from '@/lib/auth-client';
+import { useSession } from '@/features/auth/auth-client';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 

@@ -14,7 +14,7 @@ import { IconStar, IconStarFilled } from '@tabler/icons-react';
 import { useMemo, useState, useTransition } from 'react';
 import { saveAlbumRating } from '@/features/ratings/actions';
 import TrackRatingRow from './album-track-rating-row';
-import { AlbumTrackForRating } from '@/data/tracks';
+import { AlbumTrackForRating } from '@/features/tracks/queries';
 import Image from 'next/image';
 import RatingGrade from '@/components/dashboard/rating-grade';
 
