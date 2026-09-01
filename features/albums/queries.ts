@@ -3,6 +3,8 @@ import { Prisma } from '../../app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import { SortKey } from '@/lib/sort-ratings';
 
+const NO_USER_REVIEW = '__no_user__'; // reuse NO_USER if already in scope
+
 type AlbumWithRelations = Prisma.AlbumGetPayload<{
   include: {
     artists: {
@@ -306,3 +308,37 @@ export async function getAlbumWithAverageRating(slug: string) {
     openForRatings: isAlbumOpenForRatings(album),
   };
 }
+
+export async function getRecentReviewsByArtist(artistId: string, limit = 5) {
+  const ratings = await prisma.rating.findMany({
+    where: {
+      album: { artists: { some: { artistId } } },
+      comment: { isNot: null },
+    },
+    select: {
+      id: true,
+      score: true,
+      createdAt: true,
+      user: { select: { id: true, username: true, image: true } },
+      comment: { select: { body: true } },
+      album: {
+        select: { id: true, title: true, slug: true, coverImage: true },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+  return ratings.map(r => ({
+    id: r.id,
+    score: r.score,
+    createdAt: r.createdAt,
+    user: r.user,
+    comment: r.comment?.body ?? null,
+    album: r.album,
+  }));
+}
+
+export type ArtistReviewSummary = Awaited<
+  ReturnType<typeof getRecentReviewsByArtist>
+>[number];
