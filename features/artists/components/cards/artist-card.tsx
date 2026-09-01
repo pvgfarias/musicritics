@@ -1,5 +1,5 @@
 import RatingGrade from '@/components/dashboard/rating-grade';
-import { ArtistSummary } from '@/data/artists';
+import { ArtistSummary } from '@/features/artists/queries';
 import { IconDisc, IconUser, IconWorld } from '@tabler/icons-react';
 import Image from 'next/image';
 
@@ -31,6 +31,17 @@ export default function ArtistCard({
           className='object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]'
           priority={priority}
         />
+        {actions && (
+          <div
+            className='absolute top-2 left-1 flex gap-1 z-10 cursor-pointer'
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            {actions}
+          </div>
+        )}
       </div>
       <div className='flex flex-col gap-1 p-2.5'>
         <p className='font-title font-bold text-sm text-dark-blue dark:text-white line-clamp-1 transition-colors duration-200 group-hover:text-orange-500'>

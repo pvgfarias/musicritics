@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   createArtistSchema,
   type CreateArtistInput,
-} from '@/lib/artist-form-schema';
+} from '@/features/artists/schema';
 
 function slugify(name: string) {
   return name

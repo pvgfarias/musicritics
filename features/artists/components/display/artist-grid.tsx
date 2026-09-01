@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'motion/react';
 import ArtistCard from '../cards/artist-card';
-import type { ArtistSummary } from '@/data/artists';
+import type { ArtistSummary } from '@/features/artists/queries';
 import Link from 'next/link';
 
 const cardVariants = {

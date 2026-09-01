@@ -1,11 +1,11 @@
 'use client';
 
-import ArtistDisplay from '@/components/artists/display/artist-display';
+import ArtistDisplay from './display/artist-display';
 import Pagination from '@/components/ui/pagination';
 import SearchBar from '@/components/ui/search-bar';
 import SortSelector from '@/components/ui/sort-selector';
 import ViewMode from '@/components/ui/view-mode';
-import { ArtistSummary } from '@/data/artists';
+import { ArtistSummary } from '@/features/artists/queries';
 import { Suspense, useState } from 'react';
 
 type ArtistsClientProps = {

@@ -2,9 +2,9 @@
 'use client';
 
 import { useState } from 'react';
-import ArtistsClient from '@/app/dashboard/artists/artists-client';
+import ArtistsClient from '@/features/artists/components/artists-client';
 import { CreateArtistDialog } from './dialog/create-artist-dialog';
-import type { ArtistSummary } from '@/data/artists';
+import type { ArtistSummary } from '@/features/artists/queries';
 import { ArtistActionsMenu } from './artist-actions-menu';
 import { EditArtistDialog } from './dialog/edit-artist-dialog';
 import { DeleteArtistDialog } from './dialog/delete-artist-dialog';

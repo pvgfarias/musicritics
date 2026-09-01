@@ -1,5 +1,5 @@
 import RatingGrade from '@/components/dashboard/rating-grade';
-import { ArtistSummary } from '@/data/artists';
+import { ArtistSummary } from '@/features/artists/queries';
 import Image from 'next/image';
 import { ARTIST_ROW_GRID } from '../display/artist-list';
 

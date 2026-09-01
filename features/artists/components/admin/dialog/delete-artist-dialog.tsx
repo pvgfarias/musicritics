@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { IconLoader2 } from '@tabler/icons-react';
-import { deleteArtist } from '@/app/actions/artist';
+import { deleteArtist } from '@/features/artists/actions';
 
 type DeleteArtistDialogProps = {
   artistId: string;

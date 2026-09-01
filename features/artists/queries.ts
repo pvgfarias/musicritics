@@ -1,6 +1,6 @@
 // data/artists.ts
 import { SortKey } from '@/lib/sort-ratings';
-import { Prisma } from '../app/generated/prisma/client';
+import { Prisma } from '@/app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 
 type ArtistsQuery = {
@@ -41,6 +41,7 @@ function buildArtistSummarySelect(userId?: string) {
 }
 
 // Kept for the type helper below — shape is identical regardless of userId.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const artistSummarySelect = buildArtistSummarySelect();
 
 type ArtistSummaryRaw = Prisma.ArtistGetPayload<{

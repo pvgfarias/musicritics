@@ -1,9 +1,9 @@
 // components/admin/artist-form.tsx
 'use client';
 
-import { useArtistForm } from '@/hooks/use-artist-form';
+import { useArtistForm } from '@/features/artists/use-artist-form';
 import { ArtistFormFields } from './artist-form-fields';
-import type { CreateArtistInput } from '@/lib/artist-form-schema';
+import type { CreateArtistInput } from '@/features/artists/schema';
 
 type ArtistFormProps = {
   defaultValues: CreateArtistInput;

@@ -1,8 +1,8 @@
-import { getArtistsPage } from '@/data/artists';
+import { getArtistsPage } from '@/features/artists/queries';
 import { auth } from '@/lib/auth';
 import { SortKey } from '@/lib/sort-ratings';
 import { headers } from 'next/headers';
-import ArtistsClient from './artists-client';
+import ArtistsClient from '@/features/artists/components/artists-client';
 
 const PAGE_SIZE = 15;
 

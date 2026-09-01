@@ -2,7 +2,7 @@
 'use client';
 
 import { ArtistImageUploadField } from './artist-image-upload-field';
-import type { ArtistFormState } from '@/hooks/use-artist-form';
+import type { ArtistFormState } from '@/features/artists/use-artist-form';
 
 export function ArtistFormFields({
   form,

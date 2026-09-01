@@ -1,4 +1,4 @@
-import { ArtistSummary } from '@/data/artists';
+import { ArtistSummary } from '@/features/artists/queries';
 import Link from 'next/link';
 import ArtistListRow from '../cards/artist-list-row';
 import {

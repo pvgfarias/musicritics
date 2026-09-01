@@ -14,12 +14,12 @@ import {
 import { IconLoader2 } from '@tabler/icons-react';
 import { toast } from 'sonner';
 
-import { updateArtist, getArtistForEdit } from '@/app/actions/artist';
-import { useArtistForm } from '@/hooks/use-artist-form';
+import { updateArtist, getArtistForEdit } from '@/features/artists/actions';
+import { useArtistForm } from '@/features/artists/use-artist-form';
 import { ArtistFormFields } from '../artist-form-fields';
 
-import type { CreateArtistInput } from '@/lib/artist-form-schema';
-import type { ArtistSummary } from '@/data/artists';
+import type { CreateArtistInput } from '@/features/artists/schema';
+import type { ArtistSummary } from '@/features/artists/queries';
 
 type EditArtistDialogProps = {
   artist: ArtistSummary | null;

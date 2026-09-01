@@ -12,10 +12,9 @@ import {
 } from '@/components/ui/dialog';
 import { IconLoader2 } from '@tabler/icons-react';
 import { toast } from 'sonner';
-import { createArtist } from '@/app/actions/artist';
-// import { ArtistFormFields } from '../artist-form-fields';
-import type { CreateArtistInput } from '@/lib/artist-form-schema';
-import { useArtistForm } from '@/hooks/use-artist-form';
+import { createArtist } from '@/features/artists/actions';
+import type { CreateArtistInput } from '@/features/artists/schema';
+import { useArtistForm } from '@/features/artists/use-artist-form';
 import { ArtistFormFields } from '../artist-form-fields';
 
 const DEFAULT_VALUES: CreateArtistInput = {

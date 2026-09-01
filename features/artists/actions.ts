@@ -4,11 +4,11 @@
 import {
   CreateArtistInput,
   createArtistSchema,
-} from '@/lib/artist-form-schema';
+} from '@/features/artists/schema';
 import { requirePermission } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { Prisma } from '../generated/prisma/client';
+import { Prisma } from '@/app/generated/prisma/client';
 
 type CreateArtistResult =
   | { success: true; artistId: string }

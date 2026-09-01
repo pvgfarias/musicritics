@@ -3,7 +3,7 @@
 
 import { useState, useTransition } from 'react';
 import { IconX } from '@tabler/icons-react';
-import { searchArtists } from '@/app/actions/artist';
+import { searchArtists } from '@/features/artists/actions';
 
 type ArtistOption = { id: string; name: string; image: string | null };
 

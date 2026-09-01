@@ -1,6 +1,6 @@
 'use client';
 
-import { ArtistSummary } from '@/data/artists';
+import { ArtistSummary } from '@/features/artists/queries';
 import { ArtistList } from './artist-list';
 import { ArtistGrid } from './artist-grid';
 
