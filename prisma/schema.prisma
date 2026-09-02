@@ -89,7 +89,7 @@ model Artist {
   slug      String    @unique
   image     String?
   bio       String?
-  genre     String?
+  genres      ArtistGenre[]
   debutDate DateTime?
 
   albums AlbumArtist[]
@@ -101,7 +101,7 @@ model Album {
   slug        String    @unique
   coverImage  String?
   releaseDate DateTime?
-  genre       String?
+  genres      AlbumGenre[]
   finalized   Boolean   @default(false) // false = open for ratings, true = closed/finalized
   createdAt   DateTime  @default(now())
 
@@ -201,4 +201,42 @@ model AlbumSocialLink {
   album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
 
   @@index([albumId])
+}
+
+model Genre {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  slug     String  @unique
+  parentId String?
+
+  parent   Genre?  @relation("GenreHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Genre[] @relation("GenreHierarchy")
+
+  albums AlbumGenre[]
+  artists ArtistGenre[]
+  
+  @@index([parentId])
+
+}
+
+model AlbumGenre {
+  albumId String
+  genreId String
+
+  album Album @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([albumId, genreId])
+  @@index([genreId])
+}
+
+model ArtistGenre {
+  artistId String
+  genreId  String
+
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  genre  Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([artistId, genreId])
+  @@index([genreId])
 }

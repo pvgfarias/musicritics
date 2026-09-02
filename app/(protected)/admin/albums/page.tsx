@@ -3,6 +3,7 @@ import { getAlbumsPage } from '@/features/albums/queries';
 import { auth } from '@/features/auth/auth';
 import type { SortKey } from '@/lib/sort-ratings';
 import { headers } from 'next/headers';
+import { getTopLevelGenres } from '@/lib/search-genres';
 
 const PAGE_SIZE = 15;
 
@@ -23,15 +24,18 @@ export default async function Page({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
 
-  const { albums, totalPages } = await getAlbumsPage({
-    page,
-    pageSize: PAGE_SIZE,
-    query: params.query,
-    genre: params.genre,
-    status: params.status,
-    sort: (params.sort as SortKey) ?? 'recent',
-    userId: user?.id,
-  });
+  const [{ albums, totalPages }, genres] = await Promise.all([
+    getAlbumsPage({
+      page,
+      pageSize: PAGE_SIZE,
+      query: params.query,
+      genre: params.genre,
+      status: params.status,
+      sort: (params.sort as SortKey) ?? 'recent',
+      userId: user?.id,
+    }),
+    getTopLevelGenres(),
+  ]);
 
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2'>
@@ -40,6 +44,7 @@ export default async function Page({ searchParams }: PageProps) {
       </h1>
       <AdminAlbumsView
         albums={albums}
+        genres={genres}
         currentPage={page}
         totalPages={totalPages}
       />

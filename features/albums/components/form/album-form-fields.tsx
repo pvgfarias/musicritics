@@ -1,9 +1,9 @@
-// components/admin/album-form-fields.tsx
 'use client';
 
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { AlbumCoverUploadField } from './album-cover-upload-field';
 import { ArtistPickerField } from './artist-picker-field';
+import { GenrePickerField } from '@/components/ui/genre-picker-field';
 import type { AlbumFormState } from '@/features/albums/use-album-form';
 
 export function AlbumFormFields({
@@ -11,8 +11,10 @@ export function AlbumFormFields({
   tracks,
   socialLinks,
   artists,
+  genres,
   handleTitleChange,
   handleArtistsChange,
+  handleGenresChange,
   setSlugTouched,
 }: AlbumFormState) {
   const {
@@ -59,14 +61,6 @@ export function AlbumFormFields({
         </div>
 
         <div className='flex flex-col gap-1'>
-          <label className='text-sm font-medium'>Genre</label>
-          <input
-            {...register('genre')}
-            className='rounded-md border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900'
-          />
-        </div>
-
-        <div className='flex flex-col gap-1'>
           <label className='text-sm font-medium'>Release Date</label>
           <input
             type='date'
@@ -91,6 +85,11 @@ export function AlbumFormFields({
       <ArtistPickerField value={artists} onChange={handleArtistsChange} />
       {errors.artistIds && (
         <p className='text-xs text-red-600'>{errors.artistIds.message}</p>
+      )}
+
+      <GenrePickerField value={genres} onChange={handleGenresChange} />
+      {errors.genreIds && (
+        <p className='text-xs text-red-600'>{errors.genreIds.message}</p>
       )}
 
       <div className='flex flex-col gap-2'>

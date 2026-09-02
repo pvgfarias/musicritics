@@ -11,8 +11,14 @@ function slugify(name: string) {
     .replace(/\s+/g, '-');
 }
 
-export function useArtistForm(defaultValues: CreateArtistInput) {
+type GenreOption = { id: string; name: string; slug: string };
+
+export function useArtistForm(
+  defaultValues: CreateArtistInput,
+  defaultGenres: GenreOption[] = []
+) {
   const [slugTouched, setSlugTouched] = useState(false);
+  const [genres, setGenres] = useState<GenreOption[]>(defaultGenres);
 
   const form = useForm<CreateArtistInput>({
     resolver: zodResolver(createArtistSchema),
@@ -32,8 +38,12 @@ export function useArtistForm(defaultValues: CreateArtistInput) {
     form.setValue('bio', bio.trim().length ? bio : null);
   }
 
-  function handleGenreChange(genre: string | null) {
-    form.setValue('genre', genre);
+  function handleGenresChange(next: GenreOption[]) {
+    setGenres(next);
+    form.setValue(
+      'genreIds',
+      next.map(g => g.id)
+    );
   }
 
   function handleDebutDateChange(value: string | Date | null) {
@@ -47,12 +57,13 @@ export function useArtistForm(defaultValues: CreateArtistInput) {
 
   return {
     form,
+    genres,
     slugTouched,
     setSlugTouched,
     handleNameChange,
     handleImageChange,
     handleBioChange,
-    handleGenreChange,
+    handleGenresChange,
     handleDebutDateChange,
   };
 }

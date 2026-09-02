@@ -11,8 +11,11 @@ import type { User } from '@/features/auth/auth';
 import ViewMode from '@/components/ui/view-mode';
 import Pagination from '@/components/ui/pagination';
 
+type Genre = { name: string; slug: string };
+
 type AlbumsClientProps = {
   albums: AlbumSummary[];
+  genres: Genre[];
   currentPage: number;
   totalPages: number;
   renderCardActions?: (album: AlbumSummary) => React.ReactNode;
@@ -22,6 +25,7 @@ type AlbumsClientProps = {
 
 export default function AlbumsClient({
   albums,
+  genres,
   currentPage,
   totalPages,
   renderCardActions,
@@ -34,7 +38,7 @@ export default function AlbumsClient({
       <div className='flex flex-row justify-start items-center gap-2 md:gap-4 mb-2'>
         <Suspense>
           <SearchBar />
-          <GenreSelector />
+          <GenreSelector genres={genres} />
           <SortSelector />
           <AlbumStatus />
           <ViewMode viewMode={viewMode} onViewModeChange={setViewMode} />

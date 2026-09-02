@@ -1,4 +1,3 @@
-// actions/album.ts
 'use server';
 
 import { requirePermission } from '../auth/auth-helpers';
@@ -92,8 +91,8 @@ export async function createAlbum(
         slug: data.slug,
         coverImage: data.coverImage,
         releaseDate: data.releaseDate,
-        genre: data.genre,
         artists: { create: data.artistIds.map(artistId => ({ artistId })) },
+        genres: { create: data.genreIds.map(genreId => ({ genreId })) },
         tracks: {
           create: data.tracks.map(t => ({ title: t.title, number: t.number })),
         },
@@ -125,6 +124,7 @@ export async function getAlbumForEdit(albumId: string) {
       tracks: { orderBy: { number: 'asc' } },
       socialLinks: true,
       artists: { include: { artist: true } },
+      genres: { include: { genre: true } },
     },
   });
 }
@@ -149,11 +149,13 @@ export async function updateAlbum(
 
   try {
     const album = await prisma.$transaction(async tx => {
-      // Relations (tracks, socialLinks, artist links) need to be replaced
-      // wholesale since the form doesn't track per-row IDs for diffing.
+      // Relations (tracks, socialLinks, artist/genre links) need to be
+      // replaced wholesale since the form doesn't track per-row IDs for
+      // diffing.
       await tx.track.deleteMany({ where: { albumId } });
       await tx.albumSocialLink.deleteMany({ where: { albumId } });
       await tx.albumArtist.deleteMany({ where: { albumId } });
+      await tx.albumGenre.deleteMany({ where: { albumId } });
 
       return tx.album.update({
         where: { id: albumId },
@@ -162,8 +164,8 @@ export async function updateAlbum(
           slug: data.slug,
           coverImage: data.coverImage,
           releaseDate: data.releaseDate,
-          genre: data.genre,
           artists: { create: data.artistIds.map(artistId => ({ artistId })) },
+          genres: { create: data.genreIds.map(genreId => ({ genreId })) },
           tracks: {
             create: data.tracks.map(t => ({
               title: t.title,

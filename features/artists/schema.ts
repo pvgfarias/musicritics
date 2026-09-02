@@ -11,7 +11,7 @@ export const createArtistSchema = z.object({
     ),
   image: z.string().nullable(),
   bio: z.string().max(1000, 'Keep it under 1000 characters').nullable(),
-  genre: z.string().nullable(),
+  genreIds: z.array(z.string()),
   debutDate: z.date().nullable(),
 });
 

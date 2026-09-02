@@ -1,4 +1,3 @@
-// lib/use-album-form.ts
 'use client';
 
 import { useState } from 'react';
@@ -18,12 +17,15 @@ function slugify(title: string) {
 }
 
 type ArtistOption = { id: string; name: string; image: string | null };
+type GenreOption = { id: string; name: string; slug: string };
 
 export function useAlbumForm(
   defaultValues: CreateAlbumInput,
-  defaultArtists: ArtistOption[] = []
+  defaultArtists: ArtistOption[] = [],
+  defaultGenres: GenreOption[] = []
 ) {
   const [artists, setArtists] = useState<ArtistOption[]>(defaultArtists);
+  const [genres, setGenres] = useState<GenreOption[]>(defaultGenres);
   const [slugTouched, setSlugTouched] = useState(false);
 
   const form = useForm<CreateAlbumInput>({
@@ -50,15 +52,25 @@ export function useAlbumForm(
     );
   }
 
+  function handleGenresChange(next: GenreOption[]) {
+    setGenres(next);
+    form.setValue(
+      'genreIds',
+      next.map(g => g.id)
+    );
+  }
+
   return {
     form,
     tracks,
     socialLinks,
     artists,
+    genres,
     slugTouched,
     setSlugTouched,
     handleTitleChange,
     handleArtistsChange,
+    handleGenresChange,
   };
 }
 

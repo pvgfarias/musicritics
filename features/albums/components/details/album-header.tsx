@@ -18,6 +18,8 @@ export default function AlbumHeader({
   tracks: AlbumTrackForRating[];
   userRating: AlbumUserRating | undefined;
 }) {
+  const genreLabel = album.genreNames.join(' / ');
+
   return (
     <div className='flex flex-col gap-4 w-full'>
       <div className='flex flex-row gap-14 '>
@@ -50,7 +52,7 @@ export default function AlbumHeader({
 
         <div className='flex flex-col gap-4 w-full'>
           <span className='font-mono text-xs text-ember tracking-[0.2em] uppercase'>
-            ALBUM • {album.genre}
+            ALBUM{genreLabel ? ` • ${genreLabel}` : ''}
           </span>
           <h1 className='text-5xl font-title text-gray-950 dark:text-white'>
             {album.title}

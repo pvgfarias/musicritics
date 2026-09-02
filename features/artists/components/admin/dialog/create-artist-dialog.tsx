@@ -22,7 +22,7 @@ const DEFAULT_VALUES: CreateArtistInput = {
   slug: '',
   image: null,
   bio: null,
-  genre: null,
+  genreIds: [],
   debutDate: null,
 };
 
@@ -44,6 +44,7 @@ export function CreateArtistDialog() {
     if (result.success) {
       toast.success(`"${data.name}" created`);
       reset();
+      artistForm.handleGenresChange([]);
       setOpen(false);
     } else if (result.field) {
       setError(result.field as keyof CreateArtistInput, {

@@ -38,8 +38,12 @@ export async function getArtistForEdit(artistId: string) {
       slug: true,
       image: true,
       bio: true,
-      genre: true,
       debutDate: true,
+      genres: {
+        select: {
+          genre: { select: { id: true, name: true, slug: true } },
+        },
+      },
     },
   });
 
@@ -72,8 +76,8 @@ export async function createArtist(
         slug: data.slug,
         image: data.image,
         bio: data.bio,
-        genre: data.genre,
         debutDate: data.debutDate,
+        genres: { create: data.genreIds.map(genreId => ({ genreId })) },
       },
       select: { id: true },
     });
@@ -110,17 +114,23 @@ export async function updateArtist(
   const data = parsed.data;
 
   try {
-    const artist = await prisma.artist.update({
-      where: { id: artistId },
-      data: {
-        name: data.name,
-        slug: data.slug,
-        image: data.image,
-        bio: data.bio,
-        genre: data.genre,
-        debutDate: data.debutDate,
-      },
-      select: { id: true },
+    const artist = await prisma.$transaction(async tx => {
+      // Genre links need to be replaced wholesale since the form doesn't
+      // track per-row IDs for diffing (same approach as album genres).
+      await tx.artistGenre.deleteMany({ where: { artistId } });
+
+      return tx.artist.update({
+        where: { id: artistId },
+        data: {
+          name: data.name,
+          slug: data.slug,
+          image: data.image,
+          bio: data.bio,
+          debutDate: data.debutDate,
+          genres: { create: data.genreIds.map(genreId => ({ genreId })) },
+        },
+        select: { id: true },
+      });
     });
 
     revalidatePath('/dashboard/artists');
@@ -178,8 +188,8 @@ export async function deleteArtist(
       });
     }
 
-    // Cascades the remaining AlbumArtist rows (collaborative albums),
-    // removing this artist from their credits without deleting them.
+    // Cascades the remaining AlbumArtist and ArtistGenre rows,
+    // removing this artist from their credits without deleting albums.
     await tx.artist.delete({ where: { id: artistId } });
 
     return soloAlbums.length;

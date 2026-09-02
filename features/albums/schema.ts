@@ -21,7 +21,7 @@ export const createAlbumSchema = z.object({
     ),
   coverImage: z.string().nullable(),
   releaseDate: z.date().nullable(),
-  genre: z.string().nullable(),
+  genreIds: z.array(z.string()).min(1, 'At least one genre is required'),
   artistIds: z.array(z.string()).min(1, 'At least one artist is required'),
   tracks: z.array(trackSchema).min(1, 'At least one track is required'),
   socialLinks: z.array(socialLinkSchema),

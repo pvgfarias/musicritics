@@ -1,4 +1,3 @@
-// data/albums.ts
 import { Prisma } from '../../app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import { SortKey } from '@/lib/sort-ratings';
@@ -12,6 +11,11 @@ type AlbumWithRelations = Prisma.AlbumGetPayload<{
         artist: {
           select: { id: true; name: true; slug: true; image: true };
         };
+      };
+    };
+    genres: {
+      include: {
+        genre: { select: { id: true; name: true; slug: true } };
       };
     };
     tracks: {
@@ -62,13 +66,17 @@ function buildAlbumSummarySelect(userId?: string) {
     slug: true,
     coverImage: true,
     releaseDate: true,
-    genre: true,
     finalized: true,
     createdAt: true,
     averageRating: true,
     ratingCount: true,
     artists: {
       select: { artist: { select: { id: true, name: true, slug: true } } },
+    },
+    genres: {
+      select: {
+        genre: { select: { id: true, name: true, slug: true } },
+      },
     },
     ratings: {
       where: { userId: userId ?? NO_USER },
@@ -90,9 +98,11 @@ export type AlbumFull = Awaited<ReturnType<typeof getAlbumWithAverageRating>>;
 
 export type AlbumTrack = Exclude<AlbumFull, null>['tracks'][number];
 
-export type AlbumSummary = Omit<AlbumSummaryRaw, 'ratings'> & {
+export type AlbumSummary = Omit<AlbumSummaryRaw, 'ratings' | 'genres'> & {
   artist: string;
   artistNames: string[];
+  genreNames: string[];
+  genreSlugs: string[];
   userRating: number | null;
 };
 
@@ -100,7 +110,7 @@ type AlbumsQuery = {
   page?: number;
   pageSize?: number;
   query?: string;
-  genre?: string;
+  genre?: string; // genre slug
   status?: string;
   sort?: SortKey;
   userId?: string; // pass the logged-in viewer's id to get their own rating back
@@ -129,7 +139,10 @@ function buildAlbumWhere({
         },
       ],
     }),
-    ...(genre && genre !== 'All' && { genre }),
+    ...(genre &&
+      genre !== 'All' && {
+        genres: { some: { genre: { slug: genre } } },
+      }),
     ...(status &&
       status !== 'All' && {
         finalized: status === 'Finalized',
@@ -154,22 +167,31 @@ function normalizeAlbum(album: AlbumWithRelations) {
     .map(entry => entry.artist.name)
     .filter(Boolean);
 
+  const genreNames = album.genres.map(entry => entry.genre.name);
+  const genreSlugs = album.genres.map(entry => entry.genre.slug);
+
   return {
     ...album,
     artist: artistNames.join(', '),
     artistNames,
+    genreNames,
+    genreSlugs,
     tracklist: album.tracks.map((track: { title: string }) => track.title),
   };
 }
 
 function normalizeAlbumSummary(album: AlbumSummaryRaw): AlbumSummary {
-  const { ratings, ...rest } = album;
+  const { ratings, genres, ...rest } = album;
   const artistNames = album.artists.map(a => a.artist.name).filter(Boolean);
+  const genreNames = genres.map(g => g.genre.name);
+  const genreSlugs = genres.map(g => g.genre.slug);
 
   return {
     ...rest,
     artist: artistNames.join(', '),
     artistNames,
+    genreNames,
+    genreSlugs,
     userRating: ratings[0]?.score ?? null,
   };
 }
@@ -236,6 +258,11 @@ export async function getAlbumBySlug(slug: string) {
           artist: {
             select: { id: true, name: true, slug: true, image: true },
           },
+        },
+      },
+      genres: {
+        include: {
+          genre: { select: { id: true, name: true, slug: true } },
         },
       },
       tracks: {

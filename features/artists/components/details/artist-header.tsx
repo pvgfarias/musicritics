@@ -3,6 +3,8 @@ import { ArtistSummary } from '../../queries';
 import RatingGrade from '@/components/dashboard/rating-grade';
 
 export function ArtistHeader({ artist }: { artist: ArtistSummary }) {
+  const primaryGenre = artist.genreNames[0];
+
   return (
     <div className='flex flex-col gap-4 w-full'>
       <div className='flex flex-row gap-14 '>
@@ -17,7 +19,7 @@ export function ArtistHeader({ artist }: { artist: ArtistSummary }) {
 
         <div className='flex flex-col gap-4 w-full'>
           <span className='font-mono text-xs text-ember tracking-[0.2em] uppercase'>
-            ARTIST • {artist.genre}
+            ARTIST{primaryGenre ? ` • ${primaryGenre}` : ''}
           </span>
           <h1 className='text-5xl font-title text-gray-950 dark:text-white'>
             {artist.name}

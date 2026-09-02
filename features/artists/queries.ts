@@ -7,7 +7,7 @@ type ArtistsQuery = {
   page?: number;
   pageSize?: number;
   query?: string;
-  genre?: string;
+  genre?: string; // genre slug
   status?: string;
   sort?: SortKey;
   userId?: string; // pass the logged-in viewer's id to get their own average back
@@ -22,8 +22,12 @@ function buildArtistSummarySelect(userId?: string) {
     slug: true,
     image: true,
     bio: true,
-    genre: true,
     debutDate: true,
+    genres: {
+      select: {
+        genre: { select: { id: true, name: true, slug: true } },
+      },
+    },
     _count: { select: { albums: true } },
     albums: {
       select: {
@@ -51,12 +55,14 @@ type ArtistSummaryRaw = Prisma.ArtistGetPayload<{
   select: typeof artistSummarySelect;
 }>;
 
-export type ArtistSummary = Omit<ArtistSummaryRaw, 'albums'> & {
+export type ArtistSummary = Omit<ArtistSummaryRaw, 'albums' | 'genres'> & {
   albumsCount: number;
   averageRating: number | null;
   ratingCount: number;
   userAverageRating: number | null;
   userRatingCount: number;
+  genreNames: string[];
+  genreSlugs: string[];
 };
 
 function sortKeyToOrderBy(
@@ -72,16 +78,21 @@ function sortKeyToOrderBy(
 
 function buildArtistWhere({
   query,
-}: Pick<ArtistsQuery, 'query'>): Prisma.ArtistWhereInput {
+  genre,
+}: Pick<ArtistsQuery, 'query' | 'genre'>): Prisma.ArtistWhereInput {
   return {
     ...(query && {
       OR: [{ name: { contains: query, mode: 'insensitive' } }],
     }),
+    ...(genre &&
+      genre !== 'All' && {
+        genres: { some: { genre: { slug: genre } } },
+      }),
   };
 }
 
 function normalizeArtistSummary(artist: ArtistSummaryRaw): ArtistSummary {
-  const { albums, ...rest } = artist;
+  const { albums, genres, ...rest } = artist;
   const albumRecords = albums.map(a => a.album);
 
   const ratedAlbums = albumRecords.filter(
@@ -107,6 +118,8 @@ function normalizeArtistSummary(artist: ArtistSummaryRaw): ArtistSummary {
     ratingCount: totalRatings,
     userAverageRating,
     userRatingCount: userScores.length,
+    genreNames: genres.map(g => g.genre.name),
+    genreSlugs: genres.map(g => g.genre.slug),
   };
 }
 
@@ -114,10 +127,11 @@ export async function getArtistsPage({
   page = 1,
   pageSize = 20,
   query,
+  genre,
   sort,
   userId,
 }: ArtistsQuery = {}) {
-  const where = buildArtistWhere({ query });
+  const where = buildArtistWhere({ query, genre });
 
   const [artists, total] = await Promise.all([
     prisma.artist.findMany({

@@ -21,6 +21,12 @@ import { ArtistFormFields } from '../artist-form-fields';
 import type { CreateArtistInput } from '@/features/artists/schema';
 import type { ArtistSummary } from '@/features/artists/queries';
 
+type GenreOption = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 type EditArtistDialogProps = {
   artist: ArtistSummary | null;
   open: boolean;
@@ -33,6 +39,7 @@ type EditArtistState =
   | {
       status: 'ready';
       initialValues: CreateArtistInput;
+      initialGenres: GenreOption[];
     };
 
 export function EditArtistDialog({
@@ -82,9 +89,14 @@ function EditArtistLoader({
             slug: full.slug,
             image: full.image,
             bio: full.bio,
-            genre: full.genre,
+            genreIds: full.genres.map(g => g.genre.id),
             debutDate: full.debutDate,
           },
+          initialGenres: full.genres.map(g => ({
+            id: g.genre.id,
+            name: g.genre.name,
+            slug: g.genre.slug,
+          })),
         });
       })
       .catch(err => {
@@ -119,6 +131,7 @@ function EditArtistLoader({
     <EditArtistForm
       artistId={artistId}
       initialValues={state.initialValues}
+      initialGenres={state.initialGenres}
       onDone={onDone}
     />
   );
@@ -127,13 +140,15 @@ function EditArtistLoader({
 function EditArtistForm({
   artistId,
   initialValues,
+  initialGenres,
   onDone,
 }: {
   artistId: string;
   initialValues: CreateArtistInput;
+  initialGenres: GenreOption[];
   onDone: () => void;
 }) {
-  const artistForm = useArtistForm(initialValues);
+  const artistForm = useArtistForm(initialValues, initialGenres);
 
   const {
     handleSubmit,

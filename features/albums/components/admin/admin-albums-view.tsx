@@ -6,16 +6,20 @@ import { CreateAlbumDialog } from '../dialog/create-album-dialog';
 import type { AlbumSummary } from '@/features/albums/queries';
 import { AlbumActionsMenu } from './album-actions-menu';
 
+type Genre = { name: string; slug: string };
+
 type AdminAlbumsViewProps = {
   albums: AlbumSummary[];
   currentPage: number;
   totalPages: number;
+  genres: Genre[];
 };
 
 export default function AdminAlbumsView({
   albums,
   currentPage,
   totalPages,
+  genres,
 }: AdminAlbumsViewProps) {
   return (
     <AlbumsClient
@@ -24,6 +28,7 @@ export default function AdminAlbumsView({
       totalPages={totalPages}
       toolbarExtra={<CreateAlbumDialog />}
       renderCardActions={album => <AlbumActionsMenu album={album} />}
+      genres={genres}
     />
   );
 }

@@ -1,46 +1,25 @@
 'use client';
 
 import { IconChevronDown } from '@tabler/icons-react';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useGenreFilter } from '@/lib/use-genre-filter';
 
-const genreList = [
-  'All',
-  'Rock',
-  'Indie',
-  'Rap',
-  'Pop',
-  'Kpop',
-  'Reggae',
-  'Soul',
-  'Shoegaze',
-  'Experimental',
-];
+type Genre = { name: string; slug: string };
 
-export default function GenreSelector() {
+export default function GenreSelector({ genres }: { genres: Genre[] }) {
   const [isOpen, setIsOpen] = useState(false);
-
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const currentGenre = searchParams.get('genre') ?? '';
+  const { currentSlug, currentGenre, selectGenre } = useGenreFilter(genres);
 
-  const handleGenreUpdate = (genre: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (genre === 'All') {
-      params.delete('genre');
-    } else {
-      params.set('genre', genre);
-    }
-    params.delete('page');
-    router.push(`${pathname}?${params.toString()}`);
+  function handleGenreUpdate(slug: string | null) {
+    selectGenre(slug);
     setIsOpen(false);
-  };
+  }
 
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
         containerRef.current &&
@@ -49,19 +28,17 @@ export default function GenreSelector() {
         setIsOpen(false);
       }
     };
-
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setIsOpen(false);
     };
 
     document.addEventListener('click', handleClickOutside);
     document.addEventListener('keydown', handleEscape);
-
     return () => {
       document.removeEventListener('click', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
-  }, []);
+  }, [isOpen]);
 
   return (
     <div ref={containerRef} className='relative'>
@@ -72,9 +49,7 @@ export default function GenreSelector() {
         onClick={() => setIsOpen(prev => !prev)}
         className='h-10 max-w-40 flex flex-row justify-between items-center rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-2 gap-1 text-gray-500 text-sm cursor-pointer'
       >
-        <span className={`select-none ${currentGenre ? 'text-gray-500' : ''}`}>
-          {currentGenre || 'Genre'}
-        </span>
+        <span className='select-none'>{currentGenre?.name || 'Genre'}</span>
         <IconChevronDown
           size={20}
           className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -86,17 +61,23 @@ export default function GenreSelector() {
           role='listbox'
           className='absolute top-full left-0 z-10 mt-1 rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-2 w-40 max-h-64 overflow-y-auto shadow-lg flex flex-col gap-1 text-sm'
         >
-          {genreList.map(genre => (
+          <li
+            role='option'
+            aria-selected={!currentSlug}
+            className='inline-flex items-center w-full cursor-pointer px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-500 hover:text-gray-900 dark:hover:text-white'
+            onClick={() => handleGenreUpdate(null)}
+          >
+            All
+          </li>
+          {genres.map(genre => (
             <li
-              key={genre}
+              key={genre.slug}
               role='option'
-              aria-selected={
-                currentGenre === genre || (genre === 'All' && !currentGenre)
-              }
-              className='inline-flex items-center w-full cursor-pointer px-2 py-1.5 rounded hover:bg-foreground text-gray-500 hover:text-gray-900 dark:hover:text-white'
-              onClick={() => handleGenreUpdate(genre)}
+              aria-selected={currentSlug === genre.slug}
+              className='inline-flex items-center w-full cursor-pointer px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-500 hover:text-gray-900 dark:hover:text-white'
+              onClick={() => handleGenreUpdate(genre.slug)}
             >
-              {genre}
+              {genre.name}
             </li>
           ))}
         </ul>

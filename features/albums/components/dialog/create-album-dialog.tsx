@@ -1,4 +1,3 @@
-// components/admin/create-album-dialog.tsx
 'use client';
 
 import { useState } from 'react';
@@ -22,8 +21,8 @@ const DEFAULT_VALUES: CreateAlbumInput = {
   slug: '',
   coverImage: null,
   releaseDate: null,
-  genre: '',
   artistIds: [],
+  genreIds: [],
   tracks: [{ title: '', number: 1 }],
   socialLinks: [],
 };
@@ -47,6 +46,7 @@ export function CreateAlbumDialog() {
       toast.success(`"${data.title}" created`);
       reset();
       albumForm.handleArtistsChange([]);
+      albumForm.handleGenresChange([]);
       setOpen(false);
     } else if (result.field) {
       setError(result.field as keyof CreateAlbumInput, {

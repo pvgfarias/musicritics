@@ -27,6 +27,12 @@ type ArtistOption = {
   image: string | null;
 };
 
+type GenreOption = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 type EditAlbumDialogProps = {
   album: AlbumSummary;
   open: boolean;
@@ -40,6 +46,7 @@ type EditAlbumState =
       status: 'ready';
       initialValues: CreateAlbumInput;
       initialArtists: ArtistOption[];
+      initialGenres: GenreOption[];
     };
 
 export function EditAlbumDialog({
@@ -89,8 +96,8 @@ function EditAlbumLoader({
             slug: full.slug,
             coverImage: full.coverImage,
             releaseDate: full.releaseDate,
-            genre: full.genre,
             artistIds: full.artists.map(a => a.artistId),
+            genreIds: full.genres.map(g => g.genreId),
             tracks: full.tracks.map((t, index) => ({
               title: t.title,
               number: t.number ?? index + 1,
@@ -104,6 +111,11 @@ function EditAlbumLoader({
             id: a.artist.id,
             name: a.artist.name,
             image: a.artist.image,
+          })),
+          initialGenres: full.genres.map(g => ({
+            id: g.genre.id,
+            name: g.genre.name,
+            slug: g.genre.slug,
           })),
         });
       })
@@ -140,6 +152,7 @@ function EditAlbumLoader({
       albumId={albumId}
       initialValues={state.initialValues}
       initialArtists={state.initialArtists}
+      initialGenres={state.initialGenres}
       onDone={onDone}
     />
   );
@@ -149,14 +162,16 @@ function EditAlbumForm({
   albumId,
   initialValues,
   initialArtists,
+  initialGenres,
   onDone,
 }: {
   albumId: string;
   initialValues: CreateAlbumInput;
   initialArtists: ArtistOption[];
+  initialGenres: GenreOption[];
   onDone: () => void;
 }) {
-  const albumForm = useAlbumForm(initialValues, initialArtists);
+  const albumForm = useAlbumForm(initialValues, initialArtists, initialGenres);
 
   const {
     handleSubmit,

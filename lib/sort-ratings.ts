@@ -7,7 +7,7 @@ export function sortRatings<
     averageRating?: number | null;
   },
 >(ratings: T[], sort: SortKey): T[] {
-  const copy = [...ratings]; // never mutate the source array
+  const copy = [...ratings];
   switch (sort) {
     case 'score-desc':
       return copy.sort(
