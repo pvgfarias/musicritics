@@ -2,13 +2,36 @@ import 'dotenv/config';
 import { hashPassword } from 'better-auth/crypto';
 import { prisma } from '../lib/prisma';
 
+// Swap these for real Cloudinary URLs later. Using a labeled placeholder
+// service so images stay visually distinct from each other in the meantime.
+const PLACEHOLDER_IMAGE = (label: string) =>
+  `https://res.cloudinary.com/demo/image/upload/placeholder/${slugify(label)}.jpg`;
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 async function main() {
+  // -------------------------------------------------------------------
+  // Wipe, in dependency order (children before parents)
+  // -------------------------------------------------------------------
   await prisma.comment.deleteMany();
   await prisma.trackRating.deleteMany();
   await prisma.rating.deleteMany();
   await prisma.albumSocialLink.deleteMany();
   await prisma.track.deleteMany();
+  await prisma.albumGenre.deleteMany();
+  await prisma.artistGenre.deleteMany();
   await prisma.albumArtist.deleteMany();
+  await prisma.rotationAlbum.deleteMany();
+  await prisma.rotation.deleteMany();
+  await prisma.genre.deleteMany();
   await prisma.album.deleteMany();
   await prisma.artist.deleteMany();
   await prisma.account.deleteMany();
@@ -16,7 +39,44 @@ async function main() {
   await prisma.verification.deleteMany();
   await prisma.user.deleteMany();
 
-  // All seeded users share this password for local testing convenience.
+  // -------------------------------------------------------------------
+  // Genres
+  // -------------------------------------------------------------------
+  const GENRE_NAMES = [
+    'Hyperpop',
+    'Shoegaze',
+    'Synthpop',
+    'Electronica',
+    'Post-rock',
+    'Indie Folk',
+    'Dream Pop',
+    'Ambient',
+    'Chillwave',
+    'Neo-soul',
+    'Alternative Rock',
+    'Experimental',
+    'Electropop',
+    'Synthwave',
+    'Indie Pop',
+    'Chamber Pop',
+    'Trip Hop',
+    'Future Bass',
+    'Jazz Fusion',
+    'Post-punk',
+    'Art Pop',
+  ];
+
+  const genreMap = new Map<string, string>(); // name -> id
+  for (const name of GENRE_NAMES) {
+    const genre = await prisma.genre.create({
+      data: { name, slug: slugify(name) },
+    });
+    genreMap.set(name, genre.id);
+  }
+
+  // -------------------------------------------------------------------
+  // Users
+  // -------------------------------------------------------------------
   const SEED_PASSWORD = 'password123';
   const hashedPassword = await hashPassword(SEED_PASSWORD);
 
@@ -25,28 +85,24 @@ async function main() {
       email: 'alex@example.com',
       username: 'alex',
       name: 'Alex Chen',
-      image: 'user.jpg',
       role: 'admin',
     },
     {
       email: 'maya@example.com',
       username: 'maya',
       name: 'Maya Ortiz',
-      image: 'user.jpg',
       role: 'moderator',
     },
     {
       email: 'noah@example.com',
       username: 'noah',
       name: 'Noah Brooks',
-      image: 'user.jpg',
       role: 'user',
     },
     {
       email: 'zoe@example.com',
       username: 'zoe',
       name: 'Zoe Kim',
-      image: 'user.jpg',
       role: 'user',
     },
   ];
@@ -58,15 +114,12 @@ async function main() {
           email: userData.email,
           username: userData.username,
           name: userData.name,
-          image: userData.image,
+          image: PLACEHOLDER_IMAGE(userData.username),
           role: userData.role,
-          emailVerified: true, // seeded users skip the verification email flow
+          emailVerified: true,
         },
       });
 
-      // Give each seeded user a working credential login so you can actually
-      // sign in as them locally (email + "password123") without going
-      // through the OAuth or email-verification flow.
       await prisma.account.create({
         data: {
           accountId: user.id,
@@ -79,115 +132,49 @@ async function main() {
       return user;
     })
   );
+  const [alex, maya, noah] = users;
+  const ratingPool = [alex, maya, noah]; // zoe stays unrated for admin-testing purposes
 
-  const artists = await Promise.all([
-    prisma.artist.create({
-      data: {
-        name: 'Jane Remover',
-        slug: 'jane-remover',
-        image: 'jr.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'venturing',
-        slug: 'venturing',
-        image: 'venturing.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'leroy',
-        slug: 'leroy',
-        image: 'leroy.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Aria Leaf',
-        slug: 'aria-leaf',
-        image: 'aria-leaf.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Nova Pulse',
-        slug: 'nova-pulse',
-        image: 'nova-pulse.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Cinder Fields',
-        slug: 'cinder-fields',
-        image: 'cinder-fields.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Sable & Shore',
-        slug: 'sable-and-shore',
-        image: 'sable-and-shore.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Paper Coast',
-        slug: 'paper-coast',
-        image: 'paper-coast.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Hollow Rain',
-        slug: 'hollow-rain',
-        image: 'hollow-rain.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Zephyr Echo',
-        slug: 'zephyr-echo',
-        image: 'zephyr-echo.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Little Winter',
-        slug: 'little-winter',
-        image: 'little-winter.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Mythic City',
-        slug: 'mythic-city',
-        image: 'mythic-city.jpg',
-      },
-    }),
-    prisma.artist.create({
-      data: {
-        name: 'Silver Hymn',
-        slug: 'silver-hymn',
-        image: 'silver-hymn.jpg',
-      },
-    }),
-  ]);
+  // -------------------------------------------------------------------
+  // Artists
+  // -------------------------------------------------------------------
+  const artistNames = [
+    'Jane Remover',
+    'venturing',
+    'leroy',
+    'Aria Leaf',
+    'Nova Pulse',
+    'Cinder Fields',
+    'Sable & Shore',
+    'Paper Coast',
+    'Hollow Rain',
+    'Zephyr Echo',
+    'Little Winter',
+    'Mythic City',
+    'Silver Hymn',
+  ];
 
-  const albums = [];
+  const artists = await Promise.all(
+    artistNames.map(name =>
+      prisma.artist.create({
+        data: { name, slug: slugify(name), image: PLACEHOLDER_IMAGE(name) },
+      })
+    )
+  );
 
-  // releaseYear kept here only as seed input; converted to a real releaseDate
-  // (Jan 1 of that year) below when the album is created.
+  // -------------------------------------------------------------------
+  // Albums
+  // -------------------------------------------------------------------
+  // rotationGroup marks which seeded Rotation this album belongs to.
+  // 'A' | 'B' | 'C' = past, closed rotations. 'D' = the current, open one.
   const albumSeedData = [
     {
       title: 'Revengeseekerz',
       slug: 'revengeseekerz',
-      coverImage: 'revengeseekerz.jpg',
       releaseYear: 2025,
       genre: 'Hyperpop',
       artistId: artists[0].id,
-      // still open for ratings
-      finalized: false,
+      rotationGroup: 'D',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -209,10 +196,10 @@ async function main() {
     {
       title: '♡',
       slug: 'heart',
-      coverImage: 'heart.jpg',
       releaseYear: 2025,
       genre: 'Shoegaze',
       artistId: artists[0].id,
+      rotationGroup: 'A',
       socialLinks: [
         { platform: 'Spotify', url: 'https://open.spotify.com/album/heart' },
       ],
@@ -221,12 +208,10 @@ async function main() {
     {
       title: 'Ghostholding',
       slug: 'ghostholding',
-      coverImage: 'ghostholding.jpg',
       releaseYear: 2025,
       genre: 'Shoegaze',
       artistId: artists[1].id,
-      // still open for ratings
-      finalized: false,
+      rotationGroup: 'D',
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -238,12 +223,10 @@ async function main() {
     {
       title: 'Nightshade Arcade',
       slug: 'nightshade-arcade',
-      coverImage: 'nightshade-arcade.jpg',
       releaseYear: 2024,
       genre: 'Synthpop',
       artistId: artists[3].id,
-      // still open for ratings
-      finalized: false,
+      rotationGroup: 'D',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -261,10 +244,10 @@ async function main() {
     {
       title: 'Echo Atlas',
       slug: 'echo-atlas',
-      coverImage: 'echo-atlas.jpg',
       releaseYear: 2023,
       genre: 'Electronica',
       artistId: artists[4].id,
+      rotationGroup: 'A',
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -276,10 +259,10 @@ async function main() {
     {
       title: 'Stormchaser',
       slug: 'stormchaser',
-      coverImage: 'stormchaser.jpg',
       releaseYear: 2018,
       genre: 'Post-rock',
       artistId: artists[5].id,
+      rotationGroup: 'A',
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -296,10 +279,10 @@ async function main() {
     {
       title: 'Shoreline Letters',
       slug: 'shoreline-letters',
-      coverImage: 'shoreline-letters.jpg',
       releaseYear: 2022,
       genre: 'Indie Folk',
       artistId: artists[6].id,
+      rotationGroup: 'A',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -311,10 +294,10 @@ async function main() {
     {
       title: 'Paper Coast',
       slug: 'paper-coast',
-      coverImage: 'paper-coast.jpg',
       releaseYear: 2021,
       genre: 'Dream Pop',
       artistId: artists[7].id,
+      rotationGroup: 'A',
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -326,10 +309,10 @@ async function main() {
     {
       title: 'Rain on Concrete',
       slug: 'rain-on-concrete',
-      coverImage: 'rain-on-concrete.jpg',
       releaseYear: 2019,
       genre: 'Ambient',
       artistId: artists[8].id,
+      rotationGroup: 'A',
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -341,12 +324,10 @@ async function main() {
     {
       title: 'Zephyr Echoes',
       slug: 'zephyr-echoes',
-      coverImage: 'zephyr-echoes.jpg',
       releaseYear: 2025,
       genre: 'Chillwave',
       artistId: artists[9].id,
-      // still open for ratings
-      finalized: false,
+      rotationGroup: 'D',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -356,12 +337,12 @@ async function main() {
       tracks: ['Aura', 'Softwind', 'Mirage', 'Daydream Coast'],
     },
     {
-      title: 'Winter’s Signal',
+      title: 'Winter\u2019s Signal',
       slug: 'winters-signal',
-      coverImage: 'winters-signal.jpg',
       releaseYear: 2020,
       genre: 'Neo-soul',
       artistId: artists[10].id,
+      rotationGroup: 'B',
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -373,10 +354,10 @@ async function main() {
     {
       title: 'City of Myths',
       slug: 'city-of-myths',
-      coverImage: 'city-of-myths.jpg',
       releaseYear: 2017,
       genre: 'Alternative Rock',
       artistId: artists[11].id,
+      rotationGroup: 'B',
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -393,12 +374,10 @@ async function main() {
     {
       title: 'Silver Hymn',
       slug: 'silver-hymn',
-      coverImage: 'silver-hymn.jpg',
       releaseYear: 2026,
       genre: 'Experimental',
       artistId: artists[12].id,
-      // still open for ratings — brand new release
-      finalized: false,
+      rotationGroup: 'D',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -410,10 +389,10 @@ async function main() {
     {
       title: 'Midnight Sunrise',
       slug: 'midnight-sunrise',
-      coverImage: 'midnight-sunrise.jpg',
       releaseYear: 2022,
       genre: 'Electropop',
       artistId: artists[3].id,
+      rotationGroup: 'B',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -425,10 +404,10 @@ async function main() {
     {
       title: 'Glass Horizon',
       slug: 'glass-horizon',
-      coverImage: 'glass-horizon.jpg',
       releaseYear: 2021,
       genre: 'Synthwave',
       artistId: artists[4].id,
+      rotationGroup: 'B',
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -440,12 +419,10 @@ async function main() {
     {
       title: 'Crimson Drift',
       slug: 'crimson-drift',
-      coverImage: 'crimson-drift.jpg',
       releaseYear: 2024,
       genre: 'Shoegaze',
       artistId: artists[5].id,
-      // still open for ratings
-      finalized: false,
+      rotationGroup: 'D',
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -457,10 +434,10 @@ async function main() {
     {
       title: 'Salt & Static',
       slug: 'salt-and-static',
-      coverImage: 'salt-and-static.jpg',
       releaseYear: 2023,
       genre: 'Indie Pop',
       artistId: artists[6].id,
+      rotationGroup: 'B',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -472,10 +449,10 @@ async function main() {
     {
       title: 'Origami Sea',
       slug: 'origami-sea',
-      coverImage: 'origami-sea.jpg',
       releaseYear: 2016,
       genre: 'Chamber Pop',
       artistId: artists[7].id,
+      rotationGroup: 'C',
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -487,10 +464,10 @@ async function main() {
     {
       title: 'Velvet Ash',
       slug: 'velvet-ash',
-      coverImage: 'velvet-ash.jpg',
       releaseYear: 2020,
       genre: 'Trip Hop',
       artistId: artists[8].id,
+      rotationGroup: 'C',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -502,10 +479,10 @@ async function main() {
     {
       title: 'Neon Orchard',
       slug: 'neon-orchard',
-      coverImage: 'neon-orchard.jpg',
       releaseYear: 2019,
       genre: 'Future Bass',
       artistId: artists[9].id,
+      rotationGroup: 'C',
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -517,10 +494,10 @@ async function main() {
     {
       title: 'Moonlit Compass',
       slug: 'moonlit-compass',
-      coverImage: 'moonlit-compass.jpg',
       releaseYear: 2021,
       genre: 'Jazz Fusion',
       artistId: artists[10].id,
+      rotationGroup: 'C',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -532,12 +509,10 @@ async function main() {
     {
       title: 'Skyline Ruins',
       slug: 'skyline-ruins',
-      coverImage: 'skyline-ruins.jpg',
       releaseYear: 2024,
       genre: 'Post-punk',
       artistId: artists[11].id,
-      // still open for ratings
-      finalized: false,
+      rotationGroup: 'D',
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -554,10 +529,10 @@ async function main() {
     {
       title: 'Glass Cathedral',
       slug: 'glass-cathedral',
-      coverImage: 'glass-cathedral.jpg',
       releaseYear: 2018,
       genre: 'Art Pop',
       artistId: artists[12].id,
+      rotationGroup: 'C',
       socialLinks: [
         {
           platform: 'Spotify',
@@ -571,66 +546,154 @@ async function main() {
         'Crest of Sound',
       ],
     },
-  ];
+  ] as const;
 
-  for (const albumSeed of albumSeedData) {
+  const albumsBySlug = new Map<
+    string,
+    Awaited<ReturnType<typeof prisma.album.create>> & {
+      tracks: { id: string; title: string }[];
+    }
+  >();
+
+  for (const seed of albumSeedData) {
     const album = await prisma.album.create({
       data: {
-        title: albumSeed.title,
-        slug: albumSeed.slug,
-        coverImage: albumSeed.coverImage,
-        releaseDate: new Date(albumSeed.releaseYear, 0, 1),
-        genre: albumSeed.genre,
-        // Most seeded albums are treated as finalized/closed; a couple are
-        // left open (finalized: false) so there's something to rate.
-        finalized: albumSeed.finalized ?? true,
-        socialLinks: {
-          create: albumSeed.socialLinks,
+        title: seed.title,
+        slug: seed.slug,
+        coverImage: PLACEHOLDER_IMAGE(seed.slug),
+        releaseDate: new Date(seed.releaseYear, 0, 1),
+        genres: {
+          create: [{ genre: { connect: { id: genreMap.get(seed.genre)! } } }],
         },
-        artists: {
-          create: {
-            artist: {
-              connect: { id: albumSeed.artistId },
-            },
-          },
-        },
+        socialLinks: { create: [...seed.socialLinks] },
+        artists: { create: { artist: { connect: { id: seed.artistId } } } },
         tracks: {
-          create: albumSeed.tracks.map((title, index) => ({
+          create: seed.tracks.map((title, index) => ({
             title,
             number: index + 1,
           })),
         },
       },
-      include: {
-        tracks: true,
-      },
+      include: { tracks: true },
     });
-
-    albums.push(album);
+    albumsBySlug.set(seed.slug, album);
   }
 
-  for (const album of albums) {
-    const albumTracks = album.tracks;
-    const userPool = [users[0], users[1], users[2]];
+  // -------------------------------------------------------------------
+  // Rotations
+  //
+  // A, B, C = past, closed rotations (with scored, public snapshots).
+  // "Paper Coast" is deliberately placed in both A and C to demonstrate
+  // an album returning to rotation and building up score history.
+  // D = the current, open rotation (unclosed, partially rated).
+  // -------------------------------------------------------------------
+  const now = new Date();
 
-    for (let userIndex = 0; userIndex < userPool.length; userIndex += 1) {
-      const user = userPool[userIndex];
-      const trackScores = albumTracks.map(
-        (_, index) => 70 + ((index + userIndex * 5) % 20)
-      );
-      const averageScore = Math.round(
-        trackScores.reduce((sum, score) => sum + score, 0) / trackScores.length
+  const rotationA = await prisma.rotation.create({
+    data: {
+      name: '#1 week - dream pop & ambient',
+      slug: 'week-1-dream-pop-ambient',
+      startDate: new Date(now.getTime() - 21 * DAY_MS),
+      endDate: new Date(now.getTime() - 14 * DAY_MS),
+    },
+  });
+  const rotationB = await prisma.rotation.create({
+    data: {
+      name: '#2 week - deep cuts',
+      slug: 'week-2-deep-cuts',
+      startDate: new Date(now.getTime() - 14 * DAY_MS),
+      endDate: new Date(now.getTime() - 7 * DAY_MS),
+    },
+  });
+  const rotationC = await prisma.rotation.create({
+    data: {
+      name: '#3 week - throwbacks & returns',
+      slug: 'week-3-throwbacks-returns',
+      startDate: new Date(now.getTime() - 7 * DAY_MS),
+      endDate: new Date(now.getTime() - 1 * DAY_MS),
+    },
+  });
+  const rotationD = await prisma.rotation.create({
+    data: {
+      name: '#4 week - fresh drops',
+      slug: 'week-4-fresh-drops',
+      startDate: new Date(now.getTime() - 2 * DAY_MS),
+      endDate: new Date(now.getTime() + 5 * DAY_MS),
+    },
+  });
+
+  const rotationAAlbums = [
+    'heart',
+    'echo-atlas',
+    'stormchaser',
+    'shoreline-letters',
+    'paper-coast',
+    'rain-on-concrete',
+  ];
+  const rotationBAlbums = [
+    'winters-signal',
+    'city-of-myths',
+    'midnight-sunrise',
+    'glass-horizon',
+    'salt-and-static',
+  ];
+  const rotationCAlbums = [
+    'origami-sea',
+    'velvet-ash',
+    'neon-orchard',
+    'moonlit-compass',
+    'glass-cathedral',
+    'paper-coast',
+  ];
+  const rotationDAlbums = [
+    'revengeseekerz',
+    'ghostholding',
+    'nightshade-arcade',
+    'zephyr-echoes',
+    'silver-hymn',
+    'crimson-drift',
+    'skyline-ruins',
+  ];
+
+  // Seeds ratings + a RotationAlbum row for one album in a closed rotation,
+  // then snapshots the average/count onto RotationAlbum and mirrors it onto
+  // Album (last rotation processed for a given album "wins" the mirror,
+  // since we process A -> B -> C -> D in chronological order).
+  async function seedClosedRotationAlbum(
+    rotationId: string,
+    rotationEnd: Date,
+    rotationStart: Date,
+    albumSlug: string
+  ) {
+    const album = albumsBySlug.get(albumSlug)!;
+
+    await prisma.rotationAlbum.create({
+      data: { rotationId, albumId: album.id },
+    });
+
+    const windowSpan = rotationEnd.getTime() - rotationStart.getTime();
+    const scores: number[] = [];
+
+    for (let i = 0; i < ratingPool.length; i++) {
+      const user = ratingPool[i];
+      const score = 60 + ((i * 7 + album.title.length * 3) % 35); // deterministic spread, 60-94
+      scores.push(score);
+      const ratedAt = new Date(
+        rotationStart.getTime() +
+          (windowSpan * (i + 1)) / (ratingPool.length + 1)
       );
 
       const rating = await prisma.rating.create({
         data: {
           userId: user.id,
           albumId: album.id,
-          score: averageScore,
+          rotationId,
+          score,
+          ratedAt,
         },
       });
 
-      if (user.id === users[0].id) {
+      if (user.id === alex.id) {
         await prisma.comment.create({
           data: {
             body: `A strong listen for ${album.title}.`,
@@ -639,20 +702,47 @@ async function main() {
           },
         });
       }
+    }
 
-      for (let index = 0; index < albumTracks.length; index += 1) {
-        const track = albumTracks[index];
+    const averageRating = Math.round(
+      scores.reduce((sum, s) => sum + s, 0) / scores.length
+    );
+    const ratingCount = scores.length;
+
+    await prisma.rotationAlbum.update({
+      where: { rotationId_albumId: { rotationId, albumId: album.id } },
+      data: { averageRating, ratingCount, closedAt: rotationEnd },
+    });
+    await prisma.album.update({
+      where: { id: album.id },
+      data: { averageRating, ratingCount },
+    });
+
+    await seedTrackRatingsOnce(album);
+  }
+
+  // Track ratings aren't rotation-scoped, so an album that appears in
+  // multiple rotations (e.g. "Paper Coast" in A and C) must only get its
+  // tracks rated once, not once per appearance.
+  const trackRatedAlbumIds = new Set<string>();
+  async function seedTrackRatingsOnce(album: {
+    id: string;
+    title: string;
+    tracks: { id: string; title: string }[];
+  }) {
+    if (trackRatedAlbumIds.has(album.id)) return;
+    trackRatedAlbumIds.add(album.id);
+
+    for (let i = 0; i < ratingPool.length; i++) {
+      const user = ratingPool[i];
+      for (let t = 0; t < album.tracks.length; t++) {
+        const track = album.tracks[t];
+        const score = 60 + ((i * 5 + t * 4) % 35);
         const trackRating = await prisma.trackRating.create({
-          data: {
-            userId: user.id,
-            trackId: track.id,
-            score: trackScores[index],
-          },
+          data: { userId: user.id, trackId: track.id, score },
         });
 
-        // Seed a comment on the opening track for the first user, as an
-        // example of a track-level comment.
-        if (user.id === users[0].id && index === 0) {
+        if (user.id === alex.id && t === 0) {
           await prisma.comment.create({
             data: {
               body: `"${track.title}" is a great opener.`,
@@ -665,12 +755,88 @@ async function main() {
     }
   }
 
+  for (const slug of rotationAAlbums) {
+    await seedClosedRotationAlbum(
+      rotationA.id,
+      rotationA.endDate,
+      rotationA.startDate,
+      slug
+    );
+  }
+  for (const slug of rotationBAlbums) {
+    await seedClosedRotationAlbum(
+      rotationB.id,
+      rotationB.endDate,
+      rotationB.startDate,
+      slug
+    );
+  }
+  for (const slug of rotationCAlbums) {
+    await seedClosedRotationAlbum(
+      rotationC.id,
+      rotationC.endDate,
+      rotationC.startDate,
+      slug
+    );
+  }
+
+  // Current, open rotation: RotationAlbum rows exist but stay unclosed
+  // (averageRating/ratingCount/closedAt all null). A couple of albums get
+  // partial, in-progress ratings to simulate a week actively in motion —
+  // these are NOT public yet and Album.averageRating is left untouched.
+  for (const slug of rotationDAlbums) {
+    const album = albumsBySlug.get(slug)!;
+    await prisma.rotationAlbum.create({
+      data: { rotationId: rotationD.id, albumId: album.id },
+    });
+    await seedTrackRatingsOnce(album);
+  }
+
+  await prisma.rating.create({
+    data: {
+      userId: alex.id,
+      albumId: albumsBySlug.get('revengeseekerz')!.id,
+      rotationId: rotationD.id,
+      score: 88,
+      ratedAt: now,
+    },
+  });
+  await prisma.rating.create({
+    data: {
+      userId: maya.id,
+      albumId: albumsBySlug.get('revengeseekerz')!.id,
+      rotationId: rotationD.id,
+      score: 82,
+      ratedAt: now,
+    },
+  });
+  await prisma.rating.create({
+    data: {
+      userId: alex.id,
+      albumId: albumsBySlug.get('ghostholding')!.id,
+      rotationId: rotationD.id,
+      score: 75,
+      ratedAt: now,
+    },
+  });
+
   console.log('Seed completed successfully.');
   console.log(`Test login for any seeded user: <email> / ${SEED_PASSWORD}`);
   console.log('  alex@example.com  -> admin');
   console.log('  maya@example.com  -> moderator');
   console.log('  noah@example.com  -> user');
-  console.log('  zoe@example.com   -> user');
+  console.log(
+    '  zoe@example.com   -> user (unrated, useful for testing empty states)'
+  );
+  console.log(
+    'Rotations seeded: A/B/C closed with public scores, D currently open.'
+  );
+  console.log(
+    '"Paper Coast" appears in both rotation A and C to demo score history.'
+  );
+  console.log(
+    'All image fields are placeholder URLs — swap for real Cloudinary URLs later.'
+  );
 }
 
 main()

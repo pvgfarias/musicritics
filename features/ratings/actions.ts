@@ -5,7 +5,6 @@ import { auth } from '@/features/auth/auth';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { Prisma } from '@/app/generated/prisma/client';
-import { recomputeAlbumAggregate } from './mutations';
 
 export type TrackRatingInput = {
   trackId: string;
@@ -70,6 +69,25 @@ export async function saveAlbumRating({
   const userId = session?.user?.id;
   if (!userId) throw new Error('You must be signed in to rate an album.');
 
+  // The whole save — album score, comment, AND track ratings — is gated on
+  // the album currently being in an active, unclosed rotation. The rating
+  // form should only ever be shown while this is true, but we still check
+  // server-side since this is a server action.
+  const now = new Date();
+  const activeRotationAlbum = await prisma.rotationAlbum.findFirst({
+    where: {
+      albumId,
+      closedAt: null,
+      rotation: { startDate: { lte: now }, endDate: { gte: now } },
+    },
+    select: { rotationId: true },
+  });
+
+  if (!activeRotationAlbum) {
+    throw new Error('This album is not currently open for ratings.');
+  }
+  const rotationId = activeRotationAlbum.rotationId;
+
   const ratedScores = trackRatings
     .map(t => t.score)
     .filter((s): s is number => s !== null);
@@ -80,12 +98,13 @@ export async function saveAlbumRating({
 
   await prisma.$transaction(async tx => {
     const rating = await tx.rating.upsert({
-      where: { userId_albumId: { userId, albumId } },
-      create: { userId, albumId, score: albumScore },
+      where: { userId_albumId_rotationId: { userId, albumId, rotationId } },
+      create: { userId, albumId, rotationId, score: albumScore },
       update: { score: albumScore },
     });
 
-    await recomputeAlbumAggregate(tx, albumId); // ← the fix
+    // Deliberately no Album.averageRating recompute here — see mutations.ts.
+    // The public score only updates when the rotation-close job runs.
 
     await syncComment(tx, {
       ratingId: rating.id,
@@ -93,8 +112,9 @@ export async function saveAlbumRating({
       authorId: userId,
     });
 
-    // Upserts still need to happen per-row (no upsertMany in Prisma),
-    // but we can at least fire them without the extra findUnique each time
+    // Track ratings aren't rotation-scoped (schema-wise), but writing them
+    // is still gated by the same "album is open" check above, since they're
+    // part of the same rate-this-album flow.
     const trackRatingResults = await Promise.all(
       trackRatings.map(t =>
         tx.trackRating.upsert({
@@ -107,7 +127,6 @@ export async function saveAlbumRating({
 
     const trackRatingIds = trackRatingResults.map(tr => tr.id);
 
-    // 1 round trip: fetch existing comments for all trackRatings at once
     const existingComments = await tx.comment.findMany({
       where: { trackRatingId: { in: trackRatingIds } },
     });
@@ -115,7 +134,6 @@ export async function saveAlbumRating({
       existingComments.map(c => [c.trackRatingId, c])
     );
 
-    // Batch comment writes by operation type instead of one-by-one find+branch
     const toDelete: string[] = [];
     const toUpdate: { id: string; body: string }[] = [];
     const toCreate: { trackRatingId: string; body: string }[] = [];

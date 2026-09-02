@@ -60,9 +60,9 @@ export default function AlbumListRow({
         </div>
 
         <div className='flex justify-center text-gray-600 dark:text-white'>
-          {album.finalized && album.averageRating ? (
+          {!album.openForRatings && album.averageRating ? (
             <RatingGrade ratingGrade={album.averageRating} size='sm' />
-          ) : album.finalized ? (
+          ) : album.openForRatings ? (
             <span className='text-gray-500 dark:text-slate-400'>-</span>
           ) : (
             <IconClock size={14} className='text-gray-500' />

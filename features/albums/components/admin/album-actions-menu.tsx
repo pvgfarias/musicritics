@@ -16,13 +16,27 @@ import {
   IconRotate,
 } from '@tabler/icons-react';
 import { type AlbumSummary } from '@/features/albums/queries';
-import { toggleRotation } from '@/features/albums/actions';
+import { toggleAlbumInCurrentRotation } from '@/features/rotations/actions';
 import { DeleteAlbumDialog } from '../dialog/delete-album-dialog';
 import { EditAlbumDialog } from '../dialog/edit-album-dialog';
 
 export function AlbumActionsMenu({ album }: { album: AlbumSummary }) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [rotationError, setRotationError] = useState<string | null>(null);
+
+  async function handleToggleRotation() {
+    setRotationError(null);
+    const result = await toggleAlbumInCurrentRotation(
+      album.id,
+      album.openForRatings
+    );
+    if (!result.success) {
+      // Swap this for your actual toast/notification pattern — kept as a
+      // plain inline message here so the failure isn't silent.
+      setRotationError(result.error);
+    }
+  }
 
   return (
     <>
@@ -48,12 +62,15 @@ export function AlbumActionsMenu({ album }: { album: AlbumSummary }) {
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onClick={() => toggleRotation(album.id, album.finalized)}
+            onClick={handleToggleRotation}
             className={'cursor-pointer'}
           >
             <IconRotate size={16} className='mr-1' />
-            {!album.finalized ? 'Remove From Rotation' : 'Add To Rotation'}
+            {album.openForRatings ? 'Remove From Rotation' : 'Add To Rotation'}
           </DropdownMenuItem>
+          {rotationError && (
+            <p className='px-2 pb-1 text-xs text-red-600'>{rotationError}</p>
+          )}
 
           <DropdownMenuSeparator />
 

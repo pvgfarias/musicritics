@@ -22,35 +22,6 @@ export async function deleteAlbum(albumId: string): Promise<ActionResult> {
 
   const album = await prisma.album.findUnique({
     where: { id: albumId },
-    select: { id: true, finalized: true },
-  });
-
-  if (!album) {
-    return { success: false, error: 'Album not found' };
-  }
-
-  if (isAlbumOpenForRatings(album)) {
-    return {
-      success: false,
-      error: 'Remove this album from rotation before deleting it.',
-    };
-  }
-
-  await prisma.album.delete({ where: { id: albumId } });
-
-  revalidatePath('/dashboard/albums');
-  return { success: true };
-}
-
-export async function toggleRotation(
-  albumId: string,
-  openForRatings: boolean
-): Promise<ActionResult> {
-  const allowed = await requirePermission({ album: ['update'] });
-  if (!allowed) throw new Error('Unauthorized');
-
-  const album = await prisma.album.findUnique({
-    where: { id: albumId },
     select: { id: true },
   });
 
@@ -58,14 +29,29 @@ export async function toggleRotation(
     return { success: false, error: 'Album not found' };
   }
 
-  await prisma.album.update({
-    where: { id: albumId },
-    data: { finalized: !openForRatings },
-  });
+  // isAlbumOpenForRatings now queries RotationAlbum/Rotation directly
+  // (there's no boolean on Album to read anymore).
+  if (await isAlbumOpenForRatings(albumId)) {
+    return {
+      success: false,
+      error: 'Remove this album from its active rotation before deleting it.',
+    };
+  }
+
+  // Note: deleting an album with closed-rotation history cascades its
+  // Ratings, RotationAlbum snapshots, and Comments via onDelete: Cascade.
+  // That's a deliberate trade-off carried over from before — deletion still
+  // erases historical scores, only the *in-progress* case is guarded.
+  await prisma.album.delete({ where: { id: albumId } });
 
   revalidatePath('/dashboard/albums');
   return { success: true };
 }
+
+// toggleRotation removed — rotation membership is no longer a per-album
+// boolean. Use addAlbumToRotation / removeAlbumFromRotation from
+// '@/features/rotations/actions' instead, which operate on a specific
+// Rotation and enforce the "can't modify a closed rotation" rule.
 
 export async function createAlbum(
   input: CreateAlbumInput

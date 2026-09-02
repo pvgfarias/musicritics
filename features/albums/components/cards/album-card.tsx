@@ -31,7 +31,7 @@ export default function AlbumCard({
           className='object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]'
           priority={priority}
         />
-        {!album.finalized && (
+        {album.openForRatings && (
           <div className='absolute flex justify-center items-center gap-2 bg-ember font-mono text-gray-200 px-1.5 py-0.5 text-[10px] rounded-md bottom-2 right-2 uppercase'>
             <IconRefresh size={10} /> Weekly Rotation
           </div>
@@ -67,7 +67,7 @@ export default function AlbumCard({
             )}
           </div>
 
-          {album.finalized && album.averageRating != null && (
+          {!album.openForRatings && album.averageRating != null && (
             <div className='flex flex-row justify-center items-center gap-1 bg-foreground text-gray-800 dark:text-gray-200 rounded-md px-0.5'>
               <IconWorld size={16} />
               <RatingGrade ratingGrade={album.averageRating} size='sm' />

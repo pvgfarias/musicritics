@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import RatingGrade from '@/components/dashboard/rating-grade';
-import { AlbumTrackForRating } from '@/features/tracks/queries';
+import { AlbumTrackForRating } from '@/features/ratings/queries';
 import {
   IconBubble,
   IconClock,
@@ -15,11 +15,11 @@ import { AlbumTrack } from '@/features/albums/queries';
 export default function AlbumTracksRow({
   track,
   userTrackRating,
-  finalized,
+  ratingsArePublic,
 }: {
   track: AlbumTrack;
   userTrackRating: AlbumTrackForRating | undefined;
-  finalized: boolean;
+  ratingsArePublic: boolean;
 }) {
   const [showComments, setShowComments] = useState(false);
 
@@ -51,9 +51,9 @@ export default function AlbumTracksRow({
           <div className='flex flex-col justify-center items-center gap-1'>
             <IconWorld size={16} className='text-gray-600 dark:text-gray-400' />
             <span className='text-gray-600 dark:text-white'>
-              {finalized && track.averageRating ? (
+              {ratingsArePublic && track.averageRating ? (
                 <RatingGrade ratingGrade={track.averageRating} size='sm' />
-              ) : finalized ? (
+              ) : ratingsArePublic ? (
                 '-'
               ) : (
                 <IconClock size={14} className='text-gray-500 mt-1' />
@@ -62,7 +62,7 @@ export default function AlbumTracksRow({
           </div>
         </div>
 
-        {finalized && (
+        {ratingsArePublic && (
           <button
             type='button'
             onClick={() => commentCount > 0 && setShowComments(prev => !prev)}

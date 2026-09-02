@@ -1,5 +1,5 @@
 import { AlbumFull } from '@/features/albums/queries';
-import { AlbumTrackForRating } from '@/features/tracks/queries';
+import { AlbumTrackForRating } from '@/features/ratings/queries';
 import AlbumTracksRow from './album-tracks-row';
 
 export default function AlbumTracks({
@@ -30,7 +30,7 @@ export default function AlbumTracks({
                 <AlbumTracksRow
                   track={track}
                   userTrackRating={tracks.find(t => t.id === track.id)}
-                  finalized={album.finalized}
+                  ratingsArePublic={!album.openForRatings}
                 />
               </li>
             ))}

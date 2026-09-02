@@ -102,7 +102,6 @@ model Album {
   coverImage  String?
   releaseDate DateTime?
   genres      AlbumGenre[]
-  finalized   Boolean   @default(false) // false = open for ratings, true = closed/finalized
   createdAt   DateTime  @default(now())
 
   averageRating Float?
@@ -112,6 +111,7 @@ model Album {
   tracks      Track[]
   ratings     Rating[]
   socialLinks AlbumSocialLink[]
+  rotations   RotationAlbum[]
 }
 
 model Track {
@@ -151,9 +151,12 @@ model Rating {
   albumId String
   album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
 
+  rotationId String 
+  rotation   Rotation @relation(fields: [rotationId], references: [id], onDelete: Cascade)
+
   comment Comment?
 
-  @@unique([userId, albumId])
+  @@unique([userId, albumId, rotationId])
   @@index([albumId])
 }
 
@@ -239,4 +242,31 @@ model ArtistGenre {
 
   @@id([artistId, genreId])
   @@index([genreId])
+}
+
+model Rotation {
+  id        String   @id @default(cuid())
+  name      String   // "#1 week - metal and screamo"
+  slug      String?  @unique
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+
+  albums  RotationAlbum[]
+  ratings Rating[]
+}
+
+model RotationAlbum {
+  id         String   @id @default(cuid())
+  rotationId String
+  albumId    String
+  rotation   Rotation @relation(fields: [rotationId], references: [id], onDelete: Cascade)
+  album      Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+
+  averageRating Float?    // snapshot, filled when the rotation closes
+  ratingCount   Int       @default(0)
+  closedAt      DateTime? // set once the snapshot has been taken
+
+  @@unique([rotationId, albumId])
+  @@index([albumId])
 }

@@ -2,7 +2,18 @@ import { Prisma } from '../../app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import { SortKey } from '@/lib/sort-ratings';
 
-const NO_USER_REVIEW = '__no_user__'; // reuse NO_USER if already in scope
+const NO_USER = '__no_user__';
+
+// Selects the caller's own (at most one) rating, and whether the album has
+// an unclosed RotationAlbum whose parent Rotation window is active right
+// now. Both are cheap, indexed lookups folded into one select rather than
+// separate per-row queries.
+function activeRotationWhere(now: Date): Prisma.RotationAlbumWhereInput {
+  return {
+    closedAt: null,
+    rotation: { startDate: { lte: now }, endDate: { gte: now } },
+  };
+}
 
 type AlbumWithRelations = Prisma.AlbumGetPayload<{
   include: {
@@ -42,31 +53,42 @@ type AlbumWithRelations = Prisma.AlbumGetPayload<{
         };
       };
     };
+    // Closed-cycle history only — the current, still-open cycle (if any)
+    // never has a public score, so it's excluded here on purpose.
+    rotations: {
+      where: { closedAt: { not: null } };
+      include: {
+        rotation: {
+          select: {
+            id: true;
+            name: true;
+            slug: true;
+            startDate: true;
+            endDate: true;
+          };
+        };
+      };
+    };
     socialLinks: true;
   };
 }>;
 
-// Lightweight list-view select. No longer pulls raw Rating rows just to
-// average them — averageRating/ratingCount are denormalized columns on
-// Album, kept in sync by upsertAlbumRating/deleteAlbumRating below.
+// Lightweight list-view select. averageRating/ratingCount are still
+// denormalized columns on Album (mirrored from the most recently closed
+// RotationAlbum by the close job), so this stays a single flat query — no
+// join needed just to show a score in a grid.
 //
-// The `ratings` relation here is intentionally still selected, but filtered
-// down to (at most) the current viewer's own rating via `where: { userId }`.
-// That's a different concern than the average: "does this one user have a
-// rating" is always 0-or-1 row per album, so it never had the overhead
-// problem the average did — it just needs a real userId to filter on, so
-// when there's no logged-in viewer we filter on a value no rating can ever
-// have and always get an empty array back.
-const NO_USER = '__no_user__';
-
+// `ratings` here is filtered to (at most) the current viewer's own rating.
+// `rotations` here is filtered to an active, unclosed cycle — its mere
+// presence means the album is currently open for ratings.
 function buildAlbumSummarySelect(userId?: string) {
+  const now = new Date();
   return {
     id: true,
     title: true,
     slug: true,
     coverImage: true,
     releaseDate: true,
-    finalized: true,
     createdAt: true,
     averageRating: true,
     ratingCount: true,
@@ -81,6 +103,11 @@ function buildAlbumSummarySelect(userId?: string) {
     ratings: {
       where: { userId: userId ?? NO_USER },
       select: { score: true },
+      take: 1,
+    },
+    rotations: {
+      where: activeRotationWhere(now),
+      select: { rotationId: true },
       take: 1,
     },
   } satisfies Prisma.AlbumSelect;
@@ -98,12 +125,26 @@ export type AlbumFull = Awaited<ReturnType<typeof getAlbumWithAverageRating>>;
 
 export type AlbumTrack = Exclude<AlbumFull, null>['tracks'][number];
 
-export type AlbumSummary = Omit<AlbumSummaryRaw, 'ratings' | 'genres'> & {
+export type AlbumSummary = Omit<
+  AlbumSummaryRaw,
+  'ratings' | 'genres' | 'rotations'
+> & {
   artist: string;
   artistNames: string[];
   genreNames: string[];
   genreSlugs: string[];
   userRating: number | null;
+  openForRatings: boolean;
+};
+
+export type RotationHistoryEntry = {
+  rotationId: string;
+  name: string;
+  slug: string | null;
+  startDate: Date;
+  endDate: Date;
+  averageRating: number | null;
+  ratingCount: number;
 };
 
 type AlbumsQuery = {
@@ -111,14 +152,25 @@ type AlbumsQuery = {
   pageSize?: number;
   query?: string;
   genre?: string; // genre slug
-  status?: string;
+  status?: 'All' | 'InRotation' | 'NotInRotation';
   sort?: SortKey;
   userId?: string; // pass the logged-in viewer's id to get their own rating back
 };
 
-// An album accepts new ratings from users as long as it hasn't been finalized.
-export function isAlbumOpenForRatings(album: { finalized: boolean }) {
-  return !album.finalized;
+// An album accepts new/edited ratings only while it belongs to a Rotation
+// whose window is currently active and hasn't been closed yet. This is a
+// real query now (there's no boolean on Album to read anymore) — call it
+// sparingly on detail pages, and prefer the folded-in `rotations` select
+// above for list views to avoid N+1s.
+export async function isAlbumOpenForRatings(albumId: string): Promise<boolean> {
+  const now = new Date();
+
+  const active = await prisma.rotationAlbum.findFirst({
+    where: { albumId, ...activeRotationWhere(now) },
+    select: { id: true },
+  });
+
+  return active !== null;
 }
 
 function buildAlbumWhere({
@@ -126,6 +178,8 @@ function buildAlbumWhere({
   genre,
   status,
 }: Pick<AlbumsQuery, 'query' | 'genre' | 'status'>): Prisma.AlbumWhereInput {
+  const now = new Date();
+
   return {
     ...(query && {
       OR: [
@@ -145,7 +199,10 @@ function buildAlbumWhere({
       }),
     ...(status &&
       status !== 'All' && {
-        finalized: status === 'Finalized',
+        rotations:
+          status === 'InRotation'
+            ? { some: activeRotationWhere(now) }
+            : { none: activeRotationWhere(now) },
       }),
   };
 }
@@ -170,6 +227,20 @@ function normalizeAlbum(album: AlbumWithRelations) {
   const genreNames = album.genres.map(entry => entry.genre.name);
   const genreSlugs = album.genres.map(entry => entry.genre.slug);
 
+  const rotationHistory: RotationHistoryEntry[] = album.rotations
+    .map(ra => ({
+      rotationId: ra.rotation.id,
+      name: ra.rotation.name,
+      slug: ra.rotation.slug,
+      startDate: ra.rotation.startDate,
+      endDate: ra.rotation.endDate,
+      averageRating: ra.averageRating,
+      ratingCount: ra.ratingCount,
+    }))
+    // Already ordered by the query, but keep this explicit/local in case
+    // the include's orderBy ever changes out from under this function.
+    .sort((a, b) => b.endDate.getTime() - a.endDate.getTime());
+
   return {
     ...album,
     artist: artistNames.join(', '),
@@ -177,11 +248,12 @@ function normalizeAlbum(album: AlbumWithRelations) {
     genreNames,
     genreSlugs,
     tracklist: album.tracks.map((track: { title: string }) => track.title),
+    rotationHistory,
   };
 }
 
 function normalizeAlbumSummary(album: AlbumSummaryRaw): AlbumSummary {
-  const { ratings, genres, ...rest } = album;
+  const { ratings, genres, rotations, ...rest } = album;
   const artistNames = album.artists.map(a => a.artist.name).filter(Boolean);
   const genreNames = genres.map(g => g.genre.name);
   const genreSlugs = genres.map(g => g.genre.slug);
@@ -193,6 +265,7 @@ function normalizeAlbumSummary(album: AlbumSummaryRaw): AlbumSummary {
     genreNames,
     genreSlugs,
     userRating: ratings[0]?.score ?? null,
+    openForRatings: rotations.length > 0,
   };
 }
 
@@ -293,6 +366,21 @@ export async function getAlbumBySlug(slug: string) {
         },
         orderBy: { createdAt: 'desc' },
       },
+      rotations: {
+        where: { closedAt: { not: null } },
+        orderBy: { rotation: { endDate: 'desc' } },
+        include: {
+          rotation: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              startDate: true,
+              endDate: true,
+            },
+          },
+        },
+      },
       socialLinks: {
         orderBy: { platform: 'asc' },
       },
@@ -332,7 +420,7 @@ export async function getAlbumWithAverageRating(slug: string) {
     tracks: tracksWithRatings,
     albumAverageRating: album.averageRating,
     ratingCount: album.ratingCount,
-    openForRatings: isAlbumOpenForRatings(album),
+    openForRatings: await isAlbumOpenForRatings(album.id),
   };
 }
 

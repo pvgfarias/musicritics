@@ -1,6 +1,6 @@
-// data/tracks.ts
 import { Prisma } from '@/app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
+import { isAlbumOpenForRatings } from '@/features/albums/queries';
 
 type TrackWithRelations = Prisma.TrackGetPayload<{
   include: {
@@ -10,7 +10,6 @@ type TrackWithRelations = Prisma.TrackGetPayload<{
         title: true;
         slug: true;
         coverImage: true;
-        finalized: true;
         artists: {
           include: {
             artist: { select: { id: true; name: true; slug: true } };
@@ -52,10 +51,12 @@ export type TrackSummary = TrackSummaryRaw & {
   averageRating: number | null;
 };
 
-export function isTrackOpenForRatings(track: {
-  album: { finalized: boolean };
-}) {
-  return !track.album.finalized;
+// A track accepts ratings exactly when its parent album does — there's no
+// separate rotation concept for tracks, so this just delegates to the same
+// RotationAlbum lookup used everywhere else. Now async (was a synchronous
+// boolean read before).
+export async function isTrackOpenForRatings(albumId: string) {
+  return isAlbumOpenForRatings(albumId);
 }
 
 function normalizeTrack(track: TrackWithRelations) {
@@ -109,7 +110,6 @@ export async function getTrackById(id: string) {
           title: true,
           slug: true,
           coverImage: true,
-          finalized: true,
           artists: {
             include: {
               artist: { select: { id: true, name: true, slug: true } },
@@ -151,6 +151,6 @@ export async function getTrackWithAverageRating(id: string) {
     ...track,
     averageRating,
     ratingCount: track.ratings.length,
-    openForRatings: isTrackOpenForRatings(track),
+    openForRatings: await isTrackOpenForRatings(track.album.id),
   };
 }

@@ -43,7 +43,7 @@ export default function AlbumHeader({
               />
             </div>
           )}
-          {!album.finalized && (
+          {album.openForRatings && (
             <div className='absolute flex justify-center items-center gap-2 bg-ember font-mono text-gray-200 px-2.5 py-1 text-xs rounded-full bottom-2 right-2 uppercase'>
               <IconRefresh size={12} /> Weekly Rotation
             </div>
@@ -67,7 +67,7 @@ export default function AlbumHeader({
               </p>
             )}
           </div>
-          {!album.finalized && (
+          {album.openForRatings && (
             <AlbumRatingDialog
               album={album}
               userRating={userRating}
@@ -95,7 +95,7 @@ export default function AlbumHeader({
                 <div className='relative group inline-block'>
                   <RatingGrade ratingGrade={userRating.score} size='lg' />
 
-                  {album.finalized && (
+                  {!album.openForRatings && (
                     <div
                       className='pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 
                    w-56 rounded-md bg-gray-900 dark:bg-gray-800 px-3 py-2 
@@ -116,8 +116,15 @@ export default function AlbumHeader({
               <span className='font-mono text-xs text-gray-600 dark:text-gray-300 uppercase tracking-widest'>
                 Public Score
               </span>
-              {album.finalized ? (
+              {!album.openForRatings && album.albumAverageRating != null ? (
                 <RatingGrade ratingGrade={album.albumAverageRating} size='lg' />
+              ) : !album.openForRatings ? (
+                // Never been through a closed rotation cycle — distinct from
+                // "closed with a score", which didn't used to be a
+                // reachable state under the old boolean.
+                <p className='font-mono text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-2'>
+                  Not yet rated
+                </p>
               ) : (
                 <p className='font-mono text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-2'>
                   IN 3 DAYS...
