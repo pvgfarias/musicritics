@@ -4,13 +4,8 @@ import { useState } from 'react';
 import Image from 'next/image';
 import RatingScore from '@/components/dashboard/rating-score';
 import { AlbumTrackForRating } from '@/features/ratings/queries';
-import {
-  IconBubble,
-  IconClock,
-  IconUser,
-  IconWorld,
-} from '@tabler/icons-react';
 import { AlbumTrack } from '@/features/albums/queries';
+import { ALBUM_TRACK_GRID } from './album-tracks';
 
 export default function AlbumTracksRow({
   track,
@@ -29,32 +24,45 @@ export default function AlbumTracksRow({
 
   const userComment = userTrackRating?.comment || null;
 
-  // Exclude the current user's own rating from the public list so it
-  // isn't shown twice once rotation ends.
   const otherComments = userId
     ? comments.filter(rating => rating.user.id !== userId)
     : comments;
 
-  // What this user can actually see right now: just their own comment
-  // during rotation, everyone's once ratings go public.
   const visibleCommentCount = ratingsArePublic
     ? comments.length
     : userComment
       ? 1
       : 0;
 
+  const canToggle = visibleCommentCount > 0;
+
   return (
-    <div className='flex flex-col w-full rounded-md hover:bg-orange-100 dark:hover:bg-slate-900 transition-colors'>
-      <div className='group flex flex-row justify-start items-center px-2 py-4 gap-6'>
+    <div
+      className={`flex flex-col w-full rounded-md hover:bg-orange-100 dark:hover:bg-slate-900 transition-colors ${
+        canToggle ? 'cursor-pointer' : ''
+      }`}
+    >
+      <div
+        role={canToggle ? 'button' : undefined}
+        tabIndex={canToggle ? 0 : undefined}
+        aria-expanded={canToggle ? showComments : undefined}
+        onClick={() => canToggle && setShowComments(prev => !prev)}
+        onKeyDown={e => {
+          if (canToggle && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            setShowComments(prev => !prev);
+          }
+        }}
+        className={`${ALBUM_TRACK_GRID} group px-2 py-4`}
+      >
         <span className='font-mono text-xs text-gray-600 dark:text-gray-400 group-hover:text-ember'>
           {String(track.number).padStart(2, '0')}
         </span>
-        <span className='text-md font-text text-gray-800 dark:text-gray-200 flex-1'>
+        <span className='text-md font-text text-gray-800 dark:text-gray-200'>
           {track.title}
         </span>
 
-        <div className='flex flex-col justify-center items-center gap-1.5'>
-          <IconUser size={16} className='text-gray-600 dark:text-gray-400' />
+        <div className='flex items-center justify-center gap-1.5'>
           <span className='font-mono text-xs text-gray-500'>
             {userTrackRating?.score ? (
               <RatingScore ratingScore={userTrackRating.score} size='sm' />
@@ -64,49 +72,29 @@ export default function AlbumTracksRow({
           </span>
         </div>
 
-        <div className='flex flex-row items-center gap-2.5'>
-          <div className='flex flex-col justify-center items-center gap-1'>
-            <IconWorld size={16} className='text-gray-600 dark:text-gray-400' />
-            <span className='text-gray-600 dark:text-white'>
-              {ratingsArePublic && track.averageRating ? (
-                <RatingScore ratingScore={track.averageRating} size='sm' />
-              ) : ratingsArePublic ? (
-                '-'
-              ) : (
-                <IconClock size={14} className='text-gray-500 mt-1' />
-              )}
-            </span>
-          </div>
+        <div className='flex items-center justify-center gap-1.5'>
+          <span className='text-gray-600 dark:text-white'>
+            {ratingsArePublic && track.averageRating && (
+              <RatingScore ratingScore={track.averageRating} size='sm' />
+            )}
+          </span>
         </div>
 
-        {/* Always rendered now — count/behavior reflects what's visible
-            to this user, not just the public aggregate. */}
-        <button
-          type='button'
-          onClick={() =>
-            visibleCommentCount > 0 && setShowComments(prev => !prev)
-          }
-          disabled={visibleCommentCount === 0}
-          className='flex flex-col items-center gap-1 disabled:cursor-default'
-        >
-          <IconBubble
-            size={16}
-            className={visibleCommentCount > 0 ? 'text-ember' : 'text-gray-500'}
-          />
+        <div className='flex items-center justify-center gap-1.5'>
           <span
             className={`font-mono text-xs ${
-              visibleCommentCount > 0 ? 'text-ember' : 'text-gray-500'
+              canToggle ? 'text-ember' : 'text-gray-500'
             }`}
           >
             {visibleCommentCount}
           </span>
-        </button>
+        </div>
+
+        <div />
       </div>
 
       {showComments && (
         <div className='flex flex-col gap-3 px-10 pb-4'>
-          {/* The user's own comment — visible in or out of rotation,
-              but only when the list is toggled open like everyone else's. */}
           {userComment && (
             <div className='flex flex-row gap-3'>
               <div className='w-7 h-7 rounded-full bg-gray-300 dark:bg-slate-800 shrink-0' />
@@ -129,7 +117,6 @@ export default function AlbumTracksRow({
             </div>
           )}
 
-          {/* Everyone else's comments, only once rotation has ended. */}
           {ratingsArePublic &&
             otherComments.map(rating => (
               <div key={rating.id} className='flex flex-row gap-3'>
