@@ -6,12 +6,6 @@ import { revalidatePath } from 'next/cache';
 
 type ActionResult = { success: true } | { success: false; error: string };
 
-// Convenience wrapper for admin UI that just wants "toggle this album's
-// rotation membership" without picking a specific Rotation — resolves to
-// whichever Rotation is currently active (startDate <= now <= endDate).
-// If you ever run multiple concurrent rotations, this stops being
-// unambiguous and the caller should switch to addAlbumToRotation /
-// removeAlbumFromRotation with an explicit rotationId instead.
 export async function toggleAlbumInCurrentRotation(
   albumId: string,
   isCurrentlyInRotation: boolean
