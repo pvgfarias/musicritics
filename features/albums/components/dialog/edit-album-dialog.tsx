@@ -98,6 +98,11 @@ function EditAlbumLoader({
             artistIds: full.artists.map(a => a.artistId),
             genreIds: full.genres.map(g => g.genreId),
             tracks: full.tracks.map((t, index) => ({
+              // Carry the existing track id through so updateAlbum can
+              // diff existing-vs-new tracks instead of treating every
+              // track as brand new on save (which used to delete and
+              // recreate all tracks -> cascade-deleted every rating).
+              id: t.id,
               title: t.title,
               number: t.number ?? index + 1,
             })),
@@ -179,6 +184,10 @@ function EditAlbumForm({
   } = albumForm.form;
 
   async function onSubmit(data: CreateAlbumInput) {
+    console.log(
+      'tracks about to submit:',
+      data.tracks.map(t => ({ id: t.id, title: t.title }))
+    );
     try {
       const result = await updateAlbum(albumId, data);
 

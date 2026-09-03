@@ -33,10 +33,22 @@ export function useAlbumForm(
     defaultValues,
   });
 
-  const tracks = useFieldArray({ control: form.control, name: 'tracks' });
+  // keyName is changed from the default 'id' to '_fieldKey'. useFieldArray
+  // otherwise injects its own generated id onto every array item using the
+  // property name 'id' for React keying — which collides with and silently
+  // overwrites our track schema's real 'id' (the DB track id) the moment
+  // the field array initializes from defaultValues. That overwritten value
+  // then goes straight into the submitted form data, so updateAlbum can
+  // never match tracks by id, and every track looks "new" on save.
+  const tracks = useFieldArray({
+    control: form.control,
+    name: 'tracks',
+    keyName: '_fieldKey',
+  });
   const socialLinks = useFieldArray({
     control: form.control,
     name: 'socialLinks',
+    keyName: '_fieldKey',
   });
 
   function handleTitleChange(value: string) {

@@ -4,7 +4,7 @@ import type { SortKey } from '@/lib/sort-ratings';
 import { auth } from '@/features/auth/auth';
 import { headers } from 'next/headers';
 import { getTopLevelGenres } from '@/lib/search-genres';
-
+import { Status } from '@/features/albums/components/album-status';
 const PAGE_SIZE = 15;
 
 type PageProps = {
@@ -12,7 +12,7 @@ type PageProps = {
     page?: string;
     query?: string;
     genre?: string;
-    status?: string;
+    status?: Status;
     sort?: string;
   }>;
 };

@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
-const OPTIONS = [
+const ALBUM_STATUS = [
   { value: 'All', label: 'All' },
   { value: 'InRotation', label: 'Open' },
   { value: 'NotInRotation', label: 'Closed' },
 ] as const;
 
-type Status = (typeof OPTIONS)[number]['value'];
+export type Status = (typeof ALBUM_STATUS)[number]['value'];
 
 export default function AlbumStatus() {
   const [status, setStatus] = useState<Status>('All');
@@ -30,7 +30,7 @@ export default function AlbumStatus() {
 
   return (
     <div className='h-10 w-60 flex flex-row items-center rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-1 gap-1 text-gray-500 text-sm cursor-pointer'>
-      {OPTIONS.map(option => (
+      {ALBUM_STATUS.map(option => (
         <button
           key={option.value}
           type='button'

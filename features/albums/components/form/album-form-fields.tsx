@@ -107,7 +107,7 @@ export function AlbumFormFields({
         </div>
 
         {tracks.fields.map((field, index) => (
-          <div key={field.id} className='flex items-center gap-2'>
+          <div key={field._fieldKey} className='flex items-center gap-2'>
             <input
               type='number'
               {...register(`tracks.${index}.number`, { valueAsNumber: true })}
@@ -147,7 +147,7 @@ export function AlbumFormFields({
         </div>
 
         {socialLinks.fields.map((field, index) => (
-          <div key={field.id} className='flex items-center gap-2'>
+          <div key={field._fieldKey} className='flex items-center gap-2'>
             <input
               {...register(`socialLinks.${index}.platform`)}
               placeholder='Platform'

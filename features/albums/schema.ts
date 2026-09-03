@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
 export const trackSchema = z.object({
+  // Present for existing tracks (round-tripped from getAlbumForEdit),
+  // absent for tracks newly added in the edit form. updateAlbum uses this
+  // to diff tracks by id instead of deleting and recreating all of them
+  // on every save — track deletion cascades to Rating, so wholesale
+  // replacement was silently wiping every track rating on any album edit.
+  id: z.string().optional(),
   title: z.string().min(1, 'Track title is required'),
   number: z.number().int().positive(),
 });

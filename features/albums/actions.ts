@@ -135,13 +135,65 @@ export async function updateAlbum(
 
   try {
     const album = await prisma.$transaction(async tx => {
-      // Relations (tracks, socialLinks, artist/genre links) need to be
-      // replaced wholesale since the form doesn't track per-row IDs for
-      // diffing.
-      await tx.track.deleteMany({ where: { albumId } });
+      // socialLinks / artist / genre links have no dependent rating data,
+      // so wholesale replace-on-save is still fine for these.
       await tx.albumSocialLink.deleteMany({ where: { albumId } });
       await tx.albumArtist.deleteMany({ where: { albumId } });
       await tx.albumGenre.deleteMany({ where: { albumId } });
+
+      // Tracks are NOT wholesale-replaced anymore. Ratings cascade-delete
+      // when their Track is deleted, so blowing away every track on every
+      // save (even ones unrelated to the tracklist, like a cover image
+      // change) was silently wiping every track rating in the app.
+      //
+      // Instead we diff by track id:
+      //   - existing track present in the submitted data -> update in place
+      //   - existing track missing from submitted data    -> delete (and
+      //     yes, that legitimately cascades its ratings — the user removed
+      //     the track)
+      //   - submitted track with no id                     -> create new
+      //
+      // This requires `data.tracks[i].id` to be present (optional) on the
+      // schema/form for existing rows. If `createAlbumSchema` doesn't carry
+      // track id yet, add it there first — otherwise every track will look
+      // "new" and this degrades back into delete-all/recreate-all.
+      const existingTracks = await tx.track.findMany({
+        where: { albumId },
+        select: { id: true },
+      });
+      const existingIds = new Set(existingTracks.map(t => t.id));
+
+      const submittedWithId = data.tracks.filter(
+        (t): t is typeof t & { id: string } =>
+          Boolean((t as { id?: string }).id)
+      );
+      const submittedIds = new Set(submittedWithId.map(t => t.id));
+
+      const idsToDelete = [...existingIds].filter(id => !submittedIds.has(id));
+      if (idsToDelete.length > 0) {
+        await tx.track.deleteMany({ where: { id: { in: idsToDelete } } });
+      }
+
+      for (const t of submittedWithId) {
+        if (!existingIds.has(t.id)) continue; // stale/foreign id, ignore
+        await tx.track.update({
+          where: { id: t.id },
+          data: { title: t.title, number: t.number },
+        });
+      }
+
+      const tracksToCreate = data.tracks.filter(
+        t => !(t as { id?: string }).id
+      );
+      if (tracksToCreate.length > 0) {
+        await tx.track.createMany({
+          data: tracksToCreate.map(t => ({
+            albumId,
+            title: t.title,
+            number: t.number,
+          })),
+        });
+      }
 
       return tx.album.update({
         where: { id: albumId },
@@ -152,12 +204,6 @@ export async function updateAlbum(
           releaseDate: data.releaseDate,
           artists: { create: data.artistIds.map(artistId => ({ artistId })) },
           genres: { create: data.genreIds.map(genreId => ({ genreId })) },
-          tracks: {
-            create: data.tracks.map(t => ({
-              title: t.title,
-              number: t.number,
-            })),
-          },
           socialLinks: { create: data.socialLinks },
         },
         select: { id: true },
