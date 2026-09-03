@@ -2,12 +2,24 @@ import RatingScore from '@/components/dashboard/rating-score';
 import { AlbumFull } from '@/features/albums/queries';
 import Image from 'next/image';
 
+type AlbumRating = Exclude<AlbumFull, null>['ratings'][number];
+
 export default function AlbumReviews({
   album,
+  userRating,
 }: {
   album: Exclude<AlbumFull, null>;
+  userRating: AlbumRating | undefined;
 }) {
-  const reviews = album.ratings.filter(rating => rating.comment);
+  const inRotation = album.openForRatings;
+
+  // During rotation, only the current user's own comment is visible.
+  // Once rotation ends, everyone's reviews become public.
+  const reviews = inRotation
+    ? userRating?.comment
+      ? [userRating]
+      : []
+    : album.ratings.filter(rating => rating.comment);
 
   return (
     <div className='flex flex-col w-full'>
@@ -21,7 +33,7 @@ export default function AlbumReviews({
       </div>
       <div className='h-px bg-gray-300 dark:bg-slate-800 w-full' />
       <div className='flex flex-col gap-2 mt-2'>
-        {album?.ratings && album.ratingCount > 0 ? (
+        {reviews.length > 0 ? (
           <ul className='flex flex-col gap-2'>
             {reviews.map((rating, index) => (
               <div key={index}>

@@ -25,11 +25,14 @@ export default async function AlbumPage({
     ? album.ratings.find(rating => rating.userId === session.user.id)
     : undefined;
 
-  console.log(userRating);
-
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2'>
-      <AlbumDetails album={album} tracks={tracks} userRating={userRating} />
+      <AlbumDetails
+        album={album}
+        tracks={tracks}
+        userRating={userRating}
+        userId={user?.id}
+      />
     </main>
   );
 }

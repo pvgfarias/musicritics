@@ -5,9 +5,11 @@ import AlbumTracksRow from './album-tracks-row';
 export default function AlbumTracks({
   album,
   tracks,
+  userId,
 }: {
   album: Exclude<AlbumFull, null>;
   tracks: AlbumTrackForRating[];
+  userId: string | undefined;
 }) {
   if (!album) return null;
 
@@ -31,6 +33,7 @@ export default function AlbumTracks({
                   track={track}
                   userTrackRating={tracks.find(t => t.id === track.id)}
                   ratingsArePublic={!album.openForRatings}
+                  userId={userId}
                 />
               </li>
             ))}

@@ -10,16 +10,18 @@ export default function AlbumDetails({
   album,
   tracks,
   userRating,
+  userId,
 }: {
   album: Exclude<AlbumFull, null>;
   tracks: AlbumTrackForRating[];
   userRating: AlbumUserRating | undefined;
+  userId: string | undefined;
 }) {
   return (
     <div className='flex flex-col gap-8 w-full'>
       <AlbumHeader album={album} tracks={tracks} userRating={userRating} />
-      <AlbumTracks album={album} tracks={tracks} />
-      <AlbumReviews album={album} />
+      <AlbumTracks album={album} tracks={tracks} userId={userId} />
+      <AlbumReviews album={album} userRating={userRating} />
     </div>
   );
 }
