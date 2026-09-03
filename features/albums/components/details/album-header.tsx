@@ -5,7 +5,7 @@ import { IconDisc, IconRefresh } from '@tabler/icons-react';
 import Image from 'next/image';
 import AlbumRatingDialog from './rating/album-rating-dialog';
 import { AlbumTrackForRating } from '@/features/ratings/queries';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import { AlbumPlatformLink } from './album-platform-link';
 type AlbumUserRating = Exclude<AlbumFull, null>['ratings'][number];
 
@@ -93,7 +93,7 @@ export default function AlbumHeader({
               </span>
               {userRating ? (
                 <div className='relative group inline-block'>
-                  <RatingGrade ratingGrade={userRating.score} size='lg' />
+                  <RatingScore ratingScore={userRating.score} size='lg' />
 
                   {!album.openForRatings && (
                     <div
@@ -117,7 +117,7 @@ export default function AlbumHeader({
                 Public Score
               </span>
               {!album.openForRatings && album.albumAverageRating != null ? (
-                <RatingGrade ratingGrade={album.albumAverageRating} size='lg' />
+                <RatingScore ratingScore={album.albumAverageRating} size='lg' />
               ) : !album.openForRatings ? (
                 // Never been through a closed rotation cycle — distinct from
                 // "closed with a score", which didn't used to be a

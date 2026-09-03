@@ -1,12 +1,12 @@
-type RatingGradeProps = {
-  ratingGrade: number | null | undefined;
+type RatingScoreProps = {
+  ratingScore: number | null | undefined;
   inAlbum?: boolean;
   size?: 'sm' | 'md' | 'lg';
   label?: string;
   withBackground?: boolean;
 };
 
-const SIZE_CLASSES: Record<NonNullable<RatingGradeProps['size']>, string> = {
+const SIZE_CLASSES: Record<NonNullable<RatingScoreProps['size']>, string> = {
   sm: 'h-6 w-6 text-xs',
   md: 'h-9 w-9 text-sm',
   lg: 'h-12 w-12 text-lg',
@@ -14,38 +14,54 @@ const SIZE_CLASSES: Record<NonNullable<RatingGradeProps['size']>, string> = {
 const COLOR_MAP = [
   {
     threshold: 80,
-    color: 'emerald',
-    text: 'text-emerald-400',
-    bg: 'bg-emerald-800',
+    textOnly: 'text-emerald-400',
+    text: 'text-white',
+    bg: 'bg-emerald-600',
   },
-  { threshold: 70, color: 'lime', text: 'text-lime-400', bg: 'bg-lime-800' },
-  { threshold: 60, color: 'amber', text: 'text-amber-400', bg: 'bg-amber-800' },
+  {
+    threshold: 70,
+    textOnly: 'text-lime-500',
+    text: 'text-white',
+    bg: 'bg-lime-500',
+  },
+  {
+    threshold: 60,
+    textOnly: 'text-amber-400',
+    text: 'text-white',
+    bg: 'bg-amber-600',
+  },
   {
     threshold: 40,
-    color: 'orange',
-    text: 'text-orange-400',
-    bg: 'bg-orange-800',
+    textOnly: 'text-orange-400',
+    text: 'text-white',
+    bg: 'bg-orange-600',
   },
 ] as const;
 
-const DEFAULT = { text: 'text-red-400', bg: 'bg-red-800' };
+const DEFAULT = {
+  textOnly: 'text-red-400',
+  text: 'text-white',
+  bg: 'bg-red-600',
+};
 
-function getRatingColor(ratingGrade: number, withBackground = false): string {
+function getRatingColor(ratingScore: number, withBackground = false): string {
   const match =
-    COLOR_MAP.find(({ threshold }) => ratingGrade >= threshold) ?? DEFAULT;
+    COLOR_MAP.find(({ threshold }) => ratingScore >= threshold) ?? DEFAULT;
 
-  return withBackground ? `${match.text} ${match.bg}` : match.text;
+  return withBackground
+    ? `${match.text} ${match.bg} rounded-sm`
+    : match.textOnly;
 }
 
-export default function RatingGrade({
-  ratingGrade,
+export default function RatingScore({
+  ratingScore,
   inAlbum = false,
   size = 'md',
   label,
   withBackground = false,
-}: RatingGradeProps) {
-  const hasScore = ratingGrade != null;
-  const displayScore = hasScore ? Math.round(ratingGrade) : null;
+}: RatingScoreProps) {
+  const hasScore = ratingScore != null;
+  const displayScore = hasScore ? Math.round(ratingScore) : null;
 
   const colorClasses = hasScore
     ? getRatingColor(displayScore!, withBackground)

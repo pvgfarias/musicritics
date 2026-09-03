@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import type { AlbumSummary } from '@/features/albums/queries';
 import { IconRefresh, IconUser, IconWorld } from '@tabler/icons-react';
 
@@ -63,14 +63,14 @@ export default function AlbumCard({
             <IconUser size={16} />
 
             {album.userRating != null && (
-              <RatingGrade ratingGrade={album.userRating} size='sm' />
+              <RatingScore ratingScore={album.userRating} size='sm' />
             )}
           </div>
 
           {!album.openForRatings && album.averageRating != null && (
             <div className='flex flex-row justify-center items-center gap-1 bg-foreground text-gray-800 dark:text-gray-200 rounded-md px-0.5'>
               <IconWorld size={16} />
-              <RatingGrade ratingGrade={album.averageRating} size='sm' />
+              <RatingScore ratingScore={album.averageRating} size='sm' />
             </div>
           )}
         </div>

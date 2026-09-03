@@ -1,4 +1,4 @@
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import { ArtistSummary } from '@/features/artists/queries';
 import { IconDisc, IconUser, IconWorld } from '@tabler/icons-react';
 import Image from 'next/image';
@@ -52,11 +52,11 @@ export default function ArtistCard({
           </div>
           <div className='flex flex-row justify-center items-center gap-1 text-dark-blue dark:text-white'>
             <IconWorld size={16} />
-            <RatingGrade ratingGrade={artist.averageRating} size='sm' />
+            <RatingScore ratingScore={artist.averageRating} size='sm' />
           </div>
           <div className='flex flex-row justify-center items-center gap-1 text-dark-blue dark:text-white'>
             <IconUser size={16} />
-            <RatingGrade ratingGrade={artist.userAverageRating} size='sm' />
+            <RatingScore ratingScore={artist.userAverageRating} size='sm' />
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import { IconDisc } from '@tabler/icons-react';
 import type { ActiveRotationAlbum } from '@/features/rotations/queries';
 import { coverSrc } from '@/lib/format';
@@ -16,7 +16,7 @@ export default function CurrentRotationAlbumCard({
 
   return (
     <Link
-      href={`/albums/${album.slug}`}
+      href={`/dashboard/albums/${album.slug}`}
       className='group flex flex-col w-full shrink-0 rounded-sm
         transition-all duration-200 ease-out
         hover:-translate-y-1.5 hover:shadow-lg
@@ -35,16 +35,25 @@ export default function CurrentRotationAlbumCard({
             <IconDisc size={40} className='text-gray-400 dark:text-gray-500' />
           </div>
         )}
-
         <div
           className={`absolute flex justify-center items-center gap-1 font-mono px-1.5 py-0.5 text-[10px] rounded-md bottom-2 right-2 uppercase ${
             album.userRating != null
               ? 'bg-emerald-600 text-white'
-              : 'bg-ember text-gray-200'
+              : 'bg-gray-600 text-gray-200'
           }`}
         >
           {album.userRating != null ? 'Rated' : 'Not rated'}
         </div>
+        {album.userRating != null && (
+          <div className='mt-1'>
+            <RatingScore
+              ratingScore={album.userRating}
+              size='sm'
+              inAlbum={true}
+              withBackground={true}
+            />
+          </div>
+        )}
       </div>
 
       <div className='flex flex-col p-2.5 justify-start gap-0.5'>
@@ -54,11 +63,6 @@ export default function CurrentRotationAlbumCard({
         <p className='text-[13px] text-gray-700 dark:text-gray-300 line-clamp-1'>
           {album.artist}
         </p>
-        {album.userRating != null && (
-          <div className='mt-1'>
-            <RatingGrade ratingGrade={album.userRating} size='sm' />
-          </div>
-        )}
       </div>
     </Link>
   );

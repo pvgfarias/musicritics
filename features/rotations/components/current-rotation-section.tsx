@@ -51,7 +51,7 @@ export default function CurrentRotationSection({
             </span>
             <div className='h-2 w-full rounded-full bg-gray-200 dark:bg-slate-800 overflow-hidden'>
               <div
-                className='h-full bg-ember transition-all duration-300'
+                className='h-full bg-emerald-500 transition-all duration-300'
                 style={{ width: `${percent}%` }}
               />
             </div>

@@ -1,7 +1,5 @@
-// components/admin/album-actions-menu.tsx
 'use client';
 
-import { useState } from 'react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,10 +20,6 @@ type AlbumActionsMenuProps = {
   onDelete: () => void;
   inRotation: boolean;
 };
-// import { type AlbumSummary } from '@/features/albums/queries';
-// import { toggleAlbumInCurrentRotation } from '@/features/rotations/actions';
-// import { DeleteAlbumDialog } from '../dialog/delete-album-dialog';
-// import { EditAlbumDialog } from '../dialog/edit-album-dialog';
 
 export function AlbumActionsMenu({
   onEdit,
@@ -33,23 +27,6 @@ export function AlbumActionsMenu({
   onDelete,
   inRotation,
 }: AlbumActionsMenuProps) {
-  // const [editOpen, setEditOpen] = useState(false);
-  // const [deleteOpen, setDeleteOpen] = useState(false);
-  // const [rotationError, setRotationError] = useState<string | null>(null);
-
-  // async function handleToggleRotation() {
-  //   setRotationError(null);
-  //   const result = await toggleAlbumInCurrentRotation(
-  //     album.id,
-  //     album.openForRatings
-  //   );
-  //   if (!result.success) {
-  //     // Swap this for your actual toast/notification pattern — kept as a
-  //     // plain inline message here so the failure isn't silent.
-  //     setRotationError(result.error);
-  //   }
-  // }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger

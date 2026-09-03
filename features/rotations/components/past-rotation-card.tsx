@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import { IconDisc } from '@tabler/icons-react';
 import type { RotationSummary } from '@/features/rotations/queries';
 import { formatDateRange, coverSrc } from '@/lib/format';
@@ -54,7 +54,7 @@ export default function PastRotationCard({
                 )}
                 {album.averageRating != null && (
                   <div className='absolute bottom-0.5 right-0.5'>
-                    <RatingGrade ratingGrade={album.averageRating} size='sm' />
+                    <RatingScore ratingScore={album.averageRating} size='sm' />
                   </div>
                 )}
               </div>

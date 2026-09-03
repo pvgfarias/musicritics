@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { ArtistSummary } from '../../queries';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 
 export function ArtistHeader({ artist }: { artist: ArtistSummary }) {
   const primaryGenre = artist.genreNames[0];
@@ -38,8 +38,8 @@ export function ArtistHeader({ artist }: { artist: ArtistSummary }) {
               </span>
               {artist.userAverageRating && (
                 <div className='relative group inline-block'>
-                  <RatingGrade
-                    ratingGrade={artist.userAverageRating}
+                  <RatingScore
+                    ratingScore={artist.userAverageRating}
                     size='lg'
                   />
                 </div>
@@ -49,7 +49,7 @@ export function ArtistHeader({ artist }: { artist: ArtistSummary }) {
               <span className='font-mono text-xs text-gray-600 dark:text-gray-300 uppercase tracking-widest'>
                 Public Score
               </span>
-              <RatingGrade ratingGrade={artist.averageRating} size='lg' />
+              <RatingScore ratingScore={artist.averageRating} size='lg' />
             </div>
           </div>
         </div>

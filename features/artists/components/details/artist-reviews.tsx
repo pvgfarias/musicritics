@@ -1,7 +1,7 @@
 // features/artists/components/details/artist-reviews.tsx
 import Image from 'next/image';
 import Link from 'next/link';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import { ArtistReviewSummary } from '@/features/albums/queries';
 
 export function ArtistReviews({ reviews }: { reviews: ArtistReviewSummary[] }) {
@@ -68,7 +68,7 @@ export function ArtistReviews({ reviews }: { reviews: ArtistReviewSummary[] }) {
 
                   {review.score !== null && (
                     <span className='text-md font-text text-ember'>
-                      <RatingGrade ratingGrade={review.score} size='md' />
+                      <RatingScore ratingScore={review.score} size='md' />
                     </span>
                   )}
                 </li>

@@ -23,8 +23,6 @@ interface PlatformLinkProps {
 
 export function AlbumPlatformLink({ platform, url }: PlatformLinkProps) {
   const icon = PLATFORM_ICONS[normalize(platform)];
-  console.log(platform);
-  console.log(icon);
   if (!icon) return null;
 
   return (

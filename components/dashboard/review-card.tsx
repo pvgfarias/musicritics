@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 import currentRatings from '@/data/currentRatings';
-import RatingGrade from './rating-grade';
+import RatingScore from './rating-score';
 
 type Rating = (typeof currentRatings)[number];
 
@@ -11,7 +11,7 @@ export default function ReviewCard({ rating }: { rating: Rating }) {
       <div className='flex flex-row gap-4 items-center'>
         <div className='relative'>
           {rating.finalGrade !== undefined && (
-            <RatingGrade ratingGrade={rating.finalGrade} inAlbum={false} />
+            <RatingScore ratingScore={rating.finalGrade} inAlbum={false} />
           )}
           <Image
             src={`/${rating.image}`}

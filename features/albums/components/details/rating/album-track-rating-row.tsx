@@ -2,7 +2,7 @@ import { AlbumTrackForRating } from '@/features/tracks/queries';
 import { IconMessageCircle } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Slider } from '@/components/ui/slider';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 
 function scoreColor(score: number | null) {
   if (score === null) return 'text-gray-500';
@@ -47,7 +47,7 @@ export default function TrackRatingRow({
         <span
           className={`text-sm font-semibold tabular-nums w-7 text-right ${scoreColor(score)}`}
         >
-          {score === null ? '–' : <RatingGrade ratingGrade={score} size='sm' />}
+          {score === null ? '–' : <RatingScore ratingScore={score} size='sm' />}
         </span>
       </div>
       <Slider

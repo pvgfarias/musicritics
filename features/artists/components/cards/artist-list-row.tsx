@@ -1,4 +1,4 @@
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import { ArtistSummary } from '@/features/artists/queries';
 import Image from 'next/image';
 import { ARTIST_ROW_GRID } from '../display/artist-list';
@@ -41,11 +41,11 @@ export default function ArtistListRow({
         </span>
 
         <div className='flex justify-center'>
-          <RatingGrade ratingGrade={artist.userAverageRating} size='sm' />
+          <RatingScore ratingScore={artist.userAverageRating} size='sm' />
         </div>
 
         <div className='flex justify-center'>
-          <RatingGrade ratingGrade={artist.averageRating} size='sm' />
+          <RatingScore ratingScore={artist.averageRating} size='sm' />
         </div>
 
         {actions && (

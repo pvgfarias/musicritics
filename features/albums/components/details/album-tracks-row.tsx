@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import { AlbumTrackForRating } from '@/features/ratings/queries';
 import {
   IconBubble,
@@ -40,7 +40,7 @@ export default function AlbumTracksRow({
           <IconUser size={16} className='text-gray-600 dark:text-gray-400' />
           <span className='font-mono text-xs text-gray-500'>
             {userTrackRating?.score ? (
-              <RatingGrade ratingGrade={userTrackRating.score} size='sm' />
+              <RatingScore ratingScore={userTrackRating.score} size='sm' />
             ) : (
               '—'
             )}
@@ -52,7 +52,7 @@ export default function AlbumTracksRow({
             <IconWorld size={16} className='text-gray-600 dark:text-gray-400' />
             <span className='text-gray-600 dark:text-white'>
               {ratingsArePublic && track.averageRating ? (
-                <RatingGrade ratingGrade={track.averageRating} size='sm' />
+                <RatingScore ratingScore={track.averageRating} size='sm' />
               ) : ratingsArePublic ? (
                 '-'
               ) : (
@@ -105,7 +105,7 @@ export default function AlbumTracksRow({
                     {rating.comment?.author?.username}
                   </span>
                   {rating.score != null && (
-                    <RatingGrade ratingGrade={rating.score} size='sm' />
+                    <RatingScore ratingScore={rating.score} size='sm' />
                   )}
                 </div>
                 <p className='text-sm font-text text-gray-700 dark:text-gray-300'>

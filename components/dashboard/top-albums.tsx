@@ -1,6 +1,6 @@
 import currentRatings from '@/data/currentRatings';
 import Image from 'next/image';
-import RatingGrade from './rating-grade';
+import RatingScore from './rating-score';
 
 export default function TopAlbums() {
   const recentReviews = currentRatings.filter(

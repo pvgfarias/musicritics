@@ -1,6 +1,6 @@
 import currentRatings from '@/data/currentRatings';
 import Image from 'next/image';
-import RatingGrade from './rating-grade';
+import RatingScore from './rating-score';
 
 export default function RecentReviews() {
   const recentReviews = currentRatings.filter(
@@ -44,7 +44,7 @@ export default function RecentReviews() {
               </p>
             </div>
             {review.finalGrade && (
-              <RatingGrade ratingGrade={review.finalGrade} inAlbum={false} />
+              <RatingScore ratingScore={review.finalGrade} inAlbum={false} />
             )}
           </div>
         ))}

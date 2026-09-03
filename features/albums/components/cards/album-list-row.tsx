@@ -1,6 +1,6 @@
 import { AlbumSummary } from '@/features/albums/queries';
 import Image from 'next/image';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import { IconClock } from '@tabler/icons-react';
 import { ALBUM_ROW_GRID } from '../display/album-list';
 
@@ -53,7 +53,7 @@ export default function AlbumListRow({
 
         <div className='flex justify-center'>
           {album.userRating ? (
-            <RatingGrade ratingGrade={album.userRating} size='sm' />
+            <RatingScore ratingScore={album.userRating} size='sm' />
           ) : (
             <span className='text-gray-500 dark:text-slate-400'>—</span>
           )}
@@ -61,7 +61,7 @@ export default function AlbumListRow({
 
         <div className='flex justify-center text-gray-600 dark:text-white'>
           {!album.openForRatings && album.averageRating ? (
-            <RatingGrade ratingGrade={album.averageRating} size='sm' />
+            <RatingScore ratingScore={album.averageRating} size='sm' />
           ) : album.openForRatings ? (
             <span className='text-gray-500 dark:text-slate-400'>-</span>
           ) : (

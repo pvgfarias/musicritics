@@ -16,7 +16,7 @@ import { saveAlbumRating } from '@/features/ratings/actions';
 import TrackRatingRow from './album-track-rating-row';
 import { AlbumTrackForRating } from '@/features/tracks/queries';
 import Image from 'next/image';
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 
 // One entry from album.ratings — the current user's rating, if it exists.
 type AlbumUserRating = Exclude<AlbumFull, null>['ratings'][number];
@@ -123,8 +123,8 @@ export default function AlbumRatingDialog({
               <p className='font-mono text-xs text-gray-600 dark:text-gray-500 uppercase tracking-widest'>
                 OVERALL
               </p>
-              <RatingGrade
-                ratingGrade={averageScore ?? 0}
+              <RatingScore
+                ratingScore={averageScore ?? 0}
                 inAlbum={false}
                 size='lg'
               />

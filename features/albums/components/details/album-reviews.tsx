@@ -1,4 +1,4 @@
-import RatingGrade from '@/components/dashboard/rating-grade';
+import RatingScore from '@/components/dashboard/rating-score';
 import { AlbumFull } from '@/features/albums/queries';
 import Image from 'next/image';
 
@@ -47,7 +47,7 @@ export default function AlbumReviews({
                     )}
                   </div>
                   <span className='text-md font-text text-ember'>
-                    <RatingGrade ratingGrade={rating.score} size='md' />
+                    <RatingScore ratingScore={rating.score} size='md' />
                   </span>
                 </li>
 
