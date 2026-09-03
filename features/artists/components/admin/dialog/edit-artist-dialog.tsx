@@ -1,4 +1,3 @@
-// components/admin/artist/dialog/edit-artist-dialog.tsx
 'use client';
 
 import { useEffect, useState } from 'react';

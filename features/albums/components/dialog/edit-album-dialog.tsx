@@ -1,4 +1,3 @@
-// components/admin/album/dialog/edit-album-dialog.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -34,7 +33,7 @@ type GenreOption = {
 };
 
 type EditAlbumDialogProps = {
-  album: AlbumSummary;
+  album: AlbumSummary | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
@@ -61,7 +60,7 @@ export function EditAlbumDialog({
           <DialogTitle>Edit Album</DialogTitle>
         </DialogHeader>
 
-        {open && (
+        {open && album && (
           <EditAlbumLoader
             key={album.id}
             albumId={album.id}

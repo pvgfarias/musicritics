@@ -1,4 +1,3 @@
-// components/admin/artist-actions-menu.tsx
 'use client';
 
 import {
