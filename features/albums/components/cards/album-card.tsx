@@ -36,6 +36,7 @@ export default function AlbumCard({
             <IconRefresh size={10} /> Weekly Rotation
           </div>
         )}
+
         {actions && (
           <div
             className='absolute top-2 left-1 flex gap-1 z-10 cursor-pointer'
@@ -59,20 +60,18 @@ export default function AlbumCard({
         </p>
 
         <div className='flex flex-row gap-2'>
-          <div className='flex flex-row justify-center items-center gap-1 text-gray-800 dark:text-gray-200 rounded-md px-1'>
+          <div className='flex flex-row justify-center items-center gap-1 text-gray-800 dark:text-gray-200 rounded-md'>
             <IconUser size={16} />
-
-            {album.userRating != null && (
-              <RatingScore ratingScore={album.userRating} size='sm' />
-            )}
+            <RatingScore ratingScore={album.userRating} size='sm' />
           </div>
 
-          {!album.openForRatings && album.averageRating != null && (
-            <div className='flex flex-row justify-center items-center gap-1 bg-foreground text-gray-800 dark:text-gray-200 rounded-md px-0.5'>
-              <IconWorld size={16} />
-              <RatingScore ratingScore={album.averageRating} size='sm' />
-            </div>
-          )}
+          <div className='flex flex-row justify-center items-center gap-1 text-gray-800 dark:text-gray-200 rounded-md'>
+            <IconWorld size={16} />
+            <RatingScore
+              ratingScore={!album.openForRatings ? album.averageRating : null}
+              size='sm'
+            />
+          </div>
         </div>
       </div>
     </div>

@@ -65,7 +65,7 @@ export default function RatingScore({
 
   const colorClasses = hasScore
     ? getRatingColor(displayScore!, withBackground)
-    : 'bg-neutral-700/70 text-neutral-300';
+    : 'text-neutral-300';
 
   const positioning = inAlbum ? 'absolute top-2 right-2' : '';
 

@@ -1,9 +1,6 @@
-import RecentReviews from '@/components/dashboard/recent-reviews';
-import TopAlbums from '@/components/dashboard/top-albums';
-import TopSongs from '@/components/dashboard/top-songs';
-import WeeklyRotation from '@/components/dashboard/weekly-rotation';
 import { getAlbumsPage } from '@/features/albums/queries';
 import { SortKey } from '@/lib/sort-ratings';
+import { Status } from '@/features/albums/components/album-status';
 
 const PAGE_SIZE = 5;
 
@@ -12,7 +9,7 @@ type PageProps = {
     page?: string;
     query?: string;
     genre?: string;
-    status?: string;
+    status?: Status;
     sort?: string;
   }>;
 };
@@ -68,16 +65,6 @@ export default async function Page({ searchParams }: PageProps) {
           </p>
         </div>
       </div>
-      {/* <div className='flex flex-row gap-6 w-full'>
-        <div className='flex flex-col w-4/5'>
-          <WeeklyRotation albums={albums} />
-          <RecentReviews />
-        </div>
-        <div className='flex flex-col w-1/5 gap-4'>
-          <TopAlbums />
-          <TopSongs />
-        </div>
-      </div> */}
     </main>
   );
 }
