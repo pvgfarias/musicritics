@@ -22,11 +22,7 @@ export default function AlbumListRow({
       <div className={`${ALBUM_ROW_GRID} p-2`}>
         <div className='relative w-12.5 h-12.5 shrink-0 overflow-hidden rounded-sm'>
           <Image
-            src={
-              album.coverImage?.includes('http')
-                ? `${album.coverImage}`
-                : `/${album.coverImage}`
-            }
+            src={album.coverImage ?? '/albums.jpg'}
             alt={`${album.title} by ${album.artists[0]?.artist.name}`}
             fill
             className='object-cover transition-transform duration-200 group-hover:scale-105'

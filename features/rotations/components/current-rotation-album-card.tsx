@@ -5,15 +5,12 @@ import Link from 'next/link';
 import RatingScore from '@/components/dashboard/rating-score';
 import { IconDisc } from '@tabler/icons-react';
 import type { ActiveRotationAlbum } from '@/features/rotations/queries';
-import { coverSrc } from '@/lib/format';
 
 export default function CurrentRotationAlbumCard({
   album,
 }: {
   album: ActiveRotationAlbum;
 }) {
-  const src = coverSrc(album.coverImage);
-
   return (
     <Link
       href={`/dashboard/albums/${album.slug}`}
@@ -23,9 +20,9 @@ export default function CurrentRotationAlbumCard({
         bg-transparent hover:bg-gray-100 dark:hover:bg-slate-900'
     >
       <div className='relative w-full aspect-square shrink-0 overflow-hidden rounded-t-sm'>
-        {src ? (
+        {album.coverImage ? (
           <Image
-            src={src}
+            src={album.coverImage}
             alt={`${album.title} by ${album.artist}`}
             fill
             className='object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]'
@@ -48,7 +45,7 @@ export default function CurrentRotationAlbumCard({
           <div className='mt-1'>
             <RatingScore
               ratingScore={album.userRating}
-              size='sm'
+              size='md'
               inAlbum={true}
               withBackground={true}
             />

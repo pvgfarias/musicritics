@@ -14,7 +14,7 @@ import { IconStar, IconStarFilled } from '@tabler/icons-react';
 import { useMemo, useState, useTransition } from 'react';
 import { saveAlbumRating } from '@/features/ratings/actions';
 import TrackRatingRow from './album-track-rating-row';
-import { AlbumTrackForRating } from '@/features/tracks/queries';
+import { AlbumTrackForRating } from '@/features/ratings/queries';
 import Image from 'next/image';
 import RatingScore from '@/components/dashboard/rating-score';
 
@@ -101,11 +101,7 @@ export default function AlbumRatingDialog({
         <DialogHeader className='flex flex-col gap-1 px-4 pt-4'>
           <div className='flex flex-row gap-2'>
             <Image
-              src={
-                album.coverImage?.includes('http')
-                  ? `${album.coverImage}`
-                  : `/${album.coverImage}`
-              }
+              src={album.coverImage ?? '/albums.jpg'}
               alt={`${album.title} cover`}
               width={75}
               height={75}

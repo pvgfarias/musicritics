@@ -10,7 +10,7 @@ export function ArtistHeader({ artist }: { artist: ArtistSummary }) {
       <div className='flex flex-row gap-14 '>
         <div className='relative w-87.5 h-87.5 shrink-0'>
           <Image
-            src={artist.image ?? 'artists.jpg'}
+            src={artist.image ?? 'user.png'}
             alt={`${artist.name}`}
             fill
             className='rounded-md'

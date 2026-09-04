@@ -21,9 +21,7 @@ export function ArtistReviews({ reviews }: { reviews: ArtistReviewSummary[] }) {
               <div key={review.id}>
                 <li className='flex flex-row justify-start items-center p-2 py-4 gap-4 rounded-md'>
                   <Image
-                    src={
-                      review.user.image ? `/${review.user.image}` : '/user.jpg'
-                    }
+                    src={review.user.image ?? '/user.png'}
                     alt={`${review.user.username}'s profile picture.`}
                     width={36}
                     height={36}
@@ -54,11 +52,7 @@ export function ArtistReviews({ reviews }: { reviews: ArtistReviewSummary[] }) {
 
                   {review.album.coverImage && (
                     <Image
-                      src={
-                        review.album.coverImage.includes('http')
-                          ? review.album.coverImage
-                          : `/${review.album.coverImage}`
-                      }
+                      src={review.album.coverImage ?? '/albums.jpg'}
                       alt={`${review.album.title} cover`}
                       width={40}
                       height={40}

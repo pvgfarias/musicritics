@@ -21,11 +21,7 @@ export default function AlbumCard({
     >
       <div className='relative w-56 aspect-square shrink-0 overflow-hidden rounded-t-sm'>
         <Image
-          src={
-            album.coverImage?.includes('http')
-              ? `${album.coverImage}`
-              : `/${album.coverImage}`
-          }
+          src={album.coverImage ?? '/albums.jpg'}
           alt={`${album.title} by ${album.artists[0]?.artist.name}`}
           fill
           className='object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]'

@@ -6,8 +6,3 @@ export function formatDateRange(start: Date, end: Date) {
     });
   return `${fmt(start)} – ${fmt(end)}`;
 }
-
-export function coverSrc(coverImage: string | null) {
-  if (!coverImage) return null;
-  return coverImage.includes('http') ? coverImage : `/${coverImage}`;
-}

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import RatingScore from '@/components/dashboard/rating-score';
 import { IconDisc } from '@tabler/icons-react';
 import type { RotationSummary } from '@/features/rotations/queries';
-import { formatDateRange, coverSrc } from '@/lib/format';
+import { formatDateRange } from '@/lib/format';
 
 export default function PastRotationCard({
   rotation,
@@ -31,15 +31,14 @@ export default function PastRotationCard({
       {rotation.topAlbums.length > 0 && (
         <div className='flex flex-row gap-2'>
           {rotation.topAlbums.map(album => {
-            const src = coverSrc(album.coverImage);
             return (
               <div
                 key={album.id}
                 className='relative w-14 h-14 shrink-0 rounded-sm overflow-hidden'
               >
-                {src ? (
+                {album.coverImage ? (
                   <Image
-                    src={src}
+                    src={album.coverImage}
                     alt={album.title}
                     fill
                     className='object-cover'

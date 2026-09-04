@@ -21,11 +21,7 @@ export default function ArtistListRow({
       <div className={`${ARTIST_ROW_GRID} p-2`}>
         <div className='relative w-12.5 h-12.5 shrink-0 overflow-hidden rounded-sm'>
           <Image
-            src={
-              artist.image?.includes('http')
-                ? `${artist.image}`
-                : `/${artist.image}`
-            }
+            src={artist.image ?? 'user.png'}
             alt={`${artist.name}`}
             fill
             className='object-cover transition-transform duration-200 group-hover:scale-105'

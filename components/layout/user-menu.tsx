@@ -39,7 +39,7 @@ export default function UserMenu() {
           )}
         >
           <Image
-            src={`/${user.image}` || '/default-avatar.jpg'}
+            src={user.image ?? '/user.png'}
             alt={user.name ?? 'User avatar'}
             width={32}
             height={32}

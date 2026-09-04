@@ -21,7 +21,7 @@ export default function ArtistCard({
     >
       <div className='relative w-56 aspect-square shrink-0 overflow-hidden rounded-t-sm'>
         <Image
-          src={artist.image ?? '/artists.jpg'}
+          src={artist.image ?? '/user.png'}
           alt={`${artist.name}`}
           fill
           sizes='224px'

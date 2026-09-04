@@ -2,11 +2,6 @@ import 'dotenv/config';
 import { hashPassword } from 'better-auth/crypto';
 import { prisma } from '../lib/prisma';
 
-// Swap these for real Cloudinary URLs later. Using a labeled placeholder
-// service so images stay visually distinct from each other in the meantime.
-const PLACEHOLDER_IMAGE = (label: string) =>
-  `https://res.cloudinary.com/demo/image/upload/placeholder/${slugify(label)}.jpg`;
-
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -114,7 +109,6 @@ async function main() {
           email: userData.email,
           username: userData.username,
           name: userData.name,
-          image: PLACEHOLDER_IMAGE(userData.username),
           role: userData.role,
           emailVerified: true,
         },
@@ -157,7 +151,7 @@ async function main() {
   const artists = await Promise.all(
     artistNames.map(name =>
       prisma.artist.create({
-        data: { name, slug: slugify(name), image: PLACEHOLDER_IMAGE(name) },
+        data: { name, slug: slugify(name) },
       })
     )
   );
@@ -560,7 +554,6 @@ async function main() {
       data: {
         title: seed.title,
         slug: seed.slug,
-        coverImage: PLACEHOLDER_IMAGE(seed.slug),
         releaseDate: new Date(seed.releaseYear, 0, 1),
         genres: {
           create: [{ genre: { connect: { id: genreMap.get(seed.genre)! } } }],
