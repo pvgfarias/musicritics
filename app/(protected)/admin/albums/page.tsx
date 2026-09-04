@@ -1,9 +1,12 @@
 import AdminAlbumsView from '@/features/albums/components/admin/admin-albums-view';
 import { getAlbumsPage } from '@/features/albums/queries';
 import { auth } from '@/features/auth/auth';
-import type { SortKey } from '@/lib/sort-ratings';
+import type { SortField, SortDirection } from '@/lib/sort-ratings';
+import { defaultDirectionForField } from '@/lib/sort-ratings';
+import type { RatedStatus } from '@/features/albums/components/album-rated-filter';
 import { headers } from 'next/headers';
 import { getTopLevelGenres } from '@/lib/search-genres';
+import { AlbumStatus } from '@/features/albums/components/album-status-filter';
 
 const PAGE_SIZE = 15;
 
@@ -12,8 +15,10 @@ type PageProps = {
     page?: string;
     query?: string;
     genre?: string;
-    status?: string;
+    status?: AlbumStatus;
     sort?: string;
+    dir?: string;
+    rated?: RatedStatus;
   }>;
 };
 
@@ -24,6 +29,16 @@ export default async function Page({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
 
+  const sortField = (params.sort as SortField) ?? 'recent';
+  const sortDirection =
+    (params.dir as SortDirection) ?? defaultDirectionForField[sortField];
+
+  // Admins are always logged in to reach this page, so `rated` doesn't need
+  // the same conditional gating as the public albums page — but the filter
+  // still only means anything relative to a specific viewer, so it's the
+  // admin's own ratings being filtered on here, not some general concept.
+  const ratedFilter = user ? params.rated : undefined;
+
   const [{ albums, totalPages }, genres] = await Promise.all([
     getAlbumsPage({
       page,
@@ -31,7 +46,9 @@ export default async function Page({ searchParams }: PageProps) {
       query: params.query,
       genre: params.genre,
       status: params.status,
-      sort: (params.sort as SortKey) ?? 'recent',
+      sortField,
+      sortDirection,
+      rated: ratedFilter,
       userId: user?.id,
     }),
     getTopLevelGenres(),

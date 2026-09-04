@@ -1,6 +1,6 @@
 import { getAlbumsPage } from '@/features/albums/queries';
 import { SortKey } from '@/lib/sort-ratings';
-import { Status } from '@/features/albums/components/album-status';
+import { Status } from '@/features/albums/components/album-status-filter';
 
 const PAGE_SIZE = 5;
 

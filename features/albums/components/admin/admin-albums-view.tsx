@@ -46,6 +46,7 @@ export default function AdminAlbumsView({
           />
         )}
         genres={genres}
+        isLoggedIn
       />
 
       <EditAlbumDialog

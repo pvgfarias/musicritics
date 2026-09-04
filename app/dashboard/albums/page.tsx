@@ -1,10 +1,12 @@
 import AlbumsClient from '@/features/albums/components/albums-client';
 import { getAlbumsPage } from '@/features/albums/queries';
-import type { SortKey } from '@/lib/sort-ratings';
+import type { SortField, SortDirection } from '@/lib/sort-ratings';
+import { defaultDirectionForField } from '@/lib/sort-ratings';
 import { auth } from '@/features/auth/auth';
 import { headers } from 'next/headers';
 import { getTopLevelGenres } from '@/lib/search-genres';
-import { Status } from '@/features/albums/components/album-status';
+import { AlbumStatus } from '@/features/albums/components/album-status-filter';
+import type { RatedStatus } from '@/features/albums/components/album-rated-filter';
 const PAGE_SIZE = 15;
 
 type PageProps = {
@@ -12,8 +14,10 @@ type PageProps = {
     page?: string;
     query?: string;
     genre?: string;
-    status?: Status;
+    status?: AlbumStatus;
     sort?: string;
+    dir?: string;
+    rated?: RatedStatus;
   }>;
 };
 
@@ -24,6 +28,12 @@ export default async function Page({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
 
+  const sortField = (params.sort as SortField) ?? 'recent';
+  const sortDirection =
+    (params.dir as SortDirection) ?? defaultDirectionForField[sortField];
+
+  const ratedFilter = user ? params.rated : undefined;
+
   const [{ albums, totalPages }, genres] = await Promise.all([
     getAlbumsPage({
       page,
@@ -31,7 +41,9 @@ export default async function Page({ searchParams }: PageProps) {
       query: params.query,
       genre: params.genre,
       status: params.status,
-      sort: (params.sort as SortKey) ?? 'recent',
+      sortField,
+      sortDirection,
+      rated: ratedFilter,
       userId: user?.id,
     }),
     getTopLevelGenres(),
@@ -48,6 +60,7 @@ export default async function Page({ searchParams }: PageProps) {
         genres={genres}
         currentPage={page}
         totalPages={totalPages}
+        isLoggedIn={!!user}
       />
     </main>
   );

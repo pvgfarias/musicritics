@@ -1,13 +1,15 @@
 import { Prisma } from '../../app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
-import { SortKey } from '@/lib/sort-ratings';
+import {
+  SortField,
+  SortDirection,
+  defaultDirectionForField,
+} from '@/lib/sort-ratings';
+
+import type { RatedStatus } from '@/features/albums/components/album-rated-filter';
 
 const NO_USER = '__no_user__';
 
-// Selects the caller's own (at most one) rating, and whether the album has
-// an unclosed RotationAlbum whose parent Rotation window is active right
-// now. Both are cheap, indexed lookups folded into one select rather than
-// separate per-row queries.
 function activeRotationWhere(now: Date): Prisma.RotationAlbumWhereInput {
   return {
     closedAt: null,
@@ -53,8 +55,6 @@ type AlbumWithRelations = Prisma.AlbumGetPayload<{
         };
       };
     };
-    // Closed-cycle history only — the current, still-open cycle (if any)
-    // never has a public score, so it's excluded here on purpose.
     rotations: {
       where: { closedAt: { not: null } };
       include: {
@@ -73,14 +73,6 @@ type AlbumWithRelations = Prisma.AlbumGetPayload<{
   };
 }>;
 
-// Lightweight list-view select. averageRating/ratingCount are still
-// denormalized columns on Album (mirrored from the most recently closed
-// RotationAlbum by the close job), so this stays a single flat query — no
-// join needed just to show a score in a grid.
-//
-// `ratings` here is filtered to (at most) the current viewer's own rating.
-// `rotations` here is filtered to an active, unclosed cycle — its mere
-// presence means the album is currently open for ratings.
 function buildAlbumSummarySelect(userId?: string) {
   const now = new Date();
   return {
@@ -113,7 +105,6 @@ function buildAlbumSummarySelect(userId?: string) {
   } satisfies Prisma.AlbumSelect;
 }
 
-// Kept for the type helper below — shape is identical regardless of userId.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const albumSummarySelect = buildAlbumSummarySelect();
 
@@ -151,17 +142,14 @@ type AlbumsQuery = {
   page?: number;
   pageSize?: number;
   query?: string;
-  genre?: string; // genre slug
+  genre?: string;
   status?: 'All' | 'InRotation' | 'NotInRotation';
-  sort?: SortKey;
-  userId?: string; // pass the logged-in viewer's id to get their own rating back
+  sortField?: SortField;
+  sortDirection?: SortDirection;
+  rated?: RatedStatus;
+  userId?: string;
 };
 
-// An album accepts new/edited ratings only while it belongs to a Rotation
-// whose window is currently active and hasn't been closed yet. This is a
-// real query now (there's no boolean on Album to read anymore) — call it
-// sparingly on detail pages, and prefer the folded-in `rotations` select
-// above for list views to avoid N+1s.
 export async function isAlbumOpenForRatings(albumId: string): Promise<boolean> {
   const now = new Date();
 
@@ -172,12 +160,16 @@ export async function isAlbumOpenForRatings(albumId: string): Promise<boolean> {
 
   return active !== null;
 }
-
 function buildAlbumWhere({
   query,
   genre,
   status,
-}: Pick<AlbumsQuery, 'query' | 'genre' | 'status'>): Prisma.AlbumWhereInput {
+  rated,
+  userId,
+}: Pick<
+  AlbumsQuery,
+  'query' | 'genre' | 'status' | 'rated' | 'userId'
+>): Prisma.AlbumWhereInput {
   const now = new Date();
 
   return {
@@ -204,18 +196,38 @@ function buildAlbumWhere({
             ? { some: activeRotationWhere(now) }
             : { none: activeRotationWhere(now) },
       }),
+    // Only applied when there's a userId to evaluate it against — the
+    // caller (getAlbumsPage) is responsible for not passing `rated` when
+    // userId is undefined, since "rated by whom?" has no answer otherwise.
+    ...(rated &&
+      rated !== 'All' &&
+      userId && {
+        ratings:
+          rated === 'Rated' ? { some: { userId } } : { none: { userId } },
+      }),
   };
 }
 
-function sortKeyToOrderBy(
-  sort?: SortKey
-): Prisma.AlbumOrderByWithRelationInput {
-  switch (sort) {
+// Returns null for 'user-score' — that case can't be expressed as a Prisma
+// orderBy (see getAlbumsPageSortedByUserRating) and is handled by the caller.
+function sortFieldToOrderBy(
+  field: SortField,
+  direction: SortDirection
+): Prisma.AlbumOrderByWithRelationInput | null {
+  switch (field) {
     case 'az':
-      return { title: 'asc' };
+      return { title: direction };
+    case 'public-score':
+      // NOTE: `nulls: 'last'` requires a Prisma version with sortable-nulls
+      // support (stable since ~4.16). If this errors or isn't supported on
+      // your version, drop the object form back to `{ averageRating: direction }`
+      // and unrated albums will sort to whichever end `direction` implies instead.
+      return { averageRating: { sort: direction, nulls: 'last' } };
+    case 'user-score':
+      return null;
     case 'recent':
     default:
-      return { createdAt: 'desc' };
+      return { createdAt: direction };
   }
 }
 
@@ -237,8 +249,6 @@ function normalizeAlbum(album: AlbumWithRelations) {
       averageRating: ra.averageRating,
       ratingCount: ra.ratingCount,
     }))
-    // Already ordered by the query, but keep this explicit/local in case
-    // the include's orderBy ever changes out from under this function.
     .sort((a, b) => b.endDate.getTime() - a.endDate.getTime());
 
   return {
@@ -275,10 +285,26 @@ export async function getAlbumsPage({
   query,
   genre,
   status,
-  sort,
+  sortField = 'recent',
+  sortDirection,
+  rated,
   userId,
 }: AlbumsQuery = {}) {
-  const where = buildAlbumWhere({ query, genre, status });
+  const where = buildAlbumWhere({ query, genre, status, rated, userId });
+  const direction = sortDirection ?? defaultDirectionForField[sortField];
+
+  if (sortField === 'user-score' && userId) {
+    return getAlbumsPageSortedByUserRating({
+      where,
+      page,
+      pageSize,
+      userId,
+      direction,
+    });
+  }
+  const orderBy = sortFieldToOrderBy(sortField, direction) ?? {
+    createdAt: 'desc' as const,
+  };
 
   const [albums, total] = await Promise.all([
     prisma.album.findMany({
@@ -286,13 +312,88 @@ export async function getAlbumsPage({
       skip: (page - 1) * pageSize,
       take: pageSize,
       select: buildAlbumSummarySelect(userId),
-      orderBy: sortKeyToOrderBy(sort),
+      orderBy,
     }),
     prisma.album.count({ where }),
   ]);
 
   return {
     albums: albums.map(normalizeAlbumSummary),
+    total,
+    totalPages: Math.ceil(total / pageSize),
+  };
+}
+
+// Handles sort=user-score. Since a viewer's rating lives in a relation
+// filtered to their own userId (not an aggregate Prisma can order by), this
+// pulls every matching album id, sorts that id list in JS against a lookup
+// of the viewer's scores, then pages and fetches full rows for just the
+// requested page — in the order already determined.
+//
+// Cost note: step 1 fetches ids for the *entire* filtered set, unpaginated.
+// Fine at catalog sizes where "all matching album ids" is a cheap query
+// (indexed, ids only); worth revisiting if that set regularly reaches into
+// the tens of thousands.
+async function getAlbumsPageSortedByUserRating({
+  where,
+  page,
+  pageSize,
+  userId,
+  direction,
+}: {
+  where: Prisma.AlbumWhereInput;
+  page: number;
+  pageSize: number;
+  userId: string;
+  direction: SortDirection;
+}) {
+  const matching = await prisma.album.findMany({
+    where,
+    select: { id: true },
+  });
+  const ids = matching.map(a => a.id);
+  const total = ids.length;
+
+  if (ids.length === 0) {
+    return { albums: [], total: 0, totalPages: 0 };
+  }
+
+  const myRatings = await prisma.rating.findMany({
+    where: { userId, albumId: { in: ids } },
+    select: { albumId: true, score: true },
+  });
+  const scoreByAlbumId = new Map(myRatings.map(r => [r.albumId, r.score]));
+
+  // Unrated albums always sort last, regardless of direction — same
+  // convention as the in-memory sortRatings() for consistency.
+  const dir = direction === 'asc' ? 1 : -1;
+  const sortedIds = [...ids].sort((a, b) => {
+    const aScore = scoreByAlbumId.get(a);
+    const bScore = scoreByAlbumId.get(b);
+    const aRated = aScore != null;
+    const bRated = bScore != null;
+    if (!aRated && !bRated) return 0;
+    if (!aRated) return 1;
+    if (!bRated) return -1;
+    return dir * (aScore! - bScore!);
+  });
+
+  const pageIds = sortedIds.slice((page - 1) * pageSize, page * pageSize);
+
+  const rows = await prisma.album.findMany({
+    where: { id: { in: pageIds } },
+    select: buildAlbumSummarySelect(userId),
+  });
+
+  // `id: { in }` doesn't preserve array order, so re-sort rows to match
+  // pageIds before returning.
+  const rowsById = new Map(rows.map(r => [r.id, r]));
+  const orderedRows = pageIds
+    .map(id => rowsById.get(id))
+    .filter((r): r is AlbumSummaryRaw => r != null);
+
+  return {
+    albums: orderedRows.map(normalizeAlbumSummary),
     total,
     totalPages: Math.ceil(total / pageSize),
   };
@@ -395,10 +496,6 @@ export async function getAlbumWithAverageRating(slug: string) {
   const album = await getAlbumBySlug(slug);
   if (!album) return null;
 
-  // Track-level averages aren't denormalized (yet) — a single album detail
-  // page fetch is cheap enough to compute these in JS. If track pages ever
-  // get their own high-traffic list view, apply the same pattern used for
-  // Album to TrackRating.
   const tracksWithRatings = album.tracks.map(track => {
     const scores = track.ratings
       .map(rating => rating.score)
