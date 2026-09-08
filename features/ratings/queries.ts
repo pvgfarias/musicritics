@@ -44,9 +44,11 @@ export async function getAlbumTracksForRating(albumId: string, userId: string) {
   });
 }
 
-// New: the rating form needs to know (a) whether it should render at all,
-// and (b) which rotation a save will apply to / when ratings close. Returns
-// null if the album isn't currently open for ratings.
+// Whether the album currently accepts new/edited track ratings, and which
+// rotation is driving that window. This is purely a "can the form submit
+// right now" check — it has no bearing on whether a Rating exists, since
+// Rating is no longer rotation-scoped. Returns null if the album isn't
+// currently open for ratings.
 export async function getActiveRotationForAlbum(albumId: string) {
   const now = new Date();
 
@@ -64,23 +66,16 @@ export async function getActiveRotationForAlbum(albumId: string) {
   return active?.rotation ?? null;
 }
 
-// New: fetch the current user's own album-level rating for this cycle, so
-// the form can be pre-filled when editing an existing rating.
-export async function getUserAlbumRatingForActiveRotation(
-  albumId: string,
-  userId: string
-) {
-  const activeRotation = await getActiveRotationForAlbum(albumId);
-  if (!activeRotation) return null;
-
+// Fetch the current user's album-level rating (derived from their track
+// ratings), regardless of which rotation — if any — is currently active.
+// Rating is keyed only on (userId, albumId) now: a user rates an album
+// once, period, and that rating persists across every rotation the album
+// ever appears in. Used both to pre-fill the form when editing, and to
+// drive the "you've already rated this" flag independent of whether the
+// album happens to be in an open rotation right now.
+export async function getUserAlbumRating(albumId: string, userId: string) {
   return prisma.rating.findUnique({
-    where: {
-      userId_albumId_rotationId: {
-        userId,
-        albumId,
-        rotationId: activeRotation.id,
-      },
-    },
+    where: { userId_albumId: { userId, albumId } },
     include: { comment: true },
   });
 }

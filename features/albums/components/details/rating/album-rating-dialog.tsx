@@ -18,18 +18,15 @@ import { AlbumTrackForRating } from '@/features/ratings/queries';
 import Image from 'next/image';
 import RatingScore from '@/components/dashboard/rating-score';
 
-// One entry from album.ratings — the current user's rating, if it exists.
-type AlbumUserRating = Exclude<AlbumFull, null>['ratings'][number];
-
 export default function AlbumRatingDialog({
   album,
-  userRating,
   tracks,
 }: {
   album: Exclude<AlbumFull, null>;
-  userRating: AlbumUserRating | undefined;
   tracks: AlbumTrackForRating[];
 }) {
+  const userRating = album.userRating;
+
   const [scores, setScores] = useState<Record<string, number | null>>(() =>
     Object.fromEntries(tracks.map(t => [t.id, t.score]))
   );

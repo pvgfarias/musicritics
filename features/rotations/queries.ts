@@ -46,9 +46,10 @@ export async function getActiveRotation(userId?: string) {
   // for an album span every rotation it's ever been in, so this has to be
   // scoped to rotation.id explicitly or a re-entering album would leak an
   // old cycle's score as if it were this one's.
+  const albumIds = rotation.albums.map(ra => ra.albumId);
   const userRatings = userId
     ? await prisma.rating.findMany({
-        where: { userId, rotationId: rotation.id },
+        where: { userId, albumId: { in: albumIds } },
         select: { albumId: true, score: true },
       })
     : [];

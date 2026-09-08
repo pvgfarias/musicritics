@@ -43,22 +43,11 @@ async function main() {
     'Synthpop',
     'Electronica',
     'Post-rock',
-    'Indie Folk',
     'Dream Pop',
-    'Ambient',
-    'Chillwave',
     'Neo-soul',
     'Alternative Rock',
-    'Experimental',
-    'Electropop',
     'Synthwave',
-    'Indie Pop',
-    'Chamber Pop',
-    'Trip Hop',
-    'Future Bass',
-    'Jazz Fusion',
-    'Post-punk',
-    'Art Pop',
+    'Chillwave',
   ];
 
   const genreMap = new Map<string, string>(); // name -> id
@@ -135,17 +124,14 @@ async function main() {
   const artistNames = [
     'Jane Remover',
     'venturing',
-    'leroy',
     'Aria Leaf',
     'Nova Pulse',
     'Cinder Fields',
-    'Sable & Shore',
     'Paper Coast',
-    'Hollow Rain',
-    'Zephyr Echo',
     'Little Winter',
     'Mythic City',
-    'Silver Hymn',
+    'Nova Pulse Duo', // distinct from Nova Pulse to avoid slug collision
+    'Zephyr Echo',
   ];
 
   const artists = await Promise.all(
@@ -157,10 +143,13 @@ async function main() {
   );
 
   // -------------------------------------------------------------------
-  // Albums
+  // Albums (10 total)
   // -------------------------------------------------------------------
-  // rotationGroup marks which seeded Rotation this album belongs to.
+  // rotationGroups marks which seeded Rotation(s) this album belongs to.
   // 'A' | 'B' | 'C' = past, closed rotations. 'D' = the current, open one.
+  // 'paper-coast' intentionally lists both 'A' and 'C' — same album,
+  // two separate trips through rotation — to demonstrate that its Rating
+  // persists globally instead of being recreated per rotation.
   const albumSeedData = [
     {
       title: 'Revengeseekerz',
@@ -168,15 +157,11 @@ async function main() {
       releaseYear: 2025,
       genre: 'Hyperpop',
       artistId: artists[0].id,
-      rotationGroup: 'D',
+      rotationGroups: ['D'],
       socialLinks: [
         {
           platform: 'Spotify',
           url: 'https://open.spotify.com/album/revengeseekerz',
-        },
-        {
-          platform: 'Apple Music',
-          url: 'https://music.apple.com/album/revengeseekerz',
         },
       ],
       tracks: [
@@ -188,24 +173,12 @@ async function main() {
       ],
     },
     {
-      title: '♡',
-      slug: 'heart',
-      releaseYear: 2025,
-      genre: 'Shoegaze',
-      artistId: artists[0].id,
-      rotationGroup: 'A',
-      socialLinks: [
-        { platform: 'Spotify', url: 'https://open.spotify.com/album/heart' },
-      ],
-      tracks: ['Angels In Camo', 'TWICE REMOVED', 'JRJRJR'],
-    },
-    {
       title: 'Ghostholding',
       slug: 'ghostholding',
       releaseYear: 2025,
       genre: 'Shoegaze',
       artistId: artists[1].id,
-      rotationGroup: 'D',
+      rotationGroups: ['D'],
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -219,8 +192,8 @@ async function main() {
       slug: 'nightshade-arcade',
       releaseYear: 2024,
       genre: 'Synthpop',
-      artistId: artists[3].id,
-      rotationGroup: 'D',
+      artistId: artists[2].id,
+      rotationGroups: ['A'],
       socialLinks: [
         {
           platform: 'Spotify',
@@ -240,8 +213,8 @@ async function main() {
       slug: 'echo-atlas',
       releaseYear: 2023,
       genre: 'Electronica',
-      artistId: artists[4].id,
-      rotationGroup: 'A',
+      artistId: artists[3].id,
+      rotationGroups: ['A'],
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -255,8 +228,8 @@ async function main() {
       slug: 'stormchaser',
       releaseYear: 2018,
       genre: 'Post-rock',
-      artistId: artists[5].id,
-      rotationGroup: 'A',
+      artistId: artists[4].id,
+      rotationGroups: ['A'],
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -271,27 +244,12 @@ async function main() {
       ],
     },
     {
-      title: 'Shoreline Letters',
-      slug: 'shoreline-letters',
-      releaseYear: 2022,
-      genre: 'Indie Folk',
-      artistId: artists[6].id,
-      rotationGroup: 'A',
-      socialLinks: [
-        {
-          platform: 'Spotify',
-          url: 'https://open.spotify.com/album/shoreline-letters',
-        },
-      ],
-      tracks: ['Paper Boats', 'High Tide', 'Postcard Sound', 'Blue Lantern'],
-    },
-    {
       title: 'Paper Coast',
       slug: 'paper-coast',
       releaseYear: 2021,
       genre: 'Dream Pop',
-      artistId: artists[7].id,
-      rotationGroup: 'A',
+      artistId: artists[5].id,
+      rotationGroups: ['A', 'C'],
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -301,42 +259,12 @@ async function main() {
       tracks: ['Folded Shore', 'Ink and Sea', 'Static Tide', 'The Quiet Fold'],
     },
     {
-      title: 'Rain on Concrete',
-      slug: 'rain-on-concrete',
-      releaseYear: 2019,
-      genre: 'Ambient',
-      artistId: artists[8].id,
-      rotationGroup: 'A',
-      socialLinks: [
-        {
-          platform: 'Bandcamp',
-          url: 'https://hollowrain.bandcamp.com/album/rain-on-concrete',
-        },
-      ],
-      tracks: ['City Drizzle', 'Underpass', 'Neon Puddles', 'Static Silence'],
-    },
-    {
-      title: 'Zephyr Echoes',
-      slug: 'zephyr-echoes',
-      releaseYear: 2025,
-      genre: 'Chillwave',
-      artistId: artists[9].id,
-      rotationGroup: 'D',
-      socialLinks: [
-        {
-          platform: 'Spotify',
-          url: 'https://open.spotify.com/album/zephyr-echoes',
-        },
-      ],
-      tracks: ['Aura', 'Softwind', 'Mirage', 'Daydream Coast'],
-    },
-    {
-      title: 'Winter\u2019s Signal',
+      title: "Winter's Signal",
       slug: 'winters-signal',
       releaseYear: 2020,
       genre: 'Neo-soul',
-      artistId: artists[10].id,
-      rotationGroup: 'B',
+      artistId: artists[6].id,
+      rotationGroups: ['B'],
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -350,8 +278,8 @@ async function main() {
       slug: 'city-of-myths',
       releaseYear: 2017,
       genre: 'Alternative Rock',
-      artistId: artists[11].id,
-      rotationGroup: 'B',
+      artistId: artists[7].id,
+      rotationGroups: ['B'],
       socialLinks: [
         {
           platform: 'Bandcamp',
@@ -366,42 +294,12 @@ async function main() {
       ],
     },
     {
-      title: 'Silver Hymn',
-      slug: 'silver-hymn',
-      releaseYear: 2026,
-      genre: 'Experimental',
-      artistId: artists[12].id,
-      rotationGroup: 'D',
-      socialLinks: [
-        {
-          platform: 'Spotify',
-          url: 'https://open.spotify.com/album/silver-hymn',
-        },
-      ],
-      tracks: ['Glass Chimes', 'Photon Drift', 'Resonant Skin', 'Mirror Pulse'],
-    },
-    {
-      title: 'Midnight Sunrise',
-      slug: 'midnight-sunrise',
-      releaseYear: 2022,
-      genre: 'Electropop',
-      artistId: artists[3].id,
-      rotationGroup: 'B',
-      socialLinks: [
-        {
-          platform: 'Spotify',
-          url: 'https://open.spotify.com/album/midnight-sunrise',
-        },
-      ],
-      tracks: ['Neon Dawn', 'Velvet Hour', 'City Lights', 'Sundown'],
-    },
-    {
       title: 'Glass Horizon',
       slug: 'glass-horizon',
       releaseYear: 2021,
       genre: 'Synthwave',
-      artistId: artists[4].id,
-      rotationGroup: 'B',
+      artistId: artists[8].id,
+      rotationGroups: ['C'],
       socialLinks: [
         {
           platform: 'Apple Music',
@@ -411,134 +309,19 @@ async function main() {
       tracks: ['Pulse Night', 'Horizon Drive', 'Afterglow', 'Neon Mirage'],
     },
     {
-      title: 'Crimson Drift',
-      slug: 'crimson-drift',
-      releaseYear: 2024,
-      genre: 'Shoegaze',
-      artistId: artists[5].id,
-      rotationGroup: 'D',
-      socialLinks: [
-        {
-          platform: 'Bandcamp',
-          url: 'https://cinderfields.bandcamp.com/album/crimson-drift',
-        },
-      ],
-      tracks: ['Dissolve', 'Red Tide', 'Faded Signal', 'Soft Burn'],
-    },
-    {
-      title: 'Salt & Static',
-      slug: 'salt-and-static',
-      releaseYear: 2023,
-      genre: 'Indie Pop',
-      artistId: artists[6].id,
-      rotationGroup: 'B',
-      socialLinks: [
-        {
-          platform: 'Spotify',
-          url: 'https://open.spotify.com/album/salt-and-static',
-        },
-      ],
-      tracks: ['Paper Boat', 'Tidal Loop', 'Static', 'Quiet Storm'],
-    },
-    {
-      title: 'Origami Sea',
-      slug: 'origami-sea',
-      releaseYear: 2016,
-      genre: 'Chamber Pop',
-      artistId: artists[7].id,
-      rotationGroup: 'C',
-      socialLinks: [
-        {
-          platform: 'Apple Music',
-          url: 'https://music.apple.com/album/origami-sea',
-        },
-      ],
-      tracks: ['Quiet Fold', 'Paper Wave', 'Ink Bloom', 'Margin Light'],
-    },
-    {
-      title: 'Velvet Ash',
-      slug: 'velvet-ash',
-      releaseYear: 2020,
-      genre: 'Trip Hop',
-      artistId: artists[8].id,
-      rotationGroup: 'C',
-      socialLinks: [
-        {
-          platform: 'Spotify',
-          url: 'https://open.spotify.com/album/velvet-ash',
-        },
-      ],
-      tracks: ['Ashes', 'Hollow', 'Low Glow', 'Stillness'],
-    },
-    {
-      title: 'Neon Orchard',
-      slug: 'neon-orchard',
-      releaseYear: 2019,
-      genre: 'Future Bass',
+      title: 'Zephyr Echoes',
+      slug: 'zephyr-echoes',
+      releaseYear: 2025,
+      genre: 'Chillwave',
       artistId: artists[9].id,
-      rotationGroup: 'C',
-      socialLinks: [
-        {
-          platform: 'Bandcamp',
-          url: 'https://zephyrecho.bandcamp.com/album/neon-orchard',
-        },
-      ],
-      tracks: ['Electric Bloom', 'Skyline', 'Soft Pulse', 'Radiant Fade'],
-    },
-    {
-      title: 'Moonlit Compass',
-      slug: 'moonlit-compass',
-      releaseYear: 2021,
-      genre: 'Jazz Fusion',
-      artistId: artists[10].id,
-      rotationGroup: 'C',
+      rotationGroups: ['D'],
       socialLinks: [
         {
           platform: 'Spotify',
-          url: 'https://open.spotify.com/album/moonlit-compass',
+          url: 'https://open.spotify.com/album/zephyr-echoes',
         },
       ],
-      tracks: ['North Star', 'Velvet Road', 'Luminous', 'Night Drive'],
-    },
-    {
-      title: 'Skyline Ruins',
-      slug: 'skyline-ruins',
-      releaseYear: 2024,
-      genre: 'Post-punk',
-      artistId: artists[11].id,
-      rotationGroup: 'D',
-      socialLinks: [
-        {
-          platform: 'Apple Music',
-          url: 'https://music.apple.com/album/skyline-ruins',
-        },
-      ],
-      tracks: [
-        'Concrete Ghost',
-        'Broken Windows',
-        'Echo Tower',
-        'Signal Noise',
-      ],
-    },
-    {
-      title: 'Glass Cathedral',
-      slug: 'glass-cathedral',
-      releaseYear: 2018,
-      genre: 'Art Pop',
-      artistId: artists[12].id,
-      rotationGroup: 'C',
-      socialLinks: [
-        {
-          platform: 'Spotify',
-          url: 'https://open.spotify.com/album/glass-cathedral',
-        },
-      ],
-      tracks: [
-        'Marble Floor',
-        'Chamber Light',
-        'Silver Choir',
-        'Crest of Sound',
-      ],
+      tracks: ['Aura', 'Softwind', 'Mirage', 'Daydream Coast'],
     },
   ] as const;
 
@@ -575,9 +358,10 @@ async function main() {
   // -------------------------------------------------------------------
   // Rotations
   //
-  // A, B, C = past, closed rotations (with scored, public snapshots).
+  // A, B, C = past, closed rotations (with public score snapshots).
   // "Paper Coast" is deliberately placed in both A and C to demonstrate
-  // an album returning to rotation and building up score history.
+  // an album returning to rotation while its Rating (derived from track
+  // ratings) stays a single, persistent row rather than being duplicated.
   // D = the current, open rotation (unclosed, partially rated).
   // -------------------------------------------------------------------
   const now = new Date();
@@ -614,123 +398,69 @@ async function main() {
       endDate: new Date(now.getTime() + 5 * DAY_MS),
     },
   });
+  const rotationsById = {
+    A: rotationA,
+    B: rotationB,
+    C: rotationC,
+    D: rotationD,
+  } as const;
 
-  const rotationAAlbums = [
-    'heart',
-    'echo-atlas',
-    'stormchaser',
-    'shoreline-letters',
-    'paper-coast',
-    'rain-on-concrete',
-  ];
-  const rotationBAlbums = [
-    'winters-signal',
-    'city-of-myths',
-    'midnight-sunrise',
-    'glass-horizon',
-    'salt-and-static',
-  ];
-  const rotationCAlbums = [
-    'origami-sea',
-    'velvet-ash',
-    'neon-orchard',
-    'moonlit-compass',
-    'glass-cathedral',
-    'paper-coast',
-  ];
-  const rotationDAlbums = [
-    'revengeseekerz',
-    'ghostholding',
-    'nightshade-arcade',
-    'zephyr-echoes',
-    'silver-hymn',
-    'crimson-drift',
-    'skyline-ruins',
-  ];
-
-  // Seeds ratings + a RotationAlbum row for one album in a closed rotation,
-  // then snapshots the average/count onto RotationAlbum and mirrors it onto
-  // Album (last rotation processed for a given album "wins" the mirror,
-  // since we process A -> B -> C -> D in chronological order).
-  async function seedClosedRotationAlbum(
-    rotationId: string,
-    rotationEnd: Date,
-    rotationStart: Date,
-    albumSlug: string
-  ) {
-    const album = albumsBySlug.get(albumSlug)!;
-
-    await prisma.rotationAlbum.create({
-      data: { rotationId, albumId: album.id },
+  // ---------------------------------------------------------------------
+  // Track ratings drive everything. Rating (the album-level "My Score") is
+  // never entered directly — it's always recomputed as the average of a
+  // user's own TrackRating rows for that album, then upserted into the
+  // single Rating row for (userId, albumId). This mirrors how the app
+  // itself should write ratings: track scores in, album score derived.
+  // ---------------------------------------------------------------------
+  async function recomputeUserAlbumRating(userId: string, albumId: string) {
+    const trackRatings = await prisma.trackRating.findMany({
+      where: { userId, track: { albumId } },
+      select: { score: true },
     });
+    const scores = trackRatings
+      .map(r => r.score)
+      .filter((s): s is number => s != null);
 
-    const windowSpan = rotationEnd.getTime() - rotationStart.getTime();
-    const scores: number[] = [];
-
-    for (let i = 0; i < ratingPool.length; i++) {
-      const user = ratingPool[i];
-      const score = 60 + ((i * 7 + album.title.length * 3) % 35); // deterministic spread, 60-94
-      scores.push(score);
-      const ratedAt = new Date(
-        rotationStart.getTime() +
-          (windowSpan * (i + 1)) / (ratingPool.length + 1)
-      );
-
-      const rating = await prisma.rating.create({
-        data: {
-          userId: user.id,
-          albumId: album.id,
-          rotationId,
-          score,
-          ratedAt,
-        },
-      });
-
-      if (user.id === alex.id) {
-        await prisma.comment.create({
-          data: {
-            body: `A strong listen for ${album.title}.`,
-            authorId: user.id,
-            ratingId: rating.id,
-          },
-        });
-      }
+    if (scores.length === 0) {
+      await prisma.rating.deleteMany({ where: { userId, albumId } });
+      return;
     }
 
-    const averageRating = Math.round(
-      scores.reduce((sum, s) => sum + s, 0) / scores.length
-    );
-    const ratingCount = scores.length;
+    const avg = scores.reduce((sum, s) => sum + s, 0) / scores.length;
 
-    await prisma.rotationAlbum.update({
-      where: { rotationId_albumId: { rotationId, albumId: album.id } },
-      data: { averageRating, ratingCount, closedAt: rotationEnd },
+    await prisma.rating.upsert({
+      where: { userId_albumId: { userId, albumId } },
+      create: { userId, albumId, score: avg },
+      update: { score: avg, ratedAt: new Date() },
     });
-    await prisma.album.update({
-      where: { id: album.id },
-      data: { averageRating, ratingCount },
-    });
-
-    await seedTrackRatingsOnce(album);
   }
 
-  // Track ratings aren't rotation-scoped, so an album that appears in
-  // multiple rotations (e.g. "Paper Coast" in A and C) must only get its
-  // tracks rated once, not once per appearance.
+  // Rates every track, for every user in `users`, for a given album, then
+  // recomputes each of those users' derived album Rating. Idempotent per
+  // album — an album seen in multiple rotations (e.g. Paper Coast) only
+  // gets its tracks rated once, not once per rotation appearance.
   const trackRatedAlbumIds = new Set<string>();
-  async function seedTrackRatingsOnce(album: {
-    id: string;
-    title: string;
-    tracks: { id: string; title: string }[];
-  }) {
+  async function seedTrackRatingsOnce(
+    album: {
+      id: string;
+      title: string;
+      tracks: { id: string; title: string }[];
+    },
+    ratersOverride?: typeof ratingPool
+  ) {
     if (trackRatedAlbumIds.has(album.id)) return;
     trackRatedAlbumIds.add(album.id);
 
-    for (let i = 0; i < ratingPool.length; i++) {
-      const user = ratingPool[i];
+    const raters = ratersOverride ?? ratingPool;
+
+    for (let i = 0; i < raters.length; i++) {
+      const user = raters[i];
       for (let t = 0; t < album.tracks.length; t++) {
         const track = album.tracks[t];
-        const score = 60 + ((i * 5 + t * 4) % 35);
+        // Deterministic but varies by album AND track, unlike the old
+        // formula which only varied by position and produced identical
+        // scores across every album.
+        const score = 60 + ((i * 5 + t * 4 + album.title.length) % 35);
         const trackRating = await prisma.trackRating.create({
           data: { userId: user.id, trackId: track.id, score },
         });
@@ -745,73 +475,102 @@ async function main() {
           });
         }
       }
+      await recomputeUserAlbumRating(user.id, album.id);
     }
   }
 
-  for (const slug of rotationAAlbums) {
-    await seedClosedRotationAlbum(
-      rotationA.id,
-      rotationA.endDate,
-      rotationA.startDate,
-      slug
-    );
-  }
-  for (const slug of rotationBAlbums) {
-    await seedClosedRotationAlbum(
-      rotationB.id,
-      rotationB.endDate,
-      rotationB.startDate,
-      slug
-    );
-  }
-  for (const slug of rotationCAlbums) {
-    await seedClosedRotationAlbum(
-      rotationC.id,
-      rotationC.endDate,
-      rotationC.startDate,
-      slug
-    );
+  // Adds a RotationAlbum row (membership only — no score logic here).
+  async function addToRotation(rotationId: string, albumId: string) {
+    await prisma.rotationAlbum.create({ data: { rotationId, albumId } });
   }
 
-  // Current, open rotation: RotationAlbum rows exist but stay unclosed
-  // (averageRating/ratingCount/closedAt all null). A couple of albums get
-  // partial, in-progress ratings to simulate a week actively in motion —
-  // these are NOT public yet and Album.averageRating is left untouched.
-  for (const slug of rotationDAlbums) {
-    const album = albumsBySlug.get(slug)!;
-    await prisma.rotationAlbum.create({
-      data: { rotationId: rotationD.id, albumId: album.id },
+  // Closes a rotation for one album: snapshots the CUMULATIVE, all-time
+  // average across every Rating this album has ever received (not just
+  // ratings from this rotation's window), onto both RotationAlbum (history)
+  // and Album (current public score).
+  async function closeRotationForAlbum(
+    rotationId: string,
+    albumId: string,
+    closedAt: Date
+  ) {
+    const agg = await prisma.rating.aggregate({
+      where: { albumId },
+      _avg: { score: true },
+      _count: { score: true },
     });
-    await seedTrackRatingsOnce(album);
+
+    const ratingCount = agg._count.score;
+    const averageRating = ratingCount > 0 ? agg._avg.score : null;
+
+    await prisma.rotationAlbum.update({
+      where: { rotationId_albumId: { rotationId, albumId } },
+      data: { averageRating, ratingCount, closedAt },
+    });
+    await prisma.album.update({
+      where: { id: albumId },
+      data: { averageRating, ratingCount },
+    });
   }
 
-  await prisma.rating.create({
-    data: {
-      userId: alex.id,
-      albumId: albumsBySlug.get('revengeseekerz')!.id,
-      rotationId: rotationD.id,
-      score: 88,
-      ratedAt: now,
-    },
-  });
-  await prisma.rating.create({
-    data: {
-      userId: maya.id,
-      albumId: albumsBySlug.get('revengeseekerz')!.id,
-      rotationId: rotationD.id,
-      score: 82,
-      ratedAt: now,
-    },
-  });
-  await prisma.rating.create({
-    data: {
-      userId: alex.id,
-      albumId: albumsBySlug.get('ghostholding')!.id,
-      rotationId: rotationD.id,
-      score: 75,
-      ratedAt: now,
-    },
-  });
+  // -------------------------------------------------------------------
+  // Seed each closed rotation: add membership, rate tracks (derives
+  // Rating), then close — snapshotting the cumulative public score.
+  // -------------------------------------------------------------------
+  for (const seed of albumSeedData) {
+    const album = albumsBySlug.get(seed.slug)!;
+    for (const group of seed.rotationGroups) {
+      if (group === 'D') continue; // handled separately below, stays open
+      const rotation = rotationsById[group];
+      await addToRotation(rotation.id, album.id);
+      await seedTrackRatingsOnce(album);
+      await closeRotationForAlbum(rotation.id, album.id, rotation.endDate);
+    }
+  }
+
+  // -------------------------------------------------------------------
+  // Current, open rotation (D): RotationAlbum rows exist but stay unclosed
+  // (averageRating/ratingCount/closedAt all null on RotationAlbum, and
+  // Album.averageRating is left untouched — nothing public yet). A couple
+  // of albums get partial, in-progress track ratings to simulate a week
+  // actively in motion.
+  // -------------------------------------------------------------------
+  for (const seed of albumSeedData) {
+    if (!seed.rotationGroups.includes('D' as never)) continue;
+    const album = albumsBySlug.get(seed.slug)!;
+    await addToRotation(rotationD.id, album.id);
+  }
+
+  // Revengeseekerz: alex and maya have each rated every track (so they
+  // have a derived "My Score"); noah hasn't rated it yet. The album stays
+  // unclosed, so Album.averageRating remains null regardless.
+  await seedTrackRatingsOnce(albumsBySlug.get('revengeseekerz')!, [alex, maya]);
+
+  // Ghostholding: only alex has rated it so far, and only partially — two
+  // of its three tracks — to simulate a rating still in progress. Rated
+  // directly here instead of via seedTrackRatingsOnce since that helper
+  // always rates the full tracklist.
+  {
+    const ghostholding = albumsBySlug.get('ghostholding')!;
+    trackRatedAlbumIds.add(ghostholding.id); // prevent full re-seed later
+    for (const track of ghostholding.tracks.slice(0, 2)) {
+      const trackRating = await prisma.trackRating.create({
+        data: { userId: alex.id, trackId: track.id, score: 78 },
+      });
+      if (track === ghostholding.tracks[0]) {
+        await prisma.comment.create({
+          data: {
+            body: `"${track.title}" is a great opener.`,
+            authorId: alex.id,
+            trackRatingId: trackRating.id,
+          },
+        });
+      }
+    }
+    await recomputeUserAlbumRating(alex.id, ghostholding.id);
+  }
+
+  // Zephyr Echoes: nobody has rated it yet — left fully unrated on purpose
+  // to test empty states within an open rotation.
 
   console.log('Seed completed successfully.');
   console.log(`Test login for any seeded user: <email> / ${SEED_PASSWORD}`);
@@ -822,10 +581,10 @@ async function main() {
     '  zoe@example.com   -> user (unrated, useful for testing empty states)'
   );
   console.log(
-    'Rotations seeded: A/B/C closed with public scores, D currently open.'
+    'Rotations seeded: A/B/C closed with public cumulative scores, D currently open.'
   );
   console.log(
-    '"Paper Coast" appears in both rotation A and C to demo score history.'
+    '"Paper Coast" appears in both rotation A and C — same single Rating row per user carries forward, not duplicated.'
   );
   console.log(
     'All image fields are placeholder URLs — swap for real Cloudinary URLs later.'

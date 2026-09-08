@@ -69,10 +69,10 @@ export async function saveAlbumRating({
   const userId = session?.user?.id;
   if (!userId) throw new Error('You must be signed in to rate an album.');
 
-  // The whole save — album score, comment, AND track ratings — is gated on
-  // the album currently being in an active, unclosed rotation. The rating
-  // form should only ever be shown while this is true, but we still check
-  // server-side since this is a server action.
+  // Writing ratings is still gated on the album currently being in an
+  // active, unclosed rotation — that hasn't changed. What HAS changed is
+  // that this no longer determines Rating's identity; it's purely a
+  // "can this form submit right now" check.
   const now = new Date();
   const activeRotationAlbum = await prisma.rotationAlbum.findFirst({
     where: {
@@ -86,34 +86,11 @@ export async function saveAlbumRating({
   if (!activeRotationAlbum) {
     throw new Error('This album is not currently open for ratings.');
   }
-  const rotationId = activeRotationAlbum.rotationId;
-
-  const ratedScores = trackRatings
-    .map(t => t.score)
-    .filter((s): s is number => s !== null);
-
-  const albumScore = ratedScores.length
-    ? Math.round(ratedScores.reduce((a, b) => a + b, 0) / ratedScores.length)
-    : null;
 
   await prisma.$transaction(async tx => {
-    const rating = await tx.rating.upsert({
-      where: { userId_albumId_rotationId: { userId, albumId, rotationId } },
-      create: { userId, albumId, rotationId, score: albumScore },
-      update: { score: albumScore },
-    });
-
-    // Deliberately no Album.averageRating recompute here — see mutations.ts.
-    // The public score only updates when the rotation-close job runs.
-
-    await syncComment(tx, {
-      ratingId: rating.id,
-      body: albumComment,
-      authorId: userId,
-    });
-
-    // Track ratings aren't rotation-scoped (schema-wise), but writing them
-    // is still gated by the same "album is open" check above, since they're
+    // Track ratings first — Rating is derived from these, not the other
+    // way around. Not rotation-scoped (schema-wise), but writing them is
+    // still gated by the same "album is open" check above, since they're
     // part of the same rate-this-album flow.
     const trackRatingResults = await Promise.all(
       trackRatings.map(t =>
@@ -167,6 +144,46 @@ export async function saveAlbumRating({
           })),
         }),
     ]);
+
+    // Recompute the derived album score from EVERY track rating this user
+    // has for this album in the DB — not just the ones in this submission.
+    // Rating is now permanent per (userId, albumId), so it must reflect
+    // the user's full track-rating history for the album, not one save's
+    // payload.
+    const allUserTrackRatings = await tx.trackRating.findMany({
+      where: { userId, track: { albumId } },
+      select: { score: true },
+    });
+    const scores = allUserTrackRatings
+      .map(r => r.score)
+      .filter((s): s is number => s !== null);
+
+    const albumScore = scores.length
+      ? scores.reduce((a, b) => a + b, 0) / scores.length
+      : null;
+
+    if (albumScore === null) {
+      // No rated tracks left for this album — nothing to derive a score
+      // from, so there's no Rating (and no comment) to keep either.
+      await tx.rating.deleteMany({ where: { userId, albumId } });
+      return;
+    }
+
+    const rating = await tx.rating.upsert({
+      where: { userId_albumId: { userId, albumId } },
+      create: { userId, albumId, score: albumScore },
+      update: { score: albumScore, ratedAt: new Date() },
+    });
+
+    // Deliberately no Album.averageRating recompute here — the public
+    // score only updates when the rotation-close job runs (see
+    // closeRotationForAlbum / mutations.ts).
+
+    await syncComment(tx, {
+      ratingId: rating.id,
+      body: albumComment,
+      authorId: userId,
+    });
   });
 
   revalidatePath(`/albums/${albumSlug}`);

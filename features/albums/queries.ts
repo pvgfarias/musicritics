@@ -230,8 +230,7 @@ function sortFieldToOrderBy(
       return { createdAt: direction };
   }
 }
-
-function normalizeAlbum(album: AlbumWithRelations) {
+function normalizeAlbum(album: AlbumWithRelations, userId?: string) {
   const artistNames = album.artists
     .map(entry => entry.artist.name)
     .filter(Boolean);
@@ -251,6 +250,10 @@ function normalizeAlbum(album: AlbumWithRelations) {
     }))
     .sort((a, b) => b.endDate.getTime() - a.endDate.getTime());
 
+  const userRating = userId
+    ? (album.ratings.find(r => r.userId === userId) ?? null)
+    : null;
+
   return {
     ...album,
     artist: artistNames.join(', '),
@@ -259,6 +262,7 @@ function normalizeAlbum(album: AlbumWithRelations) {
     genreSlugs,
     tracklist: album.tracks.map((track: { title: string }) => track.title),
     rotationHistory,
+    userRating,
   };
 }
 
@@ -423,7 +427,7 @@ export async function getAlbumsByArtist(
   };
 }
 
-export async function getAlbumBySlug(slug: string) {
+export async function getAlbumBySlug(slug: string, userId?: string) {
   const album = await prisma.album.findUnique({
     where: { slug },
     include: {
@@ -489,11 +493,11 @@ export async function getAlbumBySlug(slug: string) {
   });
 
   if (!album) return null;
-  return normalizeAlbum(album);
+  return normalizeAlbum(album, userId);
 }
 
-export async function getAlbumWithAverageRating(slug: string) {
-  const album = await getAlbumBySlug(slug);
+export async function getAlbumWithAverageRating(slug: string, userId?: string) {
+  const album = await getAlbumBySlug(slug, userId);
   if (!album) return null;
 
   const tracksWithRatings = album.tracks.map(track => {

@@ -7,16 +7,13 @@ import AlbumRatingDialog from './rating/album-rating-dialog';
 import { AlbumTrackForRating } from '@/features/ratings/queries';
 import RatingScore from '@/components/dashboard/rating-score';
 import { AlbumPlatformLink } from './album-platform-link';
-type AlbumUserRating = Exclude<AlbumFull, null>['ratings'][number];
 
 export default function AlbumHeader({
   album,
   tracks,
-  userRating,
 }: {
   album: Exclude<AlbumFull, null>;
   tracks: AlbumTrackForRating[];
-  userRating: AlbumUserRating | undefined;
 }) {
   const genreLabel = album.genreNames.join(' / ');
 
@@ -64,11 +61,7 @@ export default function AlbumHeader({
             )}
           </div>
           {album.openForRatings && (
-            <AlbumRatingDialog
-              album={album}
-              userRating={userRating}
-              tracks={tracks}
-            />
+            <AlbumRatingDialog album={album} tracks={tracks} />
           )}
 
           <div className='flex flex-row gap-3'>
@@ -87,9 +80,9 @@ export default function AlbumHeader({
               <span className='font-mono text-xs text-gray-600 dark:text-gray-300 uppercase tracking-widest'>
                 My Score
               </span>
-              {userRating ? (
+              {album.userRating ? (
                 <div className='relative group inline-block'>
-                  <RatingScore ratingScore={userRating.score} size='lg' />
+                  <RatingScore ratingScore={album.userRating.score} size='lg' />
 
                   {!album.openForRatings && (
                     <div
@@ -115,9 +108,6 @@ export default function AlbumHeader({
               {!album.openForRatings && album.albumAverageRating != null ? (
                 <RatingScore ratingScore={album.albumAverageRating} size='lg' />
               ) : !album.openForRatings ? (
-                // Never been through a closed rotation cycle — distinct from
-                // "closed with a score", which didn't used to be a
-                // reachable state under the old boolean.
                 <p className='font-mono text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mt-2'>
                   Not yet rated
                 </p>

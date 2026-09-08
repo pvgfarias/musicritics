@@ -2,16 +2,13 @@ import RatingScore from '@/components/dashboard/rating-score';
 import { AlbumFull } from '@/features/albums/queries';
 import Image from 'next/image';
 
-type AlbumRating = Exclude<AlbumFull, null>['ratings'][number];
-
 export default function AlbumReviews({
   album,
-  userRating,
 }: {
   album: Exclude<AlbumFull, null>;
-  userRating: AlbumRating | undefined;
 }) {
   const inRotation = album.openForRatings;
+  const userRating = album.userRating;
 
   // During rotation, only the current user's own comment is visible.
   // Once rotation ends, everyone's reviews become public.

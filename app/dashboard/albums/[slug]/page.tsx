@@ -13,26 +13,17 @@ export default async function AlbumPage({
   const { slug } = await params;
   if (!slug) notFound();
 
-  const album = await getAlbumWithAverageRating(slug);
-  if (!album) notFound();
-
   const session = await auth.api.getSession({ headers: await headers() });
   const user = session?.user;
 
-  const tracks = user ? await getAlbumTracksForRating(album.id, user.id) : [];
+  const album = await getAlbumWithAverageRating(slug, user?.id);
+  if (!album) notFound();
 
-  const userRating = user
-    ? album.ratings.find(rating => rating.userId === session.user.id)
-    : undefined;
+  const tracks = user ? await getAlbumTracksForRating(album.id, user.id) : [];
 
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2'>
-      <AlbumDetails
-        album={album}
-        tracks={tracks}
-        userRating={userRating}
-        userId={user?.id}
-      />
+      <AlbumDetails album={album} tracks={tracks} userId={user?.id} />
     </main>
   );
 }

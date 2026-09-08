@@ -137,10 +137,9 @@ model AlbumArtist {
   @@id([albumId, artistId])
   @@index([artistId])
 }
-
 model Rating {
   id        String   @id @default(cuid())
-  score     Int?
+  score     Float?
   ratedAt   DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,13 +150,11 @@ model Rating {
   albumId String
   album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
 
-  rotationId String 
-  rotation   Rotation @relation(fields: [rotationId], references: [id], onDelete: Cascade)
-
   comment Comment?
 
-  @@unique([userId, albumId, rotationId])
+  @@unique([userId, albumId])
   @@index([albumId])
+  @@index([userId])
 }
 
 model TrackRating {
@@ -177,6 +174,32 @@ model TrackRating {
 
   @@unique([userId, trackId])
   @@index([trackId])
+}
+
+model Rotation {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String?  @unique
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+
+  albums RotationAlbum[]
+}
+
+model RotationAlbum {
+  id         String   @id @default(cuid())
+  rotationId String
+  albumId    String
+  rotation   Rotation @relation(fields: [rotationId], references: [id], onDelete: Cascade)
+  album      Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+
+  averageRating Float?
+  ratingCount   Int       @default(0)
+  closedAt      DateTime?
+
+  @@unique([rotationId, albumId])
+  @@index([albumId])
 }
 
 model Comment {
@@ -244,29 +267,3 @@ model ArtistGenre {
   @@index([genreId])
 }
 
-model Rotation {
-  id        String   @id @default(cuid())
-  name      String   // "#1 week - metal and screamo"
-  slug      String?  @unique
-  startDate DateTime
-  endDate   DateTime
-  createdAt DateTime @default(now())
-
-  albums  RotationAlbum[]
-  ratings Rating[]
-}
-
-model RotationAlbum {
-  id         String   @id @default(cuid())
-  rotationId String
-  albumId    String
-  rotation   Rotation @relation(fields: [rotationId], references: [id], onDelete: Cascade)
-  album      Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
-
-  averageRating Float?    // snapshot, filled when the rotation closes
-  ratingCount   Int       @default(0)
-  closedAt      DateTime? // set once the snapshot has been taken
-
-  @@unique([rotationId, albumId])
-  @@index([albumId])
-}
