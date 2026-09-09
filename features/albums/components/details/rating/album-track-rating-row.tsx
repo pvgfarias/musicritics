@@ -1,4 +1,4 @@
-import { AlbumTrackForRating } from '@/features/tracks/queries';
+import { AlbumTrackForRating } from '@/features/ratings/queries';
 import { IconMessageCircle } from '@tabler/icons-react';
 import { useState } from 'react';
 import { Slider } from '@/components/ui/slider';

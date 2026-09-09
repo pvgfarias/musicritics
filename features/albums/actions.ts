@@ -77,12 +77,25 @@ export async function createAlbum(
         slug: data.slug,
         coverImage: data.coverImage,
         releaseDate: data.releaseDate,
-        artists: { create: data.artistIds.map(artistId => ({ artistId })) },
+        releaseType: data.releaseType,
+        labelId: data.labelId ?? null,
+        // artistIds -> artists: each entry now carries a role
+        // (PRIMARY/FEATURED/PRODUCER) alongside the artistId.
+        artists: {
+          create: data.artists.map(a => ({
+            artistId: a.artistId,
+            role: a.role,
+          })),
+        },
         genres: { create: data.genreIds.map(genreId => ({ genreId })) },
         tracks: {
           create: data.tracks.map(t => ({ title: t.title, number: t.number })),
         },
-        socialLinks: { create: data.socialLinks },
+        // socialLinks -> streamingLinks. StreamingLink is the shared model
+        // (also used by Artist), so nested-creating it here through the
+        // Album relation sets albumId automatically and leaves artistId
+        // null — these rows stay scoped to this album.
+        streamingLinks: { create: data.streamingLinks },
       },
       select: { id: true },
     });
@@ -108,9 +121,13 @@ export async function getAlbumForEdit(albumId: string) {
     where: { id: albumId },
     include: {
       tracks: { orderBy: { number: 'asc' } },
-      socialLinks: true,
+      streamingLinks: true,
+      // `role` comes back automatically as a scalar on the AlbumArtist
+      // join row — no extra select needed. The edit form needs to map
+      // this to the `{ artistId, role }[]` shape createAlbumSchema expects.
       artists: { include: { artist: true } },
       genres: { include: { genre: true } },
+      label: true,
     },
   });
 }
@@ -135,9 +152,14 @@ export async function updateAlbum(
 
   try {
     const album = await prisma.$transaction(async tx => {
-      // socialLinks / artist / genre links have no dependent rating data,
-      // so wholesale replace-on-save is still fine for these.
-      await tx.albumSocialLink.deleteMany({ where: { albumId } });
+      // streamingLinks / artist / genre links have no dependent rating
+      // data, so wholesale replace-on-save is still fine for these.
+      //
+      // Model name is `streamingLink` on the Prisma client (was
+      // `albumSocialLink`), and — same as the create path — this delete
+      // is scoped by albumId, so it only ever touches this album's rows,
+      // never an artist's.
+      await tx.streamingLink.deleteMany({ where: { albumId } });
       await tx.albumArtist.deleteMany({ where: { albumId } });
       await tx.albumGenre.deleteMany({ where: { albumId } });
 
@@ -202,9 +224,16 @@ export async function updateAlbum(
           slug: data.slug,
           coverImage: data.coverImage,
           releaseDate: data.releaseDate,
-          artists: { create: data.artistIds.map(artistId => ({ artistId })) },
+          releaseType: data.releaseType,
+          labelId: data.labelId ?? null,
+          artists: {
+            create: data.artists.map(a => ({
+              artistId: a.artistId,
+              role: a.role,
+            })),
+          },
           genres: { create: data.genreIds.map(genreId => ({ genreId })) },
-          socialLinks: { create: data.socialLinks },
+          streamingLinks: { create: data.streamingLinks },
         },
         select: { id: true },
       });

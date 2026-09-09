@@ -65,7 +65,8 @@ export default function AlbumHeader({
           )}
 
           <div className='flex flex-row gap-3'>
-            {album?.socialLinks.map(link => (
+            {/* album.socialLinks -> album.streamingLinks (model rename) */}
+            {album?.streamingLinks.map(link => (
               <AlbumPlatformLink
                 key={link.platform}
                 platform={link.platform}

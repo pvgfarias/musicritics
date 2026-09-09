@@ -88,8 +88,14 @@ function EditArtistLoader({
             slug: full.slug,
             image: full.image,
             bio: full.bio,
+            country: full.country,
             genreIds: full.genres.map(g => g.genre.id),
             debutDate: full.debutDate,
+            disbandedDate: full.disbandedDate,
+            streamingLinks: full.streamingLinks.map(s => ({
+              platform: s.platform,
+              url: s.url,
+            })),
           },
           initialGenres: full.genres.map(g => ({
             id: g.genre.id,
@@ -188,9 +194,12 @@ function EditArtistForm({
           Cancel
         </button>
 
+        {/* Was type='button' with its own handleSubmit(onSubmit) call —
+            duplicated the form's own onSubmit and risked double-firing if
+            clicked while a text field still had focus. type='submit' lets
+            the form's single onSubmit handle it, same fix as EditAlbumDialog. */}
         <button
-          type='button'
-          onClick={handleSubmit(onSubmit)}
+          type='submit'
           disabled={isSubmitting}
           className='flex items-center gap-2 rounded-md bg-ember px-4 py-2 text-sm font-medium text-white disabled:opacity-60'
         >

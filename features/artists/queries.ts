@@ -1,5 +1,4 @@
 // data/artists.ts
-import { SortKey } from '@/lib/sort-ratings';
 import { Prisma } from '@/app/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 
@@ -9,7 +8,7 @@ type ArtistsQuery = {
   query?: string;
   genre?: string; // genre slug
   status?: string;
-  sort?: SortKey;
+  sort?: string;
   userId?: string; // pass the logged-in viewer's id to get their own average back
 };
 
@@ -22,7 +21,9 @@ function buildArtistSummarySelect(userId?: string) {
     slug: true,
     image: true,
     bio: true,
+    country: true,
     debutDate: true,
+    disbandedDate: true,
     genres: {
       select: {
         genre: { select: { id: true, name: true, slug: true } },
@@ -47,12 +48,30 @@ function buildArtistSummarySelect(userId?: string) {
   } satisfies Prisma.ArtistSelect;
 }
 
+// Detail-page select: everything in the summary, plus streamingLinks.
+// Kept separate from buildArtistSummarySelect so the list page (which
+// renders many rows) doesn't pull in a relation it never displays.
+function buildArtistDetailSelect(userId?: string) {
+  return {
+    ...buildArtistSummarySelect(userId),
+    streamingLinks: {
+      orderBy: { platform: 'asc' },
+    },
+  } satisfies Prisma.ArtistSelect;
+}
+
 // Kept for the type helper below — shape is identical regardless of userId.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const artistSummarySelect = buildArtistSummarySelect();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const artistDetailSelect = buildArtistDetailSelect();
 
 type ArtistSummaryRaw = Prisma.ArtistGetPayload<{
   select: typeof artistSummarySelect;
+}>;
+
+type ArtistDetailRaw = Prisma.ArtistGetPayload<{
+  select: typeof artistDetailSelect;
 }>;
 
 export type ArtistSummary = Omit<ArtistSummaryRaw, 'albums' | 'genres'> & {
@@ -65,8 +84,12 @@ export type ArtistSummary = Omit<ArtistSummaryRaw, 'albums' | 'genres'> & {
   genreSlugs: string[];
 };
 
+export type ArtistDetail = ArtistSummary & {
+  streamingLinks: ArtistDetailRaw['streamingLinks'];
+};
+
 function sortKeyToOrderBy(
-  sort?: SortKey
+  sort?: string
 ): Prisma.ArtistOrderByWithRelationInput {
   switch (sort) {
     case 'az':
@@ -151,12 +174,23 @@ export async function getArtistsPage({
   };
 }
 
-export async function getArtistBySlug(slug: string, userId?: string) {
+export async function getArtistBySlug(
+  slug: string,
+  userId?: string
+): Promise<ArtistDetail | null> {
   const artist = await prisma.artist.findUnique({
     where: { slug },
-    select: buildArtistSummarySelect(userId),
+    select: buildArtistDetailSelect(userId),
   });
 
   if (!artist) return null;
-  return normalizeArtistSummary(artist);
+
+  // streamingLinks isn't part of ArtistSummaryRaw's shape, so it's pulled
+  // out before handing the rest to normalizeArtistSummary (which computes
+  // the rating aggregates shared with the list page), then merged back in.
+  const { streamingLinks, ...summaryFields } = artist;
+  return {
+    ...normalizeArtistSummary(summaryFields),
+    streamingLinks,
+  };
 }

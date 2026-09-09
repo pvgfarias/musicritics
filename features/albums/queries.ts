@@ -69,7 +69,11 @@ type AlbumWithRelations = Prisma.AlbumGetPayload<{
         };
       };
     };
-    socialLinks: true;
+    label: { select: { id: true; name: true; slug: true } };
+    // Was `socialLinks` (AlbumSocialLink). That model is gone — social/streaming
+    // links now live on the shared StreamingLink model, scoped to this album
+    // via albumId (artistId stays null on these rows).
+    streamingLinks: true;
   };
 }>;
 
@@ -81,11 +85,18 @@ function buildAlbumSummarySelect(userId?: string) {
     slug: true,
     coverImage: true,
     releaseDate: true,
+    // New scalar field — surfaced in list views the same way AOTY/RYM tag
+    // LP/EP/Single on catalog cards. Drop this line if you don't want it
+    // on the summary card, it's not required for anything downstream.
+    releaseType: true,
     createdAt: true,
     averageRating: true,
     ratingCount: true,
     artists: {
-      select: { artist: { select: { id: true, name: true, slug: true } } },
+      select: {
+        role: true,
+        artist: { select: { id: true, name: true, slug: true } },
+      },
     },
     genres: {
       select: {
@@ -486,7 +497,8 @@ export async function getAlbumBySlug(slug: string, userId?: string) {
           },
         },
       },
-      socialLinks: {
+      label: { select: { id: true, name: true, slug: true } },
+      streamingLinks: {
         orderBy: { platform: 'asc' },
       },
     },

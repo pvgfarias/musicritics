@@ -38,12 +38,15 @@ export async function getArtistForEdit(artistId: string) {
       slug: true,
       image: true,
       bio: true,
+      country: true,
       debutDate: true,
+      disbandedDate: true,
       genres: {
         select: {
           genre: { select: { id: true, name: true, slug: true } },
         },
       },
+      streamingLinks: true,
     },
   });
 
@@ -76,8 +79,14 @@ export async function createArtist(
         slug: data.slug,
         image: data.image,
         bio: data.bio,
+        country: data.country,
         debutDate: data.debutDate,
+        disbandedDate: data.disbandedDate,
         genres: { create: data.genreIds.map(genreId => ({ genreId })) },
+        // Same shared StreamingLink model as albums — nested-creating
+        // through Artist's relation sets artistId automatically and
+        // leaves albumId null.
+        streamingLinks: { create: data.streamingLinks },
       },
       select: { id: true },
     });
@@ -118,6 +127,10 @@ export async function updateArtist(
       // Genre links need to be replaced wholesale since the form doesn't
       // track per-row IDs for diffing (same approach as album genres).
       await tx.artistGenre.deleteMany({ where: { artistId } });
+      // Scoped by artistId, so this only ever touches this artist's own
+      // streaming links — never an album's, even though it's the same
+      // underlying StreamingLink table.
+      await tx.streamingLink.deleteMany({ where: { artistId } });
 
       return tx.artist.update({
         where: { id: artistId },
@@ -126,8 +139,11 @@ export async function updateArtist(
           slug: data.slug,
           image: data.image,
           bio: data.bio,
+          country: data.country,
           debutDate: data.debutDate,
+          disbandedDate: data.disbandedDate,
           genres: { create: data.genreIds.map(genreId => ({ genreId })) },
+          streamingLinks: { create: data.streamingLinks },
         },
         select: { id: true },
       });
@@ -188,8 +204,9 @@ export async function deleteArtist(
       });
     }
 
-    // Cascades the remaining AlbumArtist and ArtistGenre rows,
-    // removing this artist from their credits without deleting albums.
+    // Cascades the remaining AlbumArtist, ArtistGenre, and StreamingLink
+    // rows, removing this artist from their credits without deleting
+    // albums.
     await tx.artist.delete({ where: { id: artistId } });
 
     return soloAlbums.length;

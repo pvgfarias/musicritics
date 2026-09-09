@@ -1,4 +1,6 @@
 import { z } from 'zod';
+// Adjust to your actual shared schemas location
+import { streamingLinkSchema } from '@/lib/shared-schema';
 
 export const trackSchema = z.object({
   // Present for existing tracks (round-tripped from getAlbumForEdit),
@@ -11,9 +13,25 @@ export const trackSchema = z.object({
   number: z.number().int().positive(),
 });
 
-export const socialLinkSchema = z.object({
-  platform: z.string().min(1),
-  url: z.string(),
+export const releaseTypeSchema = z.enum([
+  'LP',
+  'EP',
+  'SINGLE',
+  'COMPILATION',
+  'LIVE',
+  'MIXTAPE',
+  'SOUNDTRACK',
+]);
+
+export const albumArtistSchema = z.object({
+  artistId: z.string(),
+  // No .default() here — zodResolver's generic types against z.infer's
+  // *input* shape, where a schema-level default makes the field optional,
+  // while CreateAlbumInput (z.infer output) makes it required. Mixing the
+  // two breaks useForm<CreateAlbumInput>()'s resolver typing. Default is
+  // supplied in code instead: useAlbumForm's handleArtistsChange already
+  // does `role: a.role ?? 'PRIMARY'`.
+  role: z.enum(['PRIMARY', 'FEATURED', 'PRODUCER']),
 });
 
 export const createAlbumSchema = z.object({
@@ -27,10 +45,15 @@ export const createAlbumSchema = z.object({
     ),
   coverImage: z.string().nullable(),
   releaseDate: z.date().nullable(),
+  // No .default() — same reasoning as albumArtistSchema.role above.
+  // Whatever builds this form's defaultValues (the create-album page)
+  // needs to pass `releaseType: 'LP'` explicitly for new albums.
+  releaseType: releaseTypeSchema,
+  labelId: z.string().nullable().optional(),
   genreIds: z.array(z.string()).min(1, 'At least one genre is required'),
-  artistIds: z.array(z.string()).min(1, 'At least one artist is required'),
+  artists: z.array(albumArtistSchema).min(1, 'At least one artist is required'),
   tracks: z.array(trackSchema).min(1, 'At least one track is required'),
-  socialLinks: z.array(socialLinkSchema),
+  streamingLinks: z.array(streamingLinkSchema),
 });
 
 export type CreateAlbumInput = z.infer<typeof createAlbumSchema>;

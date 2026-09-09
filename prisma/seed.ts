@@ -19,7 +19,12 @@ async function main() {
   await prisma.comment.deleteMany();
   await prisma.trackRating.deleteMany();
   await prisma.rating.deleteMany();
-  await prisma.albumSocialLink.deleteMany();
+  await prisma.userFavoriteAlbum.deleteMany();
+  await prisma.userFavoriteArtist.deleteMany();
+  // Was albumSocialLink — that model no longer exists. StreamingLink is
+  // the shared model (albums + artists both use it), safe to wipe first
+  // since nothing else has a hard FK pointing at it.
+  await prisma.streamingLink.deleteMany();
   await prisma.track.deleteMany();
   await prisma.albumGenre.deleteMany();
   await prisma.artistGenre.deleteMany();
@@ -27,6 +32,7 @@ async function main() {
   await prisma.rotationAlbum.deleteMany();
   await prisma.rotation.deleteMany();
   await prisma.genre.deleteMany();
+  await prisma.label.deleteMany();
   await prisma.album.deleteMany();
   await prisma.artist.deleteMany();
   await prisma.account.deleteMany();
@@ -59,6 +65,23 @@ async function main() {
   }
 
   // -------------------------------------------------------------------
+  // Labels
+  // -------------------------------------------------------------------
+  const LABEL_NAMES = [
+    'Lush Records',
+    'Nightwave Recordings',
+    'Coastline Audio',
+  ];
+
+  const labelMap = new Map<string, string>(); // name -> id
+  for (const name of LABEL_NAMES) {
+    const label = await prisma.label.create({
+      data: { name, slug: slugify(name) },
+    });
+    labelMap.set(name, label.id);
+  }
+
+  // -------------------------------------------------------------------
   // Users
   // -------------------------------------------------------------------
   const SEED_PASSWORD = 'password123';
@@ -70,24 +93,32 @@ async function main() {
       username: 'alex',
       name: 'Alex Chen',
       role: 'admin',
+      bio: 'Always chasing the next great shoegaze record.',
+      country: 'US',
     },
     {
       email: 'maya@example.com',
       username: 'maya',
       name: 'Maya Ortiz',
       role: 'moderator',
+      bio: 'Synthpop and dream pop, mostly.',
+      country: 'MX',
     },
     {
       email: 'noah@example.com',
       username: 'noah',
       name: 'Noah Brooks',
       role: 'user',
+      bio: null,
+      country: null,
     },
     {
       email: 'zoe@example.com',
       username: 'zoe',
       name: 'Zoe Kim',
       role: 'user',
+      bio: null,
+      country: null,
     },
   ];
 
@@ -99,6 +130,8 @@ async function main() {
           username: userData.username,
           name: userData.name,
           role: userData.role,
+          bio: userData.bio,
+          country: userData.country,
           emailVerified: true,
         },
       });
@@ -121,26 +154,43 @@ async function main() {
   // -------------------------------------------------------------------
   // Artists
   // -------------------------------------------------------------------
-  const artistNames = [
-    'Jane Remover',
-    'venturing',
-    'Aria Leaf',
-    'Nova Pulse',
-    'Cinder Fields',
-    'Paper Coast',
-    'Little Winter',
-    'Mythic City',
-    'Nova Pulse Duo', // distinct from Nova Pulse to avoid slug collision
-    'Zephyr Echo',
-  ];
+  const artistSeedData = [
+    { name: 'Jane Remover', country: 'US' },
+    { name: 'venturing', country: null },
+    { name: 'Aria Leaf', country: 'GB' },
+    { name: 'Nova Pulse', country: null },
+    { name: 'Cinder Fields', country: 'CA' },
+    { name: 'Paper Coast', country: null },
+    { name: 'Little Winter', country: null },
+    { name: 'Mythic City', country: 'AU' },
+    { name: 'Nova Pulse Duo', country: null }, // distinct from Nova Pulse to avoid slug collision
+    { name: 'Zephyr Echo', country: null },
+  ] as const;
 
   const artists = await Promise.all(
-    artistNames.map(name =>
+    artistSeedData.map(a =>
       prisma.artist.create({
-        data: { name, slug: slugify(name) },
+        data: { name: a.name, slug: slugify(a.name), country: a.country },
       })
     )
   );
+
+  // A couple of artists get a streaming link too, to exercise the shared
+  // StreamingLink model from the artist side (not just the album side).
+  await prisma.streamingLink.create({
+    data: {
+      artistId: artists[0].id, // Jane Remover
+      platform: 'SPOTIFY',
+      url: 'https://open.spotify.com/artist/jane-remover',
+    },
+  });
+  await prisma.streamingLink.create({
+    data: {
+      artistId: artists[1].id, // venturing
+      platform: 'BANDCAMP',
+      url: 'https://venturing.bandcamp.com',
+    },
+  });
 
   // -------------------------------------------------------------------
   // Albums (10 total)
@@ -150,17 +200,22 @@ async function main() {
   // 'paper-coast' intentionally lists both 'A' and 'C' — same album,
   // two separate trips through rotation — to demonstrate that its Rating
   // persists globally instead of being recreated per rotation.
+  //
+  // releaseType and label are new — varied a bit across the set so the
+  // list/filter UI has something real to render, not just LP everywhere.
   const albumSeedData = [
     {
       title: 'Revengeseekerz',
       slug: 'revengeseekerz',
       releaseYear: 2025,
+      releaseType: 'LP',
+      label: 'Lush Records',
       genre: 'Hyperpop',
       artistId: artists[0].id,
       rotationGroups: ['D'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Spotify',
+          platform: 'SPOTIFY',
           url: 'https://open.spotify.com/album/revengeseekerz',
         },
       ],
@@ -176,12 +231,14 @@ async function main() {
       title: 'Ghostholding',
       slug: 'ghostholding',
       releaseYear: 2025,
+      releaseType: 'EP', // 3 tracks — reads more like an EP than an LP
+      label: null,
       genre: 'Shoegaze',
       artistId: artists[1].id,
       rotationGroups: ['D'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Bandcamp',
+          platform: 'BANDCAMP',
           url: 'https://venturing.bandcamp.com/album/ghostholding',
         },
       ],
@@ -191,12 +248,14 @@ async function main() {
       title: 'Nightshade Arcade',
       slug: 'nightshade-arcade',
       releaseYear: 2024,
+      releaseType: 'LP',
+      label: 'Nightwave Recordings',
       genre: 'Synthpop',
       artistId: artists[2].id,
       rotationGroups: ['A'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Spotify',
+          platform: 'SPOTIFY',
           url: 'https://open.spotify.com/album/nightshade-arcade',
         },
       ],
@@ -212,12 +271,14 @@ async function main() {
       title: 'Echo Atlas',
       slug: 'echo-atlas',
       releaseYear: 2023,
+      releaseType: 'LP',
+      label: 'Nightwave Recordings',
       genre: 'Electronica',
       artistId: artists[3].id,
       rotationGroups: ['A'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Apple Music',
+          platform: 'APPLE_MUSIC',
           url: 'https://music.apple.com/album/echo-atlas',
         },
       ],
@@ -227,12 +288,14 @@ async function main() {
       title: 'Stormchaser',
       slug: 'stormchaser',
       releaseYear: 2018,
+      releaseType: 'LP',
+      label: null,
       genre: 'Post-rock',
       artistId: artists[4].id,
       rotationGroups: ['A'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Bandcamp',
+          platform: 'BANDCAMP',
           url: 'https://cinderfields.bandcamp.com/album/stormchaser',
         },
       ],
@@ -247,12 +310,14 @@ async function main() {
       title: 'Paper Coast',
       slug: 'paper-coast',
       releaseYear: 2021,
+      releaseType: 'LP',
+      label: 'Coastline Audio',
       genre: 'Dream Pop',
       artistId: artists[5].id,
       rotationGroups: ['A', 'C'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Apple Music',
+          platform: 'APPLE_MUSIC',
           url: 'https://music.apple.com/album/paper-coast',
         },
       ],
@@ -262,12 +327,14 @@ async function main() {
       title: "Winter's Signal",
       slug: 'winters-signal',
       releaseYear: 2020,
+      releaseType: 'LP',
+      label: null,
       genre: 'Neo-soul',
       artistId: artists[6].id,
       rotationGroups: ['B'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Apple Music',
+          platform: 'APPLE_MUSIC',
           url: 'https://music.apple.com/album/winters-signal',
         },
       ],
@@ -277,12 +344,14 @@ async function main() {
       title: 'City of Myths',
       slug: 'city-of-myths',
       releaseYear: 2017,
+      releaseType: 'LP',
+      label: null,
       genre: 'Alternative Rock',
       artistId: artists[7].id,
       rotationGroups: ['B'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Bandcamp',
+          platform: 'BANDCAMP',
           url: 'https://mythiccity.bandcamp.com/album/city-of-myths',
         },
       ],
@@ -297,12 +366,14 @@ async function main() {
       title: 'Glass Horizon',
       slug: 'glass-horizon',
       releaseYear: 2021,
+      releaseType: 'LP',
+      label: 'Coastline Audio',
       genre: 'Synthwave',
       artistId: artists[8].id,
       rotationGroups: ['C'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Apple Music',
+          platform: 'APPLE_MUSIC',
           url: 'https://music.apple.com/album/glass-horizon',
         },
       ],
@@ -312,12 +383,14 @@ async function main() {
       title: 'Zephyr Echoes',
       slug: 'zephyr-echoes',
       releaseYear: 2025,
+      releaseType: 'EP', // 4 short tracks, same call as Ghostholding
+      label: null,
       genre: 'Chillwave',
       artistId: artists[9].id,
       rotationGroups: ['D'],
-      socialLinks: [
+      streamingLinks: [
         {
-          platform: 'Spotify',
+          platform: 'SPOTIFY',
           url: 'https://open.spotify.com/album/zephyr-echoes',
         },
       ],
@@ -338,11 +411,21 @@ async function main() {
         title: seed.title,
         slug: seed.slug,
         releaseDate: new Date(seed.releaseYear, 0, 1),
+        releaseType: seed.releaseType,
+        labelId: seed.label ? labelMap.get(seed.label)! : null,
         genres: {
           create: [{ genre: { connect: { id: genreMap.get(seed.genre)! } } }],
         },
-        socialLinks: { create: [...seed.socialLinks] },
-        artists: { create: { artist: { connect: { id: seed.artistId } } } },
+        // Was socialLinks / AlbumSocialLink — model renamed to the shared
+        // StreamingLink. Platform values are now the StreamingPlatform
+        // enum (uppercase, underscored) instead of free-text strings.
+        streamingLinks: { create: [...seed.streamingLinks] },
+        artists: {
+          create: {
+            artist: { connect: { id: seed.artistId } },
+            role: 'PRIMARY',
+          },
+        },
         tracks: {
           create: seed.tracks.map((title, index) => ({
             title,
@@ -572,6 +655,22 @@ async function main() {
   // Zephyr Echoes: nobody has rated it yet — left fully unrated on purpose
   // to test empty states within an open rotation.
 
+  // -------------------------------------------------------------------
+  // Favorites — a few entries so profile pages have something to render.
+  // Not exhaustive; enough to exercise the UI, not a full data set.
+  // -------------------------------------------------------------------
+  const revengeseekerz = albumsBySlug.get('revengeseekerz')!;
+  const paperCoast = albumsBySlug.get('paper-coast')!;
+  await prisma.userFavoriteAlbum.create({
+    data: { userId: alex.id, albumId: revengeseekerz.id, position: 1 },
+  });
+  await prisma.userFavoriteAlbum.create({
+    data: { userId: alex.id, albumId: paperCoast.id, position: 2 },
+  });
+  await prisma.userFavoriteArtist.create({
+    data: { userId: alex.id, artistId: artists[0].id, position: 1 }, // Jane Remover
+  });
+
   console.log('Seed completed successfully.');
   console.log(`Test login for any seeded user: <email> / ${SEED_PASSWORD}`);
   console.log('  alex@example.com  -> admin');
@@ -585,6 +684,9 @@ async function main() {
   );
   console.log(
     '"Paper Coast" appears in both rotation A and C — same single Rating row per user carries forward, not duplicated.'
+  );
+  console.log(
+    'Labels, releaseType, artist role, user profile fields, and a few favorites are seeded — enough to exercise the UI, not exhaustive.'
   );
   console.log(
     'All image fields are placeholder URLs — swap for real Cloudinary URLs later.'

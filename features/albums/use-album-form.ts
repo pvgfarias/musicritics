@@ -16,7 +16,18 @@ function slugify(title: string) {
     .replace(/\s+/g, '-');
 }
 
-type ArtistOption = { id: string; name: string; image: string | null };
+// `role` is optional here because callers passing plain artist search
+// results (no role picked yet) won't have one — handleArtistsChange
+// defaults it to PRIMARY. If your artist picker UI doesn't yet expose a
+// way to choose FEATURED/PRODUCER, every artist will end up PRIMARY on
+// save regardless of what a previous edit had — that picker needs a role
+// control added, this hook alone can't surface one.
+type ArtistOption = {
+  id: string;
+  name: string;
+  image: string | null;
+  role?: 'PRIMARY' | 'FEATURED' | 'PRODUCER';
+};
 type GenreOption = { id: string; name: string; slug: string };
 
 export function useAlbumForm(
@@ -45,9 +56,12 @@ export function useAlbumForm(
     name: 'tracks',
     keyName: '_fieldKey',
   });
-  const socialLinks = useFieldArray({
+  // Renamed from `socialLinks` to `streamingLinks` to match the schema —
+  // this field array now backs the shared StreamingLink model
+  // (Spotify/Apple Music/etc.), not generic social links.
+  const streamingLinks = useFieldArray({
     control: form.control,
-    name: 'socialLinks',
+    name: 'streamingLinks',
     keyName: '_fieldKey',
   });
 
@@ -59,8 +73,8 @@ export function useAlbumForm(
   function handleArtistsChange(next: ArtistOption[]) {
     setArtists(next);
     form.setValue(
-      'artistIds',
-      next.map(a => a.id)
+      'artists',
+      next.map(a => ({ artistId: a.id, role: a.role ?? 'PRIMARY' }))
     );
   }
 
@@ -75,7 +89,7 @@ export function useAlbumForm(
   return {
     form,
     tracks,
-    socialLinks,
+    streamingLinks,
     artists,
     genres,
     slugTouched,

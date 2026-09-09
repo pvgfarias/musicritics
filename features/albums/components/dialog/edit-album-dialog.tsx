@@ -24,6 +24,9 @@ type ArtistOption = {
   id: string;
   name: string;
   image: string | null;
+  // Carried through from AlbumArtist.role so re-editing an album doesn't
+  // silently reset every artist back to PRIMARY.
+  role: 'PRIMARY' | 'FEATURED' | 'PRODUCER';
 };
 
 type GenreOption = {
@@ -95,7 +98,12 @@ function EditAlbumLoader({
             slug: full.slug,
             coverImage: full.coverImage,
             releaseDate: full.releaseDate,
-            artistIds: full.artists.map(a => a.artistId),
+            releaseType: full.releaseType,
+            labelId: full.labelId,
+            artists: full.artists.map(a => ({
+              artistId: a.artistId,
+              role: a.role,
+            })),
             genreIds: full.genres.map(g => g.genreId),
             tracks: full.tracks.map((t, index) => ({
               // Carry the existing track id through so updateAlbum can
@@ -106,7 +114,11 @@ function EditAlbumLoader({
               title: t.title,
               number: t.number ?? index + 1,
             })),
-            socialLinks: full.socialLinks.map(s => ({
+            // full.socialLinks -> full.streamingLinks (model rename).
+            // `platform` comes back typed as the StreamingPlatform enum
+            // from Prisma, which lines up directly with the zod enum, so
+            // no mapping needed beyond picking the two fields.
+            streamingLinks: full.streamingLinks.map(s => ({
               platform: s.platform,
               url: s.url,
             })),
@@ -115,6 +127,7 @@ function EditAlbumLoader({
             id: a.artist.id,
             name: a.artist.name,
             image: a.artist.image,
+            role: a.role,
           })),
           initialGenres: full.genres.map(g => ({
             id: g.genre.id,
@@ -184,10 +197,6 @@ function EditAlbumForm({
   } = albumForm.form;
 
   async function onSubmit(data: CreateAlbumInput) {
-    console.log(
-      'tracks about to submit:',
-      data.tracks.map(t => ({ id: t.id, title: t.title }))
-    );
     try {
       const result = await updateAlbum(albumId, data);
 
@@ -208,13 +217,7 @@ function EditAlbumForm({
   }
 
   return (
-    <form
-      onSubmit={e => {
-        console.log('raw form submit event fired');
-        handleSubmit(onSubmit)(e);
-      }}
-      className='flex flex-col gap-5'
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-5'>
       <AlbumFormFields {...albumForm} />
 
       <DialogFooter>
@@ -227,8 +230,7 @@ function EditAlbumForm({
         </button>
 
         <button
-          type='button'
-          onClick={handleSubmit(onSubmit)}
+          type='submit'
           disabled={isSubmitting}
           className='flex items-center gap-2 rounded-md bg-ember px-4 py-2 text-sm font-medium text-white disabled:opacity-60'
         >

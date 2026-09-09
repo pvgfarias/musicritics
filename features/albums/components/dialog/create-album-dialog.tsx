@@ -21,10 +21,16 @@ const DEFAULT_VALUES: CreateAlbumInput = {
   slug: '',
   coverImage: null,
   releaseDate: null,
-  artistIds: [],
+  // releaseType has no schema-level default anymore (see album-schema.ts —
+  // .default() there was fighting zodResolver's input/output typing), so
+  // it has to be supplied here explicitly or new albums fail validation
+  // with releaseType undefined.
+  releaseType: 'LP',
+  labelId: null,
+  artists: [],
   genreIds: [],
   tracks: [{ title: '', number: 1 }],
-  socialLinks: [],
+  streamingLinks: [],
 };
 
 export function CreateAlbumDialog() {
