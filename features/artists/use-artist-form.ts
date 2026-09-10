@@ -57,10 +57,11 @@ export function useArtistForm(
     );
   }
 
-  function handleCountryChange(value: string) {
-    const trimmed = value.trim().toUpperCase();
-    form.setValue('country', trimmed.length ? trimmed : null);
-  }
+  // handleCountryChange removed — it used to trim/uppercase free-typed
+  // text into something matching the schema's regex. Now that country
+  // selection comes from CountryPickerField (a fixed list of valid ISO
+  // codes), there's nothing left to sanitize; the field wires directly to
+  // setValue, same pattern as handleImageChange above.
 
   function handleDebutDateChange(value: string | Date | null) {
     if (value === null || value instanceof Date) {
@@ -90,7 +91,6 @@ export function useArtistForm(
     handleImageChange,
     handleBioChange,
     handleGenresChange,
-    handleCountryChange,
     handleDebutDateChange,
     handleDisbandedDateChange,
   };

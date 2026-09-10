@@ -8,7 +8,7 @@ import {
 } from '@/features/albums/queries';
 import ArtistDetails from '@/features/artists/components/details/artist-details';
 
-export default async function AlbumPage({
+export default async function ArtistSlugPage({
   params,
 }: {
   params: Promise<{ slug: string }>;

@@ -29,14 +29,17 @@ type ArtistOption = {
   role?: 'PRIMARY' | 'FEATURED' | 'PRODUCER';
 };
 type GenreOption = { id: string; name: string; slug: string };
+type LabelOption = { id: string; name: string };
 
 export function useAlbumForm(
   defaultValues: CreateAlbumInput,
   defaultArtists: ArtistOption[] = [],
-  defaultGenres: GenreOption[] = []
+  defaultGenres: GenreOption[] = [],
+  defaultLabel: LabelOption | null = null
 ) {
   const [artists, setArtists] = useState<ArtistOption[]>(defaultArtists);
   const [genres, setGenres] = useState<GenreOption[]>(defaultGenres);
+  const [label, setLabel] = useState<LabelOption | null>(defaultLabel);
   const [slugTouched, setSlugTouched] = useState(false);
 
   const form = useForm<CreateAlbumInput>({
@@ -86,17 +89,24 @@ export function useAlbumForm(
     );
   }
 
+  function handleLabelChange(next: LabelOption | null) {
+    setLabel(next);
+    form.setValue('labelId', next?.id ?? null);
+  }
+
   return {
     form,
     tracks,
     streamingLinks,
     artists,
     genres,
+    label,
     slugTouched,
     setSlugTouched,
     handleTitleChange,
     handleArtistsChange,
     handleGenresChange,
+    handleLabelChange,
   };
 }
 

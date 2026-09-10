@@ -20,7 +20,7 @@ const PLATFORM_ICONS: Record<string, { src: string; alt: string }> = {
   // assets need to be dropped into /public with these exact filenames (or
   // update the src paths to match whatever you actually save them as).
   deezer: { src: '/deezer-svgrepo-com.svg', alt: 'Deezer' },
-  tidal: { src: '/tidal-svgrepo-com.svg', alt: 'Tidal' },
+  tidal: { src: '/tidal-logo-svgrepo-com.svg', alt: 'Tidal' },
   bandcamp: { src: '/bandcamp-svgrepo-com.svg', alt: 'Bandcamp' },
   amazonmusic: { src: '/amazon-music-svgrepo-com.svg', alt: 'Amazon Music' },
 };

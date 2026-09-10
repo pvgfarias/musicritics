@@ -4,6 +4,7 @@
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { ArtistImageUploadField } from './artist-image-upload-field';
 import { GenrePickerField } from '@/components/ui/genre-picker-field';
+import { CountryPickerField } from '@/components/ui/country-picker-field';
 import { STREAMING_PLATFORMS } from '@/lib/streaming-platforms';
 import type { ArtistFormState } from '@/features/artists/use-artist-form';
 
@@ -14,7 +15,6 @@ export function ArtistFormFields({
   handleNameChange,
   handleBioChange,
   handleGenresChange,
-  handleCountryChange,
   handleDebutDateChange,
   handleDisbandedDateChange,
   setSlugTouched,
@@ -66,21 +66,11 @@ export function ArtistFormFields({
           )}
         </div>
 
-        {/*
-          Plain text input, auto-uppercased by handleCountryChange to match
-          the schema's 2-letter ISO code regex. If you'd rather have a
-          searchable country-name dropdown instead of expecting someone to
-          type/remember a code, that's a separate picker component — this
-          is the lower-effort version.
-        */}
         <div className='flex flex-col gap-1'>
-          <label className='text-sm font-medium'>Country</label>
-          <input
-            value={country ?? ''}
-            onChange={e => handleCountryChange(e.target.value)}
-            placeholder='US'
-            maxLength={2}
-            className='rounded-md border border-gray-300 px-3 py-1.5 text-sm uppercase dark:border-gray-700 dark:bg-gray-900'
+          {/* CountryPickerField renders its own label internally */}
+          <CountryPickerField
+            value={country}
+            onChange={code => setValue('country', code)}
           />
           {errors.country && (
             <p className='text-xs text-red-600'>{errors.country.message}</p>

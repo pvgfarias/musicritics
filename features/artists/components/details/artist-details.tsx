@@ -1,5 +1,5 @@
 import { AlbumSummary, ArtistReviewSummary } from '@/features/albums/queries';
-import { ArtistSummary } from '../../queries';
+import { ArtistDetail } from '../../queries';
 import { ArtistHeader } from './artist-header';
 import { ArtistDiscography } from './artist-discography';
 import { ArtistReviews } from './artist-reviews';
@@ -9,7 +9,7 @@ export default function ArtistDetails({
   albums,
   reviews,
 }: {
-  artist: ArtistSummary;
+  artist: ArtistDetail;
   albums: AlbumSummary[];
   reviews: ArtistReviewSummary[];
 }) {

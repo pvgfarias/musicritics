@@ -1,22 +1,16 @@
+// components/admin/album-form-fields.tsx
 'use client';
 
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { AlbumCoverUploadField } from './album-cover-upload-field';
 import { ArtistPickerField } from './artist-picker-field';
+import { LabelPickerField } from './label-picker-field';
 import { GenrePickerField } from '@/components/ui/genre-picker-field';
+// Was a local const duplicating the same list already in
+// artist-form-fields.tsx — imported from the shared file instead so the
+// two can't drift out of sync.
+import { STREAMING_PLATFORMS } from '@/lib/streaming-platforms';
 import type { AlbumFormState } from '@/features/albums/use-album-form';
-
-const STREAMING_PLATFORMS = [
-  { value: 'SPOTIFY', label: 'Spotify' },
-  { value: 'APPLE_MUSIC', label: 'Apple Music' },
-  { value: 'DEEZER', label: 'Deezer' },
-  { value: 'TIDAL', label: 'Tidal' },
-  { value: 'YOUTUBE_MUSIC', label: 'YouTube Music' },
-  { value: 'SOUNDCLOUD', label: 'SoundCloud' },
-  { value: 'BANDCAMP', label: 'Bandcamp' },
-  { value: 'AMAZON_MUSIC', label: 'Amazon Music' },
-  { value: 'OTHER', label: 'Other' },
-] as const;
 
 const RELEASE_TYPES = [
   { value: 'LP', label: 'LP' },
@@ -34,9 +28,11 @@ export function AlbumFormFields({
   streamingLinks,
   artists,
   genres,
+  label,
   handleTitleChange,
   handleArtistsChange,
   handleGenresChange,
+  handleLabelChange,
   setSlugTouched,
 }: AlbumFormState) {
   const {
@@ -119,24 +115,6 @@ export function AlbumFormFields({
             <p className='text-xs text-red-600'>{errors.releaseType.message}</p>
           )}
         </div>
-
-        {/*
-          Plain text input as a placeholder for labelId — there's no
-          LabelPickerField yet (parallel to ArtistPickerField/
-          GenrePickerField). Swap this for a real picker once one exists;
-          for now it expects a raw Label id typed/pasted in directly.
-        */}
-        <div className='flex flex-col gap-1'>
-          <label className='text-sm font-medium'>Label ID (optional)</label>
-          <input
-            {...register('labelId')}
-            placeholder='cku1a2b3c...'
-            className='rounded-md border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900'
-          />
-          {errors.labelId && (
-            <p className='text-xs text-red-600'>{errors.labelId.message}</p>
-          )}
-        </div>
       </div>
 
       {/*
@@ -153,6 +131,13 @@ export function AlbumFormFields({
       <GenrePickerField value={genres} onChange={handleGenresChange} />
       {errors.genreIds && (
         <p className='text-xs text-red-600'>{errors.genreIds.message}</p>
+      )}
+
+      {/* Was a raw text input expecting a pasted Label id — now the real
+          search/create/delete picker. */}
+      <LabelPickerField value={label} onChange={handleLabelChange} />
+      {errors.labelId && (
+        <p className='text-xs text-red-600'>{errors.labelId.message}</p>
       )}
 
       <div className='flex flex-col gap-2'>
@@ -213,11 +198,6 @@ export function AlbumFormFields({
 
         {streamingLinks.fields.map((field, index) => (
           <div key={field._fieldKey} className='flex items-center gap-2'>
-            {/*
-              Was a free-text input — platform is now a constrained enum
-              (StreamingPlatform), so a select keeps submitted values valid
-              and matches the picklist your zod schema enforces.
-            */}
             <select
               {...register(`streamingLinks.${index}.platform`)}
               className='w-36 rounded-md border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900'

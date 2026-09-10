@@ -35,6 +35,11 @@ type GenreOption = {
   slug: string;
 };
 
+type LabelOption = {
+  id: string;
+  name: string;
+};
+
 type EditAlbumDialogProps = {
   album: AlbumSummary | null;
   open: boolean;
@@ -49,6 +54,7 @@ type EditAlbumState =
       initialValues: CreateAlbumInput;
       initialArtists: ArtistOption[];
       initialGenres: GenreOption[];
+      initialLabel: LabelOption | null;
     };
 
 export function EditAlbumDialog({
@@ -134,6 +140,12 @@ function EditAlbumLoader({
             name: g.genre.name,
             slug: g.genre.slug,
           })),
+          // full.label is the whole Label row (id/name/slug/country) from
+          // getAlbumForEdit's `label: true` include, or null if unset —
+          // LabelPickerField only needs id/name to display it.
+          initialLabel: full.label
+            ? { id: full.label.id, name: full.label.name }
+            : null,
         });
       })
       .catch(err => {
@@ -170,6 +182,7 @@ function EditAlbumLoader({
       initialValues={state.initialValues}
       initialArtists={state.initialArtists}
       initialGenres={state.initialGenres}
+      initialLabel={state.initialLabel}
       onDone={onDone}
     />
   );
@@ -180,15 +193,22 @@ function EditAlbumForm({
   initialValues,
   initialArtists,
   initialGenres,
+  initialLabel,
   onDone,
 }: {
   albumId: string;
   initialValues: CreateAlbumInput;
   initialArtists: ArtistOption[];
   initialGenres: GenreOption[];
+  initialLabel: LabelOption | null;
   onDone: () => void;
 }) {
-  const albumForm = useAlbumForm(initialValues, initialArtists, initialGenres);
+  const albumForm = useAlbumForm(
+    initialValues,
+    initialArtists,
+    initialGenres,
+    initialLabel
+  );
 
   const {
     handleSubmit,
