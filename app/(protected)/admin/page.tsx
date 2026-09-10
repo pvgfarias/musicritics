@@ -1,5 +1,5 @@
-import { requireDashboardAccess } from '@/lib/auth-helpers';
-import { IconCheck, IconPlus } from '@tabler/icons-react';
+import { requireDashboardAccess } from '@/features/auth/auth-helpers';
+import { IconPlus, IconRotate } from '@tabler/icons-react';
 import Link from 'next/link';
 
 export default async function Page() {
@@ -19,12 +19,10 @@ export default async function Page() {
         <IconPlus />
         Create Artist
       </Link>
-      <button>
-        <IconCheck /> Finalize Weekly Rotation
-      </button>
-      <div>
-        <h3>Weekly Rotation</h3>
-      </div>
+      <Link href='/admin/rotations'>
+        <IconRotate />
+        Manage Rotations
+      </Link>
       <div>
         <h3>Recent Reviews</h3>
       </div>

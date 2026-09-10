@@ -267,3 +267,89 @@ export async function getRotationById(id: string) {
   if (!rotation) return null;
   return normalizeRotationDetail(rotation);
 }
+
+export type ActiveRotationAdmin = Awaited<
+  ReturnType<typeof getActiveRotationForAdmin>
+>;
+
+export async function getActiveRotationForAdmin() {
+  const now = new Date();
+
+  const rotation = await prisma.rotation.findFirst({
+    where: { startDate: { lte: now }, endDate: { gte: now } },
+    include: {
+      albums: {
+        include: {
+          album: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              coverImage: true,
+              artists: {
+                select: { artist: { select: { name: true } } },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!rotation) return null;
+
+  const albumIds = rotation.albums.map(ra => ra.albumId);
+
+  const [distinctRaters, totalUsers] = await Promise.all([
+    prisma.rating.findMany({
+      where: { albumId: { in: albumIds } },
+      select: { userId: true },
+      distinct: ['userId'],
+    }),
+    prisma.user.count(),
+  ]);
+
+  return {
+    id: rotation.id,
+    name: rotation.name,
+    slug: rotation.slug,
+    startDate: rotation.startDate,
+    endDate: rotation.endDate,
+    raterCount: distinctRaters.length,
+    totalUsers,
+    albums: rotation.albums.map(ra => ({
+      id: ra.album.id,
+      title: ra.album.title,
+      slug: ra.album.slug,
+      coverImage: ra.album.coverImage,
+      artist: ra.album.artists.map(a => a.artist.name).join(', '),
+    })),
+  };
+}
+
+export async function searchAlbumsForRotation(query: string, limit = 20) {
+  const albums = await prisma.album.findMany({
+    where: query
+      ? { title: { contains: query, mode: 'insensitive' } }
+      : undefined,
+    take: limit,
+    orderBy: { title: 'asc' },
+    select: {
+      id: true,
+      title: true,
+      coverImage: true,
+      artists: { select: { artist: { select: { name: true } } } },
+    },
+  });
+
+  return albums.map(a => ({
+    id: a.id,
+    title: a.title,
+    coverImage: a.coverImage,
+    artist: a.artists.map(x => x.artist.name).join(', '),
+  }));
+}
+
+export type RotationAlbumSearchResult = Awaited<
+  ReturnType<typeof searchAlbumsForRotation>
+>[number];
