@@ -7,6 +7,7 @@ import Link from 'next/link';
 import UserMenu from '../user-menu';
 import { useSession } from '@/features/auth/auth-client';
 import { adminLinks, adminOnlyLinks, userLinks } from './sidebarLinks';
+import NotificationBell from '../notification-bell';
 
 export default function Sidebar() {
   const shouldReduceMotion = useReducedMotion();
@@ -59,7 +60,12 @@ export default function Sidebar() {
 
           <div className='hidden h-auto w-full grow md:block' />
           <div className='h-px bg-gray-300 dark:bg-slate-800' />
-          <UserMenu />
+          <div className='flex items-center gap-2 w-full'>
+            <div className='flex-1 min-w-0'>
+              <UserMenu />
+            </div>
+            <NotificationBell />
+          </div>
         </nav>
       </motion.div>
     </div>
