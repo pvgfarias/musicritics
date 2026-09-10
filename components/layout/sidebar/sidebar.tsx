@@ -8,6 +8,7 @@ import UserMenu from '../user-menu';
 import { useSession } from '@/features/auth/auth-client';
 import { adminLinks, adminOnlyLinks, userLinks } from './sidebarLinks';
 import NotificationBell from '../notification-bell';
+import GlobalSearch from '@/features/search/components/global-search';
 
 export default function Sidebar() {
   const shouldReduceMotion = useReducedMotion();
@@ -38,6 +39,11 @@ export default function Sidebar() {
             <IconVinyl size={24} className='shrink-0' />
             <p className='whitespace-nowrap'>MusiCritics</p>
           </Link>
+
+          <div className='px-2'>
+            <GlobalSearch />
+          </div>
+
           <SidebarLinks links={userLinks} />
 
           {isPrivileged && (
