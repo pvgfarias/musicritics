@@ -4,7 +4,6 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Link from 'next/link';
 import Image from 'next/image';
 import { IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
-import { sidebarItemClasses } from '@/lib/styles';
 import { cn } from '@/lib/utils';
 import ThemeToggle from './theme-toggle';
 import { useRouter } from 'next/navigation';
@@ -33,37 +32,34 @@ export default function UserMenu() {
       <DropdownMenu.Trigger asChild>
         <button
           type='button'
-          className={cn(
-            sidebarItemClasses(false),
-            'flex items-center gap-3 w-full overflow-hidden text-left'
-          )}
+          className='flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-slate-800'
         >
           <Image
             src={user.image ?? '/user.png'}
             alt={user.name ?? 'User avatar'}
-            width={32}
-            height={32}
+            width={28}
+            height={28}
             className='rounded-full shrink-0'
           />
-          <span className='whitespace-nowrap truncate'>
-            {user.displayUsername ?? user.username ?? user.name}{' '}
+          <span className='hidden sm:inline text-sm text-gray-800 dark:text-gray-200 whitespace-nowrap'>
+            {user.displayUsername ?? user.username ?? user.name}
           </span>
         </button>
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          side='right'
+          side='bottom'
           align='end'
-          sideOffset={14}
+          sideOffset={10}
           collisionPadding={10}
           className={cn(
-            'w-60 rounded-2xl bg-sidebar border border-dark-blue/5 dark:border-white/5',
+            'w-56 rounded-2xl bg-sidebar border border-dark-blue/5 dark:border-white/5',
             'text-dark-blue dark:text-slate-200 shadow-xl',
             'py-2 px-4 flex flex-col gap-2 z-1000',
             'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
-            'data-[side=right]:slide-in-from-left-1 data-[side=left]:slide-in-from-right-1'
+            'data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1'
           )}
         >
           <DropdownMenu.Item asChild>

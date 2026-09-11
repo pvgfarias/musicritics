@@ -9,6 +9,7 @@ export type SidebarLink = {
   href: string;
   icon: Icon;
   exact?: boolean;
+  requiresAuth?: boolean;
 };
 
 export default function SidebarLinks({ links }: { links: SidebarLink[] }) {

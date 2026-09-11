@@ -3,6 +3,7 @@ import Script from 'next/script';
 import './globals.css';
 import { Raleway, Zilla_Slab, Space_Mono } from 'next/font/google';
 import Sidebar from '@/components/layout/sidebar/sidebar';
+import Header from '@/components/layout/header';
 
 export const metadata: Metadata = {
   title: 'MusiCritics | Rate and discover new music.',
@@ -67,6 +68,7 @@ export default function RootLayout({
         <Sidebar />
 
         <div className='flex flex-col flex-1 min-w-0 h-dvh'>
+          <Header />
           <main className='relative flex-1 overflow-y-auto bg-background'>
             {children}
           </main>

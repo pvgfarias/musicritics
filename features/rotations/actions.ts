@@ -11,7 +11,7 @@ export async function toggleAlbumInCurrentRotation(
   albumId: string,
   isCurrentlyInRotation: boolean
 ): Promise<ActionResult> {
-  const allowed = await requirePermission({ album: ['update'] });
+  const allowed = await requirePermission({ album: ['manageRotation'] });
   if (!allowed) throw new Error('Unauthorized');
 
   const now = new Date();

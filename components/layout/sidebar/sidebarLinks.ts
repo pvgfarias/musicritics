@@ -1,4 +1,3 @@
-// lib/sidebar-links.ts
 import {
   IconHome,
   IconDisc,
@@ -15,7 +14,12 @@ export const userLinks: SidebarLink[] = [
   { name: 'Artists', href: '/dashboard/artists', icon: IconMicrophone2 },
   { name: 'Albums', href: '/dashboard/albums', icon: IconDisc },
   { name: 'Rotations', href: '/dashboard/rotations', icon: IconRefresh },
-  { name: 'Ratings', href: '/dashboard/ratings', icon: IconStar },
+  {
+    name: 'Ratings',
+    href: '/dashboard/ratings',
+    icon: IconStar,
+    requiresAuth: true,
+  },
 ];
 
 export const adminLinks: SidebarLink[] = [
@@ -25,7 +29,6 @@ export const adminLinks: SidebarLink[] = [
   { name: 'Manage Rotations', href: '/admin/rotations', icon: IconRefresh },
 ];
 
-// separate array since only admin (not moderator) should see it
 export const adminOnlyLinks: SidebarLink[] = [
   { name: 'Manage Users', href: '/admin/users', icon: IconUser },
 ];
