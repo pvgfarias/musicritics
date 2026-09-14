@@ -3,10 +3,122 @@
 
 import { prisma } from '@/lib/prisma';
 import { auth } from '../auth/auth';
+import { getSession, requirePermission } from '../auth/auth-helpers';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
 type ActionResult = { success: true } | { success: false; error: string };
+
+// Guards against an admin locking themselves out (self-ban, self-demote,
+// self-delete) by acting on their own account through this panel.
+async function assertNotActingOnSelf(targetUserId: string, message: string) {
+  const session = await getSession();
+  if (session?.user.id === targetUserId) {
+    throw new Error(message);
+  }
+}
+
+export async function banUser(
+  userId: string,
+  reason: string,
+  banDurationDays?: number
+): Promise<ActionResult> {
+  const allowed = await requirePermission({ user: ['ban'] });
+  if (!allowed) throw new Error('Unauthorized');
+  await assertNotActingOnSelf(userId, "You can't ban yourself.");
+
+  try {
+    await auth.api.banUser({
+      body: {
+        userId,
+        banReason: reason.trim() || undefined,
+        banExpiresIn: banDurationDays
+          ? banDurationDays * 24 * 60 * 60
+          : undefined,
+      },
+      headers: await headers(),
+    });
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Failed to ban user.',
+    };
+  }
+
+  revalidatePath('/admin/users');
+  return { success: true };
+}
+
+export async function unbanUser(userId: string): Promise<ActionResult> {
+  const allowed = await requirePermission({ user: ['ban'] });
+  if (!allowed) throw new Error('Unauthorized');
+
+  try {
+    await auth.api.unbanUser({
+      body: { userId },
+      headers: await headers(),
+    });
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Failed to unban user.',
+    };
+  }
+
+  revalidatePath('/admin/users');
+  return { success: true };
+}
+
+// Toggles between 'user' and 'moderator'. Deliberately doesn't accept
+// 'admin' here — promoting/demoting admins isn't exposed through this
+// panel, only moderator status for regular users.
+export async function setModeratorStatus(
+  userId: string,
+  makeModerator: boolean
+): Promise<ActionResult> {
+  const allowed = await requirePermission({ user: ['set-role'] });
+  if (!allowed) throw new Error('Unauthorized');
+  await assertNotActingOnSelf(userId, "You can't change your own role.");
+
+  try {
+    await auth.api.setRole({
+      body: { userId, role: makeModerator ? 'moderator' : 'user' },
+      headers: await headers(),
+    });
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Failed to update role.',
+    };
+  }
+
+  revalidatePath('/admin/users');
+  return { success: true };
+}
+
+export async function deleteUser(userId: string): Promise<ActionResult> {
+  const allowed = await requirePermission({ user: ['delete'] });
+  if (!allowed) throw new Error('Unauthorized');
+  await assertNotActingOnSelf(
+    userId,
+    "You can't delete your own account here."
+  );
+
+  try {
+    await auth.api.removeUser({
+      body: { userId },
+      headers: await headers(),
+    });
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Failed to delete user.',
+    };
+  }
+
+  revalidatePath('/admin/users');
+  return { success: true };
+}
 
 const MAX_FAVORITES = 10;
 

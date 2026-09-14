@@ -4,7 +4,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { IconSearch } from '@tabler/icons-react';
 import { useDebouncedCallback } from 'use-debounce';
 
-export default function SearchBar() {
+export default function SearchBar({
+  placeholder = 'Search albums...',
+}: {
+  placeholder?: string;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -24,7 +28,7 @@ export default function SearchBar() {
       <IconSearch size={20} className='text-gray-500' />
       <input
         type='search'
-        placeholder='Search albums...'
+        placeholder={placeholder}
         className='w-full bg-transparent focus:outline-none'
         onChange={e => handleSearch(e.target.value)}
         defaultValue={searchParams.get('query')?.toString()}

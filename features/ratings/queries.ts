@@ -1,4 +1,52 @@
 import { prisma } from '@/lib/prisma';
+import type { AlbumSummary } from '@/features/albums/queries';
+
+// The `/dashboard/ratings` page reuses getAlbumsPage() (search/sort/genre/
+// pagination all already work there via `rated: 'Rated'`), but AlbumSummary
+// doesn't carry per-rating metadata like when it was rated or whether a
+// review was left — that data isn't relevant to the catalog views that
+// query normally serves. Rather than bloating buildAlbumSummarySelect()
+// for every album card in the app, this does one small follow-up query
+// scoped to just the page of albums already fetched.
+export type RatedAlbum = AlbumSummary & {
+  ratedAt: Date;
+  hasReview: boolean;
+};
+
+export async function attachRatingMeta(
+  albums: AlbumSummary[],
+  userId: string
+): Promise<RatedAlbum[]> {
+  if (albums.length === 0) return [];
+
+  const ratings = await prisma.rating.findMany({
+    where: { userId, albumId: { in: albums.map(a => a.id) } },
+    select: {
+      albumId: true,
+      ratedAt: true,
+      comment: { select: { id: true } },
+    },
+  });
+
+  const metaByAlbumId = new Map(
+    ratings.map(r => [
+      r.albumId,
+      { ratedAt: r.ratedAt, hasReview: r.comment !== null },
+    ])
+  );
+
+  return albums.map(album => {
+    const meta = metaByAlbumId.get(album.id);
+    return {
+      ...album,
+      // Falls back to the album's own createdAt in the (shouldn't-happen)
+      // case a rating went missing between the two queries — keeps the
+      // type non-nullable rather than pushing that edge case onto the UI.
+      ratedAt: meta?.ratedAt ?? album.createdAt,
+      hasReview: meta?.hasReview ?? false,
+    };
+  });
+}
 
 export type AlbumTrackForRating = Awaited<
   ReturnType<typeof getAlbumTracksForRating>

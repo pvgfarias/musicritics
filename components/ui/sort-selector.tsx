@@ -21,14 +21,20 @@ const fieldOptions: { value: SortField; label: string }[] = [
   { value: 'az', label: 'A–Z' },
 ];
 
-export default function SortSelector() {
+export default function SortSelector({
+  defaultField = 'recent',
+}: {
+  // Which field to treat as "no ?sort= param yet" — lets a page default to
+  // a different sort (e.g. 'user-score') without the label lying about it.
+  defaultField?: SortField;
+} = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const currentField = (searchParams.get('sort') as SortField) ?? 'recent';
+  const currentField = (searchParams.get('sort') as SortField) ?? defaultField;
   const currentDirection =
     (searchParams.get('dir') as SortDirection) ??
     defaultDirectionForField[currentField];
@@ -39,7 +45,7 @@ export default function SortSelector() {
   const updateParams = (field: SortField, direction: SortDirection) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (field === 'recent') {
+    if (field === defaultField) {
       params.delete('sort');
     } else {
       params.set('sort', field);
