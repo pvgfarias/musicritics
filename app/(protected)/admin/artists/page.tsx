@@ -1,7 +1,7 @@
 import AdminArtistsView from '@/features/artists/components/admin/admin-artists-view';
 import { getArtistsPage } from '@/features/artists/queries';
 import { auth } from '@/features/auth/auth';
-import type { SortKey } from '@/lib/sort-ratings';
+import type { SortField } from '@/lib/sort-ratings';
 import { headers } from 'next/headers';
 
 const PAGE_SIZE = 15;
@@ -25,7 +25,7 @@ export default async function Page({ searchParams }: PageProps) {
     page,
     pageSize: PAGE_SIZE,
     query: params.query,
-    sort: (params.sort as SortKey) ?? 'recent',
+    sort: (params.sort as SortField) ?? 'recent',
     userId: user?.id,
   });
 
