@@ -64,7 +64,7 @@ export default function UserMenu() {
         >
           <DropdownMenu.Item asChild>
             <Link
-              href='/profile'
+              href={`/users/${user.username}`}
               className='flex py-2 items-center gap-2 text-sm font-medium rounded-md px-1 outline-none hover:bg-sidebar-active focus-visible:bg-sidebar-active'
             >
               <IconUser size={18} />

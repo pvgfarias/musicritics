@@ -129,23 +129,34 @@ const MAX_FAVORITES = 10;
 // non-transactional step before either insert lands.
 class FavoritesLimitError extends Error {}
 
-async function getCurrentUserId(): Promise<string> {
+async function getCurrentUser(): Promise<{ id: string; username: string }> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) throw new Error('Unauthorized');
-  return session.user.id;
+
+  // better-auth types username as `string | null | undefined` (the
+  // username plugin can't statically guarantee it's set), even though the
+  // DB column is non-null/unique here. Narrowing explicitly rather than
+  // `!` or `?? id` — a session with no username would mean something's
+  // actually wrong, and silently falling back would revalidate the wrong
+  // page instead of surfacing that.
+  if (!session.user.username) {
+    throw new Error('Your account is missing a username.');
+  }
+
+  return { id: session.user.id, username: session.user.username };
 }
 
 export async function toggleFavoriteAlbum(
   albumId: string,
   isCurrentlyFavorited: boolean
 ): Promise<ActionResult> {
-  const userId = await getCurrentUserId();
+  const { id: userId, username } = await getCurrentUser();
 
   if (isCurrentlyFavorited) {
     await prisma.userFavoriteAlbum.delete({
       where: { userId_albumId: { userId, albumId } },
     });
-    revalidatePath('/profile');
+    revalidatePath(`/users/${username}`);
     return { success: true };
   }
 
@@ -180,7 +191,7 @@ export async function toggleFavoriteAlbum(
     throw err;
   }
 
-  revalidatePath('/profile');
+  revalidatePath(`/users/${username}`);
   return { success: true };
 }
 
@@ -188,13 +199,13 @@ export async function toggleFavoriteArtist(
   artistId: string,
   isCurrentlyFavorited: boolean
 ): Promise<ActionResult> {
-  const userId = await getCurrentUserId();
+  const { id: userId, username } = await getCurrentUser();
 
   if (isCurrentlyFavorited) {
     await prisma.userFavoriteArtist.delete({
       where: { userId_artistId: { userId, artistId } },
     });
-    revalidatePath('/profile');
+    revalidatePath(`/users/${username}`);
     return { success: true };
   }
 
@@ -224,6 +235,56 @@ export async function toggleFavoriteArtist(
     throw err;
   }
 
-  revalidatePath('/profile');
+  revalidatePath(`/users/${username}`);
   return { success: true };
+}
+
+// Bio/country — profile-facing fields that better-auth doesn't know about
+// (it only owns name/email/image natively). Handled as a plain, self-only
+// Prisma write rather than fighting authClient.updateUser()'s field
+// whitelist, consistent with how the rest of this app's domain data is
+// written.
+export async function updateProfile(input: {
+  bio: string | null;
+  country: string | null;
+}): Promise<ActionResult> {
+  const { id: userId, username } = await getCurrentUser();
+
+  const bio = input.bio?.trim() || null;
+  if (bio && bio.length > 500) {
+    return { success: false, error: 'Bio must be 500 characters or fewer.' };
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { bio, country: input.country || null },
+    });
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Failed to update profile.',
+    };
+  }
+
+  revalidatePath(`/users/${username}`);
+  return { success: true };
+}
+
+export async function searchAlbumsForFavorites(query: string) {
+  if (!query.trim()) return [];
+  return prisma.album.findMany({
+    where: { title: { contains: query, mode: 'insensitive' } },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      coverImage: true,
+      artists: {
+        select: { artist: { select: { name: true } } },
+        take: 1,
+      },
+    },
+    take: 10,
+  });
 }

@@ -13,6 +13,16 @@ import { sendVerificationEmail, sendResetPasswordEmail } from './email';
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
 
+  user: {
+    // Off by default in better-auth — needed for the account settings page
+    // to be able to change email at all. Reuses the same
+    // emailVerification.sendVerificationEmail callback below to verify the
+    // new address before the change takes effect.
+    changeEmail: {
+      enabled: true,
+    },
+  },
+
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,

@@ -15,7 +15,7 @@ export async function sendVerificationEmail({
     sender: { name: 'MusiCritics', email: 'pve1356@gmail.com' },
     to: [{ email: emailRecipient }],
     subject: 'MusiCritics - Verify Your Email',
-    textContent: `<p>Click below to verify your email and finish signing up.</p>
+    textContent: `<p>Click below to verify this email address.</p>
            <p><a href="${url}">Verify email</a></p>
            <p>If you didn't request this, ignore this email.</p>`,
   });

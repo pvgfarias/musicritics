@@ -7,6 +7,7 @@ import { getUserProfileByUsername } from '@/features/users/queries';
 import { FollowButton } from '@/features/follows/components/follow-button';
 import RatingScore from '@/components/dashboard/rating-score';
 import { FollowListDialog } from '@/features/follows/components/follow-list-dialog';
+import { EditProfileButton } from '@/features/users/components/edit-profile-button';
 
 export default async function UserProfilePage({
   params,
@@ -58,6 +59,18 @@ export default async function UserProfilePage({
           <FollowButton
             targetUserId={profile.id}
             initiallyFollowing={profile.viewerIsFollowing}
+          />
+        )}
+
+        {profile.isOwnProfile && (
+          <EditProfileButton
+            initial={{
+              displayUsername: profile.displayUsername ?? profile.username,
+              image: profile.image,
+              bio: profile.bio,
+              country: profile.country,
+            }}
+            initialFavorites={profile.favoriteAlbums}
           />
         )}
       </div>
