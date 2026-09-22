@@ -16,8 +16,6 @@ MusiCritics is a social platform for rating and discovering music — [1–2 sen
 - 🔎 **Search** — [describe how users find albums/artists — command palette (⌘K) noted on the live site]
 - 🌗 **Light/dark theme**
 
-_(Edit this list to match what's actually shipped — cut anything aspirational, and add anything I missed.)_
-
 ## Tech Stack
 
 **Frontend**
@@ -44,11 +42,8 @@ _(Edit this list to match what's actually shipped — cut anything aspirational,
 
 A few decisions worth calling out:
 
-- **Neon + Prisma's serverless adapter** over a traditional connection pool — chosen for [reason: e.g. "cold-start performance on Vercel's serverless functions"].
-- **better-auth** over NextAuth — chosen for [reason].
-- [Add 1–2 more: e.g. how the social graph / ratings are modeled, any tricky query you solved, why you picked Zod + react-hook-form, etc.]
-
-_(This section is the most valuable one for a portfolio piece — it shows you make deliberate engineering choices, not just follow tutorials. Even 3–4 short bullets here go a long way.)_
+- **Neon + Prisma's serverless adapter** over a traditional connection pool — chosen for cold-start performance on Vercel's serverless functions
+- **better-auth** over NextAuth — better for modern applications
 
 ## Getting Started
 
@@ -76,19 +71,7 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-> Note: add a `.env.example` file to the repo (with placeholder values, no real secrets) so this step actually works for someone cloning it.
-
 ## Screenshots
-
-_(Add 2–3 screenshots or a short GIF here — the homepage, a rating/review flow, and a profile or feed page. This is often the first thing a recruiter looks at.)_
-
-## Roadmap / What's Next
-
-- [ ] [e.g. recommendation engine based on rating history]
-- [ ] [e.g. integration with Spotify/MusicBrainz API for album data]
-- [ ] [e.g. test coverage with Jest/Cypress]
-
-_(Optional, but signals the project is actively developed rather than abandoned.)_
 
 ## License
 
