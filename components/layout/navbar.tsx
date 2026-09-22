@@ -7,7 +7,7 @@ import GlobalSearch from '@/features/search/components/global-search';
 import MobileNav from './mobile-nav';
 import { useSession } from '@/features/auth/auth-client';
 
-export default function Header() {
+export default function Navbar() {
   const { data: session, isPending } = useSession();
   const isAuthenticated = !!session;
 

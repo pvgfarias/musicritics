@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import { Raleway, Zilla_Slab, Space_Mono } from 'next/font/google';
-import Sidebar from '@/components/layout/sidebar/sidebar';
-import Header from '@/components/layout/header';
 
 export const metadata: Metadata = {
   title: 'MusiCritics | Rate and discover new music.',
@@ -63,17 +61,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
         />
       </head>
-
-      <body className='flex h-dvh overflow-hidden'>
-        <Sidebar />
-
-        <div className='flex flex-col flex-1 min-w-0 h-dvh'>
-          <Header />
-          <main className='relative flex-1 overflow-y-auto bg-background'>
-            {children}
-          </main>
-        </div>
-      </body>
+      <body className='antialiased'>{children}</body>
     </html>
   );
 }
