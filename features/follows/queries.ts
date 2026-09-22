@@ -92,3 +92,34 @@ export async function getSuggestedUsers(excludeUserId: string, limit = 6) {
     select: { id: true, username: true, image: true, bio: true },
   });
 }
+
+// Site-wide activity, not scoped to who the viewer follows — same
+// "public once rotation closes" privacy rule as getFollowingFeed, since
+// this is just that same rule applied to every user instead of a filtered
+// set of them. Excludes the viewer's own ratings: seeing your own activity
+// in a "what's everyone else up to" rail isn't useful.
+export async function getGlobalFeed(viewerId?: string, limit = 15) {
+  const now = new Date();
+  return prisma.rating.findMany({
+    where: {
+      ...(viewerId && { userId: { not: viewerId } }),
+      album: {
+        rotations: {
+          none: {
+            closedAt: null,
+            rotation: { startDate: { lte: now }, endDate: { gte: now } },
+          },
+        },
+      },
+    },
+    orderBy: { ratedAt: 'desc' },
+    take: limit,
+    include: {
+      user: { select: { id: true, username: true, image: true } },
+      album: {
+        select: { id: true, title: true, slug: true, coverImage: true },
+      },
+      comment: { select: { body: true } },
+    },
+  });
+}

@@ -16,9 +16,15 @@ export default function CurrentRotationSection({
   if (!activeRotation) {
     return (
       <section className='mb-10'>
-        <p className='font-mono text-sm text-gray-500 dark:text-gray-400'>
-          No rotation is currently active. Check back soon.
-        </p>
+        <div className='flex flex-col items-center gap-2 text-center py-10 px-4 rounded-md bg-gray-50 dark:bg-slate-900'>
+          <IconRefresh size={22} className='text-gray-400 dark:text-gray-500' />
+          <p className='text-sm text-gray-700 dark:text-gray-300'>
+            No rotation is currently active.
+          </p>
+          <p className='text-xs text-gray-500 dark:text-gray-400'>
+            Check back soon — the next one opens shortly.
+          </p>
+        </div>
       </section>
     );
   }
