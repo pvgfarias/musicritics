@@ -75,4 +75,4 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 ## License
 
-[Add a license, e.g. MIT, or note "Personal project — not licensed for reuse" if you'd rather keep it closed.]
+Personal project — not licensed for reuse.
