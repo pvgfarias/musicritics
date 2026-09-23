@@ -24,8 +24,6 @@ const fieldOptions: { value: SortField; label: string }[] = [
 export default function SortSelector({
   defaultField = 'recent',
 }: {
-  // Which field to treat as "no ?sort= param yet" — lets a page default to
-  // a different sort (e.g. 'user-score') without the label lying about it.
   defaultField?: SortField;
 } = {}) {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,8 +49,6 @@ export default function SortSelector({
       params.set('sort', field);
     }
 
-    // Only write `dir` when it differs from that field's default,
-    // keeps the URL clean for the common case
     if (direction === defaultDirectionForField[field]) {
       params.delete('dir');
     } else {
@@ -64,7 +60,6 @@ export default function SortSelector({
   };
 
   const handleFieldSelect = (field: SortField) => {
-    // Switching fields resets direction to that field's sensible default
     updateParams(field, defaultDirectionForField[field]);
     setIsOpen(false);
   };
@@ -107,7 +102,7 @@ export default function SortSelector({
           aria-haspopup='listbox'
           aria-expanded={isOpen}
           onClick={() => setIsOpen(prev => !prev)}
-          className='h-10 max-w-40 flex flex-row justify-between items-center rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-2 gap-1 text-gray-500 text-sm cursor-pointer'
+          className='h-10 max-w-40 flex flex-row justify-between items-center rounded-md border border-border bg-surface p-2 gap-1 text-text-secondary text-sm cursor-pointer'
         >
           <span className='select-none'>{currentLabel}</span>
           <IconChevronDown size={20} className={isOpen ? 'rotate-180' : ''} />
@@ -115,14 +110,14 @@ export default function SortSelector({
         {isOpen && (
           <ul
             role='listbox'
-            className='absolute top-full left-0 z-10 mt-1 rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-2 w-40 shadow-lg flex flex-col gap-1 text-sm'
+            className='absolute top-full left-0 z-10 mt-1 rounded-md border border-border bg-surface p-2 w-40 shadow-lg flex flex-col gap-1 text-sm'
           >
             {fieldOptions.map(opt => (
               <li
                 key={opt.value}
                 role='option'
                 aria-selected={currentField === opt.value}
-                className='cursor-pointer px-2 py-1.5 rounded hover:bg-foreground text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                className='cursor-pointer px-2 py-1.5 rounded hover:bg-accent-soft text-text-secondary hover:text-foreground'
                 onClick={() => handleFieldSelect(opt.value)}
               >
                 {opt.label}
@@ -137,7 +132,7 @@ export default function SortSelector({
         onClick={handleDirectionToggle}
         title={directionLabel}
         aria-label={directionLabel}
-        className='h-10 w-10 flex items-center justify-center rounded-md border border-gray-300 dark:border-slate-800 bg-foreground text-gray-500 hover:text-gray-900 dark:hover:text-white cursor-pointer'
+        className='h-10 w-10 flex items-center justify-center rounded-md border border-border bg-surface text-text-secondary hover:text-foreground cursor-pointer'
       >
         {currentDirection === 'desc' ? (
           <IconArrowDown size={18} />

@@ -32,7 +32,7 @@ model User {
 
   // Profile
   bio     String?
-  country String? // ISO 3166-1 alpha-2, same convention as Artist/Label
+  country String?
 
   // User album, track and comments.
   ratings         Rating[]
@@ -41,19 +41,26 @@ model User {
   favoriteAlbums  UserFavoriteAlbum[]
   favoriteArtists UserFavoriteArtist[]
 
-  // Follow graph — self-referential via the Follow join model.
-  // "Following" = rows where this user is the follower (people they follow).
-  // "Followers" = rows where this user is being followed (their followers).
+  // Follow graph
   following Follow[] @relation("Following")
   followers Follow[] @relation("Followers")
 
-  // Notifications — split into received (this user's inbox) and sent
-  // (actions this user triggered that notified someone else).
+  // Notifications
   notificationsReceived Notification[] @relation("NotificationsReceived")
   notificationsSent     Notification[] @relation("NotificationsSent")
 
+  // Rotation streak — consecutive rotations where the user rated every
+  // album before it closed. lastCompletedRotationId is both the
+  // consecutiveness check (compare against the rotation immediately
+  // before it) and an idempotency guard against double-incrementing.
+  rotationStreak          Int       @default(0)
+  longestRotationStreak   Int       @default(0)
+  lastCompletedRotationId String?
+  lastCompletedRotation   Rotation? @relation(fields: [lastCompletedRotationId], references: [id], onDelete: SetNull)
+
   @@map("user")
 }
+
 
 model UserFavoriteAlbum {
   // Max 10 per user — enforced in application code, not the schema.
@@ -367,9 +374,11 @@ model Rotation {
 
   albums RotationAlbum[]
 
-  // Notifications tied to this rotation's lifecycle (opening, closing
-  // soon, closed). Cascades with the rotation.
   notifications Notification[]
+
+  // Users whose streak-tracking currently points at this rotation as
+  // their most recently completed one.
+  usersCompletedHere User[]
 }
 
 model RotationAlbum {

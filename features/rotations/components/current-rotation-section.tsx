@@ -16,12 +16,12 @@ export default function CurrentRotationSection({
   if (!activeRotation) {
     return (
       <section className='mb-10'>
-        <div className='flex flex-col items-center gap-2 text-center py-10 px-4 rounded-md bg-gray-50 dark:bg-slate-900'>
-          <IconRefresh size={22} className='text-gray-400 dark:text-gray-500' />
-          <p className='text-sm text-gray-700 dark:text-gray-300'>
+        <div className='flex flex-col items-center gap-2 text-center py-10 px-4 rounded-md bg-surface border border-border'>
+          <IconRefresh size={22} className='text-text-secondary' />
+          <p className='text-sm text-foreground'>
             No rotation is currently active.
           </p>
-          <p className='text-xs text-gray-500 dark:text-gray-400'>
+          <p className='text-xs text-text-secondary'>
             Check back soon — the next one opens shortly.
           </p>
         </div>
@@ -39,23 +39,23 @@ export default function CurrentRotationSection({
     <section className='mb-10 flex flex-col gap-4'>
       <div className='flex flex-row items-center justify-between flex-wrap gap-2'>
         <div className='flex flex-col gap-1'>
-          <span className='font-mono text-xs text-ember tracking-[0.2em] uppercase flex items-center gap-1.5'>
-            <IconRefresh size={12} /> Current Rotation
+          <span className='font-mono text-xs text-text-secondary tracking-[0.2em] uppercase flex items-center gap-1.5'>
+            <IconRefresh size={12} className='text-ember' /> Current Rotation
           </span>
-          <h2 className='text-2xl font-title text-gray-950 dark:text-white'>
+          <h2 className='text-2xl font-title text-foreground'>
             {activeRotation.name}
           </h2>
-          <p className='font-mono text-xs text-gray-600 dark:text-gray-400'>
+          <p className='font-mono text-xs text-text-secondary'>
             {formatDateRange(activeRotation.startDate, activeRotation.endDate)}
           </p>
         </div>
 
         {isSignedIn ? (
           <div className='flex flex-col gap-1.5 w-full sm:w-64'>
-            <span className='font-mono text-xs text-gray-600 dark:text-gray-300 uppercase tracking-widest'>
+            <span className='font-mono text-xs text-text-secondary uppercase tracking-widest'>
               {ratedCount} of {total} rated
             </span>
-            <div className='h-2 w-full rounded-full bg-gray-200 dark:bg-slate-800 overflow-hidden'>
+            <div className='h-2 w-full rounded-full bg-border overflow-hidden'>
               <div
                 className='h-full bg-emerald-500 transition-all duration-300'
                 style={{ width: `${percent}%` }}
@@ -63,8 +63,8 @@ export default function CurrentRotationSection({
             </div>
           </div>
         ) : (
-          <p className='font-mono text-xs text-gray-500 dark:text-gray-400'>
-            <Link href='/sign-in' className='text-ember hover:underline'>
+          <p className='font-mono text-xs text-text-secondary'>
+            <Link href='/login' className='text-ember hover:underline'>
               Sign in
             </Link>{' '}
             to rate this week&apos;s albums.
@@ -79,7 +79,7 @@ export default function CurrentRotationSection({
           ))}
         </div>
       ) : (
-        <p className='font-mono text-sm text-gray-500 dark:text-gray-400'>
+        <p className='font-mono text-sm text-text-secondary'>
           No albums have been added to this rotation yet.
         </p>
       )}

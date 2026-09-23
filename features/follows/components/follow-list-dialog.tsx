@@ -28,9 +28,13 @@ type Props = {
   userId: string;
   followerCount: number;
   followingCount: number;
-  // Only the profile owner gets unfollow buttons in their own "following"
-  // list — viewing someone else's following list is read-only.
   isOwnProfile: boolean;
+  // Which tab opens first when triggered externally (e.g. dashboard's
+  // separate Followers/Following stat cards). Defaults to 'followers'.
+  initialTab?: Tab;
+  // Custom trigger markup (e.g. dashboard's StatCard). When omitted,
+  // falls back to the original inline "X followers / X following" text.
+  trigger?: React.ReactNode;
 };
 
 export function FollowListDialog({
@@ -38,9 +42,11 @@ export function FollowListDialog({
   followerCount,
   followingCount,
   isOwnProfile,
+  initialTab = 'followers',
+  trigger,
 }: Props) {
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<Tab>('followers');
+  const [tab, setTab] = useState<Tab>(initialTab);
 
   const [result, setResult] = useState<{ tab: Tab; users: ListUser[] } | null>(
     null
@@ -62,13 +68,12 @@ export function FollowListDialog({
 
   const users = result?.tab === tab ? result.users : null;
 
-  function openTo(initialTab: Tab) {
-    setTab(initialTab);
+  function openTo(t: Tab) {
+    setTab(t);
     setOpen(true);
   }
 
   function handleUnfollowed(targetId: string) {
-    // Optimistically drop them from the currently-shown list.
     setResult(prev =>
       prev
         ? { ...prev, users: prev.users.filter(u => u.id !== targetId) }
@@ -78,20 +83,26 @@ export function FollowListDialog({
 
   return (
     <>
-      <div className='flex flex-row gap-4 font-mono text-xs text-gray-500 dark:text-gray-400 uppercase'>
-        <button
-          onClick={() => openTo('followers')}
-          className='hover:text-ember'
-        >
-          {followerCount} followers
+      {trigger ? (
+        <button onClick={() => openTo(initialTab)} className='contents'>
+          {trigger}
         </button>
-        <button
-          onClick={() => openTo('following')}
-          className='hover:text-ember'
-        >
-          {followingCount} following
-        </button>
-      </div>
+      ) : (
+        <div className='flex flex-row gap-4 font-mono text-xs text-text-secondary uppercase'>
+          <button
+            onClick={() => openTo('followers')}
+            className='hover:text-ember'
+          >
+            {followerCount} followers
+          </button>
+          <button
+            onClick={() => openTo('following')}
+            className='hover:text-ember'
+          >
+            {followingCount} following
+          </button>
+        </div>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className='max-h-[70vh] overflow-y-auto p-4'>
@@ -101,7 +112,7 @@ export function FollowListDialog({
                 <button
                   onClick={() => setTab('followers')}
                   className={
-                    tab === 'followers' ? 'text-ember' : 'text-gray-500'
+                    tab === 'followers' ? 'text-ember' : 'text-text-secondary'
                   }
                 >
                   Followers
@@ -109,7 +120,7 @@ export function FollowListDialog({
                 <button
                   onClick={() => setTab('following')}
                   className={
-                    tab === 'following' ? 'text-ember' : 'text-gray-500'
+                    tab === 'following' ? 'text-ember' : 'text-text-secondary'
                   }
                 >
                   Following
@@ -118,13 +129,15 @@ export function FollowListDialog({
             </DialogTitle>
           </DialogHeader>
 
-          <div className='h-px bg-gray-300 dark:bg-slate-800' />
+          <div className='h-px bg-border' />
 
           <div className='flex flex-col gap-1 pt-2'>
             {users === null ? (
-              <p className='text-sm text-gray-500 py-4 text-center'>Loading…</p>
+              <p className='text-sm text-text-secondary py-4 text-center'>
+                Loading…
+              </p>
             ) : users.length === 0 ? (
-              <p className='text-sm text-gray-500 py-4 text-center'>
+              <p className='text-sm text-text-secondary py-4 text-center'>
                 {tab === 'followers'
                   ? 'No followers yet.'
                   : 'Not following anyone yet.'}
@@ -162,13 +175,13 @@ function FollowListRow({
   const [removed, setRemoved] = useState(false);
 
   function handleUnfollow() {
-    setRemoved(true); // optimistic
+    setRemoved(true);
     startTransition(async () => {
       try {
         await unfollowUser(user.id);
         onUnfollowed();
       } catch {
-        setRemoved(false); // revert on failure
+        setRemoved(false);
       }
     });
   }
@@ -176,7 +189,7 @@ function FollowListRow({
   if (removed) return null;
 
   return (
-    <div className='flex flex-row items-center gap-3 py-2 px-1 rounded-md hover:bg-gray-50 dark:hover:bg-slate-800'>
+    <div className='flex flex-row items-center gap-3 py-2 px-1 rounded-md hover:bg-accent-soft'>
       <Link
         href={`/users/${user.username}`}
         onClick={onNavigate}
@@ -190,11 +203,11 @@ function FollowListRow({
           className='rounded-full shrink-0'
         />
         <div className='flex flex-col min-w-0'>
-          <span className='text-sm font-medium text-gray-800 dark:text-gray-200'>
+          <span className='text-sm font-medium text-foreground'>
             {user.username}
           </span>
           {user.bio && (
-            <span className='text-xs text-gray-500 dark:text-gray-400 line-clamp-1'>
+            <span className='text-xs text-text-secondary line-clamp-1'>
               {user.bio}
             </span>
           )}
@@ -205,7 +218,7 @@ function FollowListRow({
         <button
           onClick={handleUnfollow}
           disabled={isPending}
-          className='shrink-0 rounded-md border border-gray-300 dark:border-slate-700 px-3 py-1 text-xs font-medium hover:bg-gray-100 dark:hover:bg-slate-700 disabled:opacity-50'
+          className='shrink-0 rounded-md border border-border px-3 py-1 text-xs font-medium hover:bg-accent-soft disabled:opacity-50'
         >
           Unfollow
         </button>

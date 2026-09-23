@@ -24,44 +24,47 @@ export default function Pagination({
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <nav className='flex flex-row items-center justify-center gap-2 mt-6 mb-6 text-gray-500 dark:text-white'>
-      <Link
-        href={hrefForPage(Math.max(1, currentPage - 1))}
-        aria-disabled={currentPage === 1}
-        className={`px-3 py-1 rounded-sm text-sm ${
-          currentPage === 1
-            ? 'pointer-events-none opacity-40'
-            : 'hover:bg-gray-200 dark:hover:bg-slate-800'
-        }`}
-      >
-        Prev
-      </Link>
+    <nav className='flex flex-row items-center justify-center gap-2 mt-6 mb-6 text-text-secondary'>
+      {currentPage === 1 ? (
+        <span className='px-3 py-1 rounded-sm text-sm opacity-40 cursor-not-allowed'>
+          Prev
+        </span>
+      ) : (
+        <Link
+          href={hrefForPage(currentPage - 1)}
+          className='px-3 py-1 rounded-sm text-sm hover:bg-accent-soft hover:text-foreground'
+        >
+          Prev
+        </Link>
+      )}
 
       {pages.map(page => (
         <Link
           key={page}
           href={hrefForPage(page)}
+          aria-current={page === currentPage ? 'page' : undefined}
           className={`px-3 py-1 rounded-sm text-sm ${
             page === currentPage
               ? 'bg-ember text-white'
-              : 'hover:bg-gray-200 dark:hover:bg-slate-800'
+              : 'hover:bg-accent-soft hover:text-foreground'
           }`}
         >
           {page}
         </Link>
       ))}
 
-      <Link
-        href={hrefForPage(Math.min(totalPages, currentPage + 1))}
-        aria-disabled={currentPage === totalPages}
-        className={`px-3 py-1 rounded-sm text-sm ${
-          currentPage === totalPages
-            ? 'pointer-events-none opacity-40'
-            : 'hover:bg-gray-200 dark:hover:bg-slate-800'
-        }`}
-      >
-        Next
-      </Link>
+      {currentPage === totalPages ? (
+        <span className='px-3 py-1 rounded-sm text-sm opacity-40 cursor-not-allowed'>
+          Next
+        </span>
+      ) : (
+        <Link
+          href={hrefForPage(currentPage + 1)}
+          className='px-3 py-1 rounded-sm text-sm hover:bg-accent-soft hover:text-foreground'
+        >
+          Next
+        </Link>
+      )}
     </nav>
   );
 }

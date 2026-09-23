@@ -120,11 +120,6 @@ export async function createRotation(
   revalidatePath('/dashboard/rotations');
   return { success: true, rotationId: rotation.id };
 }
-
-// ──────────────────────────────
-// Close
-// ──────────────────────────────
-
 export async function closeRotation(rotationId: string): Promise<ActionResult> {
   const allowed = await requirePermission({ album: ['finalize'] });
   if (!allowed) throw new Error('Unauthorized');
@@ -163,9 +158,9 @@ export async function closeRotation(rotationId: string): Promise<ActionResult> {
     }
   });
 
-  // Notify everyone who rated at least one album in this rotation — not
-  // a blanket "all users" blast like ROTATION_OPENING, since only raters
-  // have a stake in "your scores are now public."
+  await advanceRotationStreaksOnClose(rotation);
+
+  // Notify everyone who rated at least one album in this rotation
   const raters = await prisma.rating.findMany({
     where: { albumId: { in: openAlbums.map(a => a.albumId) } },
     select: { userId: true },
@@ -183,6 +178,82 @@ export async function closeRotation(rotationId: string): Promise<ActionResult> {
   revalidatePath('/dashboard/rotations');
   revalidatePath('/dashboard/albums');
   return { success: true };
+}
+
+// ──────────────────────────────
+// Streaks
+// ──────────────────────────────
+
+async function advanceRotationStreaksOnClose(rotation: {
+  id: string;
+  startDate: Date;
+}) {
+  const rotationWithCount = await prisma.rotation.findUnique({
+    where: { id: rotation.id },
+    select: { _count: { select: { albums: true } } },
+  });
+  const albumCount = rotationWithCount?._count.albums ?? 0;
+  if (albumCount === 0) return;
+
+  const threshold = Math.ceil(albumCount * 0.8);
+
+  const previousRotation = await prisma.rotation.findFirst({
+    where: { startDate: { lt: rotation.startDate } },
+    orderBy: { startDate: 'desc' },
+    select: { id: true },
+  });
+
+  // Everyone who rated at least `threshold` albums in this rotation.
+  const raters = await prisma.rating.groupBy({
+    by: ['userId'],
+    where: { album: { rotations: { some: { rotationId: rotation.id } } } },
+    _count: { albumId: true },
+    having: { albumId: { _count: { gte: threshold } } },
+  });
+  const qualifyingUserIds = new Set(raters.map(r => r.userId));
+
+  // Advance streaks for everyone who qualified this time.
+  for (const userId of qualifyingUserIds) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        lastCompletedRotationId: true,
+        rotationStreak: true,
+        longestRotationStreak: true,
+      },
+    });
+    if (!user || user.lastCompletedRotationId === rotation.id) continue;
+
+    const isConsecutive =
+      previousRotation !== null &&
+      user.lastCompletedRotationId === previousRotation.id;
+
+    const newStreak = isConsecutive ? user.rotationStreak + 1 : 1;
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        rotationStreak: newStreak,
+        longestRotationStreak: Math.max(newStreak, user.longestRotationStreak),
+        lastCompletedRotationId: rotation.id,
+      },
+    });
+  }
+
+  // Reset anyone whose streak was tied to the PREVIOUS rotation but who
+  // didn't qualify this time — their streak is now broken, not just stale.
+  if (previousRotation) {
+    await prisma.user.updateMany({
+      where: {
+        lastCompletedRotationId: previousRotation.id,
+        id: { notIn: Array.from(qualifyingUserIds) },
+      },
+      data: {
+        rotationStreak: 0,
+        lastCompletedRotationId: null,
+      },
+    });
+  }
 }
 
 // ──────────────────────────────

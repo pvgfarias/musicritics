@@ -23,12 +23,6 @@ export default function GenreSelector({ genres }: { genres: Genre[] }) {
     currentGenre?.name ?? null
   );
 
-  // Adjusting state during render (not in an effect) to sync `selectedName`
-  // whenever `currentSlug` changes out from under us — e.g. browser
-  // back/forward, or the URL being edited elsewhere. This runs during the
-  // render itself rather than as a post-render effect, so it doesn't cause
-  // the extra render pass the warning was about.
-  // See: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
   const [prevSlug, setPrevSlug] = useState<string | null>(currentSlug);
   if (currentSlug !== prevSlug) {
     setPrevSlug(currentSlug);
@@ -54,7 +48,7 @@ export default function GenreSelector({ genres }: { genres: Genre[] }) {
   function handleGenreUpdate(slug: string | null, name: string | null) {
     selectGenre(slug);
     setSelectedName(name);
-    setPrevSlug(slug); // keep this in sync too, since we're setting selectedName manually here
+    setPrevSlug(slug);
     setQuery('');
     setResults([]);
     runSearch.cancel();
@@ -101,7 +95,7 @@ export default function GenreSelector({ genres }: { genres: Genre[] }) {
         aria-haspopup='listbox'
         aria-expanded={isOpen}
         onClick={() => setIsOpen(prev => !prev)}
-        className='h-10 max-w-40 flex flex-row justify-between items-center rounded-md border border-gray-300 dark:border-slate-800 bg-foreground p-2 gap-1 text-gray-500 text-sm cursor-pointer'
+        className='h-10 max-w-40 flex flex-row justify-between items-center rounded-md border border-border bg-surface p-2 gap-1 text-text-secondary text-sm cursor-pointer'
       >
         <span className='select-none truncate'>{selectedName || 'Genre'}</span>
         <IconChevronDown
@@ -111,18 +105,18 @@ export default function GenreSelector({ genres }: { genres: Genre[] }) {
       </button>
 
       {isOpen && (
-        <div className='absolute top-full left-0 z-10 mt-1 rounded-md border border-gray-300 dark:border-slate-800 bg-foreground shadow-lg w-56 flex flex-col text-sm'>
-          <div className='relative p-2 border-b border-gray-200 dark:border-slate-800'>
+        <div className='absolute top-full left-0 z-10 mt-1 rounded-md border border-border bg-surface shadow-lg w-56 flex flex-col text-sm'>
+          <div className='relative p-2 border-b border-border'>
             <IconSearch
               size={14}
-              className='absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none'
+              className='absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none'
             />
             <input
               ref={inputRef}
               value={query}
               onChange={e => handleQueryChange(e.target.value)}
               placeholder='Search genres…'
-              className='w-full rounded-md border border-gray-300 dark:border-slate-800 bg-transparent pl-7 pr-2 py-1.5 text-sm text-gray-900 dark:text-white outline-none focus:border-gray-400 dark:focus:border-slate-600'
+              className='w-full rounded-md border border-border bg-transparent pl-7 pr-2 py-1.5 text-sm text-foreground outline-none focus:border-ember/50'
             />
           </div>
 
@@ -134,7 +128,7 @@ export default function GenreSelector({ genres }: { genres: Genre[] }) {
               <li
                 role='option'
                 aria-selected={!currentSlug}
-                className='inline-flex items-center w-full cursor-pointer px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                className='inline-flex items-center w-full cursor-pointer px-2 py-1.5 rounded hover:bg-accent-soft text-text-secondary hover:text-foreground'
                 onClick={() => handleGenreUpdate(null, null)}
               >
                 All
@@ -142,16 +136,20 @@ export default function GenreSelector({ genres }: { genres: Genre[] }) {
             )}
 
             {isPending ? (
-              <li className='px-2 py-1.5 text-xs text-gray-400'>Searching…</li>
+              <li className='px-2 py-1.5 text-xs text-text-secondary'>
+                Searching…
+              </li>
             ) : query && listItems.length === 0 ? (
-              <li className='px-2 py-1.5 text-xs text-gray-400'>No matches</li>
+              <li className='px-2 py-1.5 text-xs text-text-secondary'>
+                No matches
+              </li>
             ) : (
               listItems.map(genre => (
                 <li
                   key={genre.slug}
                   role='option'
                   aria-selected={currentSlug === genre.slug}
-                  className='inline-flex items-center w-full cursor-pointer px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                  className='inline-flex items-center w-full cursor-pointer px-2 py-1.5 rounded hover:bg-accent-soft text-text-secondary hover:text-foreground'
                   onClick={() => handleGenreUpdate(genre.slug, genre.name)}
                 >
                   {genre.name}

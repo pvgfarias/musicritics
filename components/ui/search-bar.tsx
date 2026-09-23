@@ -24,8 +24,8 @@ export default function SearchBar({
   }, 300);
 
   return (
-    <div className='flex-1 min-w-0 max-w-96 h-10 flex flex-row justify-start items-center gap-2 p-2 rounded-md border border-gray-300 dark:border-slate-800 bg-foreground text-sm placeholder:text-gray-500 text-gray-900 dark:text-white'>
-      <IconSearch size={20} className='text-gray-500' />
+    <div className='flex-1 min-w-0 max-w-96 h-10 flex flex-row justify-start items-center gap-2 p-2 rounded-md border border-border bg-surface text-sm placeholder:text-text-secondary text-foreground'>
+      <IconSearch size={20} className='text-text-secondary' />
       <input
         type='search'
         placeholder={placeholder}
