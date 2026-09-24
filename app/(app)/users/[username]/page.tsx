@@ -31,7 +31,7 @@ export default async function UserProfilePage({
           alt={profile.username}
           width={96}
           height={96}
-          className='rounded-full'
+          className='size-24 shrink-0 rounded-full object-cover'
         />
         <div className='flex flex-col gap-2 grow'>
           <div className='flex flex-col gap-2 grow'>

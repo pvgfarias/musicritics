@@ -7,28 +7,40 @@ datasource db {
   provider = "postgresql"
 }
 
+
 // ──────────────────────────────
-// Auth
+// User related
+// - User
+// - Session
+// - Account
+// - User favorite albums
+// - User faovrite artists
+// - Verification
 // ──────────────────────────────
 
 model User {
   id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Identity 
   email           String   @unique
   emailVerified   Boolean  @default(false)
   username        String   @unique
   displayUsername String?
   name            String?
   image           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 
-  // Auth related
+  // Auth relations
+  sessions   Session[]
+  accounts   Account[]
+
+  // Admin and moderation
   role       String    @default("user")
   banned     Boolean?  @default(false)
   banReason  String?
   banExpires DateTime?
-  sessions   Session[]
-  accounts   Account[]
+
 
   // Profile
   bio     String?
@@ -49,53 +61,13 @@ model User {
   notificationsReceived Notification[] @relation("NotificationsReceived")
   notificationsSent     Notification[] @relation("NotificationsSent")
 
-  // Rotation streak — consecutive rotations where the user rated every
-  // album before it closed. lastCompletedRotationId is both the
-  // consecutiveness check (compare against the rotation immediately
-  // before it) and an idempotency guard against double-incrementing.
+  // Streak
   rotationStreak          Int       @default(0)
   longestRotationStreak   Int       @default(0)
   lastCompletedRotationId String?
   lastCompletedRotation   Rotation? @relation(fields: [lastCompletedRotationId], references: [id], onDelete: SetNull)
 
   @@map("user")
-}
-
-
-model UserFavoriteAlbum {
-  // Max 10 per user — enforced in application code, not the schema.
-  id       String @id @default(cuid())
-  position Int // display order, e.g. 1–5 or 1–10
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  albumId String
-  album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@unique([userId, albumId])
-  @@unique([userId, position])
-  @@index([albumId])
-}
-
-model UserFavoriteArtist {
-  // Max 10 per user — enforced in application code, not the schema.
-  id       String @id @default(cuid())
-  position Int
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  artistId String
-  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-
-  @@unique([userId, artistId])
-  @@unique([userId, position])
-  @@index([artistId])
 }
 
 model Session {
@@ -147,48 +119,49 @@ model Verification {
   @@index([identifier])
 }
 
+model UserFavoriteAlbum {
+
+  // max 10 albums
+  id       String @id @default(cuid())
+  position Int 
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  albumId String
+  album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, albumId])
+  @@unique([userId, position])
+  @@index([albumId])
+}
+
+model UserFavoriteArtist {
+  
+  // max 10 artists
+  id       String @id @default(cuid())
+  position Int
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  artistId String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, artistId])
+  @@unique([userId, position])
+  @@index([artistId])
+}
+
+
 // ──────────────────────────────
-// Enums
-// ──────────────────────────────
-
-enum StreamingPlatform {
-  SPOTIFY
-  APPLE_MUSIC
-  DEEZER
-  TIDAL
-  YOUTUBE_MUSIC
-  SOUNDCLOUD
-  BANDCAMP
-  AMAZON_MUSIC
-  OTHER
-}
-
-enum ReleaseType {
-  LP
-  EP
-  SINGLE
-  COMPILATION
-  LIVE
-  MIXTAPE
-  SOUNDTRACK
-}
-
-enum ArtistRole {
-  PRIMARY
-  FEATURED
-  PRODUCER
-}
-
-enum NotificationType {
-  NEW_FOLLOWER
-  ROTATION_OPENING
-  ROTATION_CLOSING_SOON
-  ROTATION_CLOSED
-  NEW_COMMENT
-}
-
-// ──────────────────────────────
-// Core content
+// Artist
+// - Artist
+// - Label
 // ──────────────────────────────
 
 model Artist {
@@ -218,6 +191,15 @@ model Label {
   albums Album[]
 }
 
+// ──────────────────────────────
+// Album
+// - Album
+// - Release Type (enum)
+// - Track
+// - Album Artist
+// - ArtistRole (enum)
+// ──────────────────────────────
+
 model Album {
   id          String       @id @default(cuid())
   title       String
@@ -242,11 +224,20 @@ model Album {
   rotations      RotationAlbum[]
   favoritedBy    UserFavoriteAlbum[]
 
-  // Notifications that reference this album (e.g. a comment on one of
-  // its ratings). Cascades — if the album goes, so do its notifications.
+  // Notifications related to this album
   notifications Notification[]
 
   @@index([labelId])
+}
+
+enum ReleaseType {
+  LP
+  EP
+  SINGLE
+  COMPILATION
+  LIVE
+  MIXTAPE
+  SOUNDTRACK
 }
 
 model Track {
@@ -263,6 +254,12 @@ model Track {
   @@index([albumId])
 }
 
+enum ArtistRole {
+  PRIMARY
+  FEATURED
+  PRODUCER
+}
+
 model AlbumArtist {
   album    Album      @relation(fields: [albumId], references: [id], onDelete: Cascade)
   albumId  String
@@ -276,6 +273,9 @@ model AlbumArtist {
 
 // ──────────────────────────────
 // Ratings & comments
+// - Rating
+// - Track rating (individual)
+// - Comment
 // ──────────────────────────────
 
 model Rating {
@@ -332,13 +332,15 @@ model Comment {
   trackRatingId String?      @unique
   trackRating   TrackRating? @relation(fields: [trackRatingId], references: [id], onDelete: Cascade)
 
-  // Notifications generated by this comment (e.g. "new comment" pings to
-  // the rating's owner). Cascades — deleting the comment clears them too.
+  // notifcation caused by the comment
   notifications Notification[]
 }
 
 // ──────────────────────────────
-// Streaming links (shared: album or artist)
+// Streaming links: can exist on
+// artist or album.
+// - StreamingLink
+// - StreamingPlatform (enum)
 // ──────────────────────────────
 
 model StreamingLink {
@@ -358,8 +360,22 @@ model StreamingLink {
   @@index([artistId])
 }
 
+enum StreamingPlatform {
+  SPOTIFY
+  APPLE_MUSIC
+  DEEZER
+  TIDAL
+  YOUTUBE_MUSIC
+  SOUNDCLOUD
+  BANDCAMP
+  AMAZON_MUSIC
+  OTHER
+}
+
 // ──────────────────────────────
-// Rotations (weekly rating cycles)
+// Rotations (weekly cycles)
+// - Rotation
+// - RotationAlbum
 // ──────────────────────────────
 
 model Rotation {
@@ -375,9 +391,9 @@ model Rotation {
   albums RotationAlbum[]
 
   notifications Notification[]
-
-  // Users whose streak-tracking currently points at this rotation as
-  // their most recently completed one.
+  
+  // Users whose most recently completed rotation (for streak
+  // tracking) is this one. Other side of User.lastCompletedRotation.
   usersCompletedHere User[]
 }
 
@@ -388,7 +404,7 @@ model RotationAlbum {
   rotation   Rotation @relation(fields: [rotationId], references: [id], onDelete: Cascade)
   album      Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
 
-  // Snapshot only: write Album.averageRating/ratingCount into these once,
+  // Snapshot only: copied from Album.averageRating/ratingCount once,
   // at closedAt. Not a live aggregate — do not keep in sync afterward.
   averageRating Float?
   ratingCount   Int       @default(0)
@@ -400,6 +416,9 @@ model RotationAlbum {
 
 // ──────────────────────────────
 // Genres
+// - Genre
+// - AlbumGenre
+// - ArtistGenre
 // ──────────────────────────────
 
 model Genre {
@@ -441,6 +460,7 @@ model ArtistGenre {
 
 // ──────────────────────────────
 // Social graph
+// - Follow
 // ──────────────────────────────
 
 model Follow {
@@ -460,6 +480,8 @@ model Follow {
 
 // ──────────────────────────────
 // Notifications
+// - Notification
+// - NotificationType
 // ──────────────────────────────
 
 model Notification {
@@ -489,4 +511,13 @@ model Notification {
 
   @@index([userId, read])
   @@index([userId, createdAt])
+}
+
+
+enum NotificationType {
+  NEW_FOLLOWER
+  ROTATION_OPENING
+  ROTATION_CLOSING_SOON
+  ROTATION_CLOSED
+  NEW_COMMENT
 }

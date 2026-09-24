@@ -14,10 +14,7 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
 
   user: {
-    // Off by default in better-auth — needed for the account settings page
-    // to be able to change email at all. Reuses the same
-    // emailVerification.sendVerificationEmail callback below to verify the
-    // new address before the change takes effect.
+    // new email needs to be verified if the user changes it
     changeEmail: {
       enabled: true,
     },
@@ -43,6 +40,17 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      mapProfileToUser: profile => {
+        const base =
+          profile.email
+            .split('@')[0]
+            .toLowerCase()
+            .replace(/[^a-z0-9_]/g, '')
+            .slice(0, 20) || 'user';
+        const suffix = Math.random().toString(36).slice(2, 6);
+        const username = `${base}_${suffix}`;
+        return { username, displayUsername: username };
+      },
     },
   },
 
@@ -57,6 +65,5 @@ export const auth = betterAuth({
   ],
 });
 
-// Infer and export types directly from the auth instance
 export type Session = typeof auth.$Infer.Session;
 export type User = typeof auth.$Infer.Session.user;

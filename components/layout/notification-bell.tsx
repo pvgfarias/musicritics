@@ -13,6 +13,9 @@ import {
 import { formatNotification } from '@/features/notifications/format';
 import type { NotificationWithRelations } from '@/features/notifications/queries';
 
+const itemClass =
+  'block w-full text-left rounded-md outline-none cursor-pointer select-none data-[highlighted]:bg-sidebar-active';
+
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -77,7 +80,7 @@ export default function NotificationBell() {
         <button
           type='button'
           aria-label='Notifications'
-          className='relative flex items-center justify-center w-9 h-9 rounded-md text-dark-blue dark:text-slate-200 hover:bg-sidebar-active shrink-0'
+          className='relative flex items-center justify-center w-9 h-9 rounded-md text-dark-blue dark:text-slate-200 outline-none hover:bg-sidebar-active focus-visible:ring-2 focus-visible:ring-orange-600/50 shrink-0'
         >
           <IconBell size={18} />
           {unreadCount > 0 && (
@@ -90,26 +93,27 @@ export default function NotificationBell() {
 
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          side='right'
+          side='bottom'
           align='end'
-          sideOffset={14}
+          sideOffset={18}
           collisionPadding={10}
           className={cn(
             'w-80 rounded-2xl bg-sidebar border border-dark-blue/5 dark:border-white/5',
             'text-dark-blue dark:text-slate-200 shadow-xl',
-            'py-2 px-2 flex flex-col gap-1 z-1000',
+            'p-1.5 flex flex-col z-1000',
             'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
-            'data-[side=right]:slide-in-from-left-1 data-[side=left]:slide-in-from-right-1'
+            'data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1'
           )}
         >
-          <div className='flex items-center justify-between px-2 py-1'>
+          <div className='flex items-center justify-between px-2.5 py-2'>
             <span className='text-sm font-medium'>Notifications</span>
             {unreadCount > 0 && (
               <button
+                type='button'
                 onClick={handleMarkAllRead}
                 disabled={isPending}
-                className='flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-ember disabled:opacity-50'
+                className='flex items-center gap-1 rounded text-xs text-gray-500 dark:text-gray-400 outline-none hover:text-ember focus-visible:text-ember disabled:opacity-50'
               >
                 <IconCheck size={12} />
                 Mark all read
@@ -117,9 +121,9 @@ export default function NotificationBell() {
             )}
           </div>
 
-          <div className='mx-2 h-px bg-dark-blue/10 dark:bg-white/10' />
+          <DropdownMenu.Separator className='-mx-1.5 mb-1.5 h-px bg-dark-blue/10 dark:bg-white/10' />
 
-          <div className='max-h-96 overflow-y-auto flex flex-col gap-0.5 pt-1'>
+          <div className='max-h-96 overflow-y-auto flex flex-col gap-0.5'>
             {notifications === null ? (
               <p className='px-2 py-6 text-sm text-center text-gray-500 dark:text-gray-400'>
                 Loading…
@@ -134,12 +138,12 @@ export default function NotificationBell() {
                 const content = (
                   <div
                     className={cn(
-                      'flex items-start gap-2 py-2 px-2 rounded-md text-sm',
+                      'flex items-start gap-2 px-2.5 py-2 rounded-md text-sm',
                       !n.read && 'bg-ember/5'
                     )}
                   >
                     {!n.read && (
-                      <span className='mt-1.5 w-1.5 h-1.5 rounded-full bg-ember shrink-0' />
+                      <span className='mt-1.5 size-1.5 rounded-full bg-ember shrink-0' />
                     )}
                     <span
                       className={cn(
@@ -153,31 +157,28 @@ export default function NotificationBell() {
                   </div>
                 );
 
-                return (
-                  <DropdownMenu.Item key={n.id} asChild>
-                    {href ? (
-                      <Link
-                        href={href}
-                        onClick={() => handleItemClick(n)}
-                        className='outline-none hover:bg-sidebar-active rounded-md focus-visible:bg-sidebar-active'
-                      >
-                        {content}
-                      </Link>
-                    ) : (
-                      <button
-                        onClick={() => handleItemClick(n)}
-                        className='w-full text-left outline-none hover:bg-sidebar-active rounded-md focus-visible:bg-sidebar-active'
-                      >
-                        {content}
-                      </button>
-                    )}
+                return href ? (
+                  <DropdownMenu.Item
+                    key={n.id}
+                    asChild
+                    onSelect={() => handleItemClick(n)}
+                  >
+                    <Link href={href} className={itemClass}>
+                      {content}
+                    </Link>
+                  </DropdownMenu.Item>
+                ) : (
+                  <DropdownMenu.Item
+                    key={n.id}
+                    onSelect={() => handleItemClick(n)}
+                    className={itemClass}
+                  >
+                    {content}
                   </DropdownMenu.Item>
                 );
               })
             )}
           </div>
-
-          <DropdownMenu.Arrow width={12} height={8} className='fill-sidebar' />
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>

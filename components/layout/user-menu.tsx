@@ -3,16 +3,25 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import Link from 'next/link';
 import Image from 'next/image';
-import { IconLogout, IconSettings, IconUser } from '@tabler/icons-react';
+import {
+  IconLogout,
+  IconMoon,
+  IconSettings,
+  IconUser,
+} from '@tabler/icons-react';
+import { setDarkMode, ThemeSwitch, useIsDarkMode } from './theme-toggle';
 import { cn } from '@/lib/utils';
-import ThemeToggle from './theme-toggle';
 import { useRouter } from 'next/navigation';
 import { authClient, useSession } from '@/features/auth/auth-client';
+
+const itemClass =
+  'flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-sm font-medium outline-none cursor-pointer select-none data-[highlighted]:bg-sidebar-active';
 
 export default function UserMenu() {
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user;
+  const isDark = useIsDarkMode();
 
   async function handleLogout() {
     await authClient.signOut({
@@ -32,14 +41,14 @@ export default function UserMenu() {
       <DropdownMenu.Trigger asChild>
         <button
           type='button'
-          className='flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-slate-800'
+          className='flex items-center gap-2 rounded-md px-2 py-1.5 outline-none hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-orange-600/50 dark:hover:bg-slate-800'
         >
           <Image
             src={user.image ?? '/user.png'}
             alt={user.name ?? 'User avatar'}
             width={28}
             height={28}
-            className='rounded-full shrink-0'
+            className='size-7 shrink-0 rounded-full object-cover'
           />
           <span className='hidden sm:inline text-sm text-gray-800 dark:text-gray-200 whitespace-nowrap'>
             {user.displayUsername ?? user.username ?? user.name}
@@ -51,54 +60,54 @@ export default function UserMenu() {
         <DropdownMenu.Content
           side='bottom'
           align='end'
-          sideOffset={10}
+          sideOffset={16}
           collisionPadding={10}
           className={cn(
             'w-56 rounded-2xl bg-sidebar border border-dark-blue/5 dark:border-white/5',
             'text-dark-blue dark:text-slate-200 shadow-xl',
-            'py-2 px-4 flex flex-col gap-2 z-1000',
+            'p-1.5 flex flex-col z-1000',
             'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
             'data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1'
           )}
+          onCloseAutoFocus={e => e.preventDefault()}
         >
           <DropdownMenu.Item asChild>
-            <Link
-              href={`/users/${user.username}`}
-              className='flex py-2 items-center gap-2 text-sm font-medium rounded-md px-1 outline-none hover:bg-sidebar-active focus-visible:bg-sidebar-active'
-            >
+            <Link href={`/users/${user.username}`} className={itemClass}>
               <IconUser size={18} />
               Profile
             </Link>
           </DropdownMenu.Item>
 
           <DropdownMenu.Item asChild>
-            <Link
-              href='/settings'
-              className='flex py-2 items-center gap-2 text-sm font-medium rounded-md px-1 outline-none hover:bg-sidebar-active focus-visible:bg-sidebar-active'
-            >
+            <Link href='/settings' className={itemClass}>
               <IconSettings size={18} />
               Settings
             </Link>
           </DropdownMenu.Item>
 
-          <div className='px-1'>
-            <ThemeToggle />
-          </div>
+          <DropdownMenu.CheckboxItem
+            checked={isDark}
+            onCheckedChange={checked => setDarkMode(checked === true)}
+            onSelect={e => e.preventDefault()}
+            className={itemClass}
+          >
+            <IconMoon size={18} />
+            Dark mode
+            <span className='ml-auto'>
+              <ThemeSwitch checked={isDark} />
+            </span>
+          </DropdownMenu.CheckboxItem>
 
-          <div className='mx-4 h-px bg-dark-blue/10 dark:bg-white/10' />
+          <DropdownMenu.Separator className='-mx-1.5 my-1.5 h-px bg-dark-blue/10 dark:bg-white/10' />
 
-          <DropdownMenu.Item asChild>
-            <button
-              onClick={handleLogout}
-              className='flex py-2 items-center gap-2 text-sm font-medium rounded-md px-1 outline-none text-red-600 hover:bg-sidebar-active dark:text-red-400 focus-visible:bg-sidebar-active'
-            >
-              <IconLogout size={18} />
-              Sign out
-            </button>
+          <DropdownMenu.Item
+            onSelect={handleLogout}
+            className={cn(itemClass, 'text-red-600 dark:text-red-400')}
+          >
+            <IconLogout size={18} />
+            Sign out
           </DropdownMenu.Item>
-
-          <DropdownMenu.Arrow width={12} height={8} className='fill-sidebar' />
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>
